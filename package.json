@@ -2,7 +2,7 @@
   "name": "api",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -11,6 +11,8 @@
   "dependencies": {
     "crypto": "^1.0.1",
     "js-sha256": "^0.6.0",
-    "request": "^2.83.0"
+    "request": "^2.83.0",
+    "mcrypt": "^0.1.12",
+    "querystring": "^0.2.0",
   }
 }
