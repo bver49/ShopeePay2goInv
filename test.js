@@ -5,7 +5,9 @@ var hashIV = 'N3eQ2vLZrXxCNgzx';
 var taxRate = 0.05;
 var MCrypt = require('mcrypt').MCrypt;
 var rijEcb = new MCrypt('rijndael-128','cbc');
+var emailReg = new RegExp(/[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/i);
 rijEcb.open(hashKey,hashIV);
+
 var shopeeData = {
 	ordersn : Math.floor(Date.now() / 1000),
 	recipient_address:{
@@ -17,7 +19,8 @@ var shopeeData = {
 		variation_discounted_price:"500",
 		variation_quantity_purchased:"2"
 	}],
-	total_amount:"1050"
+	total_amount:"1050",
+	message_to_seller:"需要發票test@gmail.com"
 }
 
 var data = {
@@ -28,7 +31,7 @@ var data = {
 	Status:"1",
 	Category: "B2C",
 	BuyerName: shopeeData.recipient_address.name,
-	BuyerEmail: "test@gmail.com",
+	BuyerEmail: shopeeData.message_to_seller.match(emailReg) ? shopeeData.message_to_seller.match(emailReg)[0] : "default@gmail.com"),
 	PrintFlag: "Y",
 	TaxType: "1",
 	TaxRate: "5",
