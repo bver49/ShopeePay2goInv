@@ -6,8 +6,8 @@ var secret = require('./config').secret;;
 var hashKey = require('./config').hashKey;
 var hashIV = require('./config').hashIV;
 var taxRate = 0.05;
-var rijEcb = new MCrypt('rijndael-128','cbc');
-rijEcb.open(hashKey,hashIV);
+var rijEcb = new MCrypt('rijndael-128', 'cbc');
+rijEcb.open(hashKey, hashIV);
 var emailReg = new RegExp(/[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/i);
 
 function dateToTs(date) {
@@ -78,27 +78,26 @@ function getOrderDetail(orders, cb) {
 }
 
 //pay2go
-function countOrigin(amount){
- return Math.round(amount/1.05);
+function countOrigin(amount) {
+	return Math.round(amount / 1.05);
 }
 
-function countTax(amount){
- return Math.round(amount-(amount/1.05));
+function countTax(amount) {
+	return Math.round(amount - (amount / 1.05));
 }
 
-function arrobjToStr(arr,title){
+function arrobjToStr(arr, title) {
 	var str = "";
-	for(var i in arr){
-		if(typeof title==="string"){
-			if(title=="item_name"){
+	for (var i in arr) {
+		if (typeof title === "string") {
+			if (title == "item_name") {
 				arr[i][title] = arr[i][title].split(" ")[0];
 			}
-			str+=arr[i][title];
+			str += arr[i][title];
+		} else {
+			str += (arr[i].variation_quantity_purchased * arr[i].variation_discounted_price);
 		}
-		else{
-			str+=(arr[i].variation_quantity_purchased * arr[i].variation_discounted_price);
-		}
-	  if(i!=arr.length-1) str+="|"
+		if (i != arr.length - 1) str += "|"
 	}
 	return str;
 }
@@ -129,28 +128,32 @@ function genInvoice(shopeeData) {
 		TaxRate: "5",
 		Amt: countOrigin(shopeeData.total_amount), //銷售額(未稅)
 		TaxAmt: countTax(shopeeData.total_amount), //發票稅額
-		TotalAmt: shopeeData.total_amount-shopeeData.estimated_shipping_fee, //發票總金額(含稅) 扣掉運費
-		ItemName: arrobjToStr(shopeeData.items,'item_name'), //商品名稱以 | 分隔
-		ItemCount: arrobjToStr(shopeeData.items,'variation_quantity_purchased'), //商品數量以 |分隔
-		ItemUnit: arrobjToStr(shopeeData.items,'item_sku'), //單位以 | 分隔
-		ItemPrice: arrobjToStr(shopeeData.items,'variation_discounted_price'), //單價以 | 分隔
+		TotalAmt: shopeeData.total_amount, //發票總金額(含稅) 商品價格+運費
+		ItemName: arrobjToStr(shopeeData.items, 'item_name'), //商品名稱以 | 分隔
+		ItemCount: arrobjToStr(shopeeData.items, 'variation_quantity_purchased'), //商品數量以 |分隔
+		ItemUnit: arrobjToStr(shopeeData.items, 'item_sku'), //單位以 | 分隔
+		ItemPrice: arrobjToStr(shopeeData.items, 'variation_discounted_price'), //單價以 | 分隔
 		ItemAmt: arrobjToStr(shopeeData.items) //含稅金額以 | 分隔
 	}
-	console.log(data);
-	request({
-		method: 'post',
-		url: 'https://cinv.pay2go.com/api/invoice_issue',
-		formData: {
-			MerchantID_: '3709908',
-			PostData_: postdata(data)
-		}
-	}, function(e, r, b) {
-		console.log(b);
-	});
+	if (shopeeData.order_status == "COMPLETED") {
+		request({
+			method: 'post',
+			url: 'https://cinv.pay2go.com/api/invoice_issue',
+			formData: {
+				MerchantID_: '3709908',
+				PostData_: postdata(data)
+			}
+		}, function(e, r, b) {
+			console.log(b);
+		});
+	} else {
+		console.log("order not complete");
+	}
 }
 
 getOrderList(dateToTs("2017/10/1"), dateToTs("2017/10/10"), 0, function(list, more) {
-	getOrderDetail(list[2].ordersn, function(order) {
+	getOrderDetail(list[1].ordersn, function(order) {
+		console.log(order);
 		genInvoice(order)
 	});
 });
