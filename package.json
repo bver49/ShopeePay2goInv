@@ -9,10 +9,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "body-parser": "^1.18.2",
     "crypto": "^1.0.1",
+    "express": "^4.16.2",
     "js-sha256": "^0.6.0",
-    "request": "^2.83.0",
     "mcrypt": "^0.1.12",
-    "querystring": "^0.2.0"
+    "querystring": "^0.2.0",
+    "request": "^2.83.0"
   }
 }
