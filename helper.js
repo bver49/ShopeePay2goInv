@@ -28,8 +28,8 @@ module.exports.getOrderList = function(tf, tt, page, cb) {
 		"shopid": require('./config').shopid,
 		"partner_id": require('./config').partner_id,
 		"timestamp": Math.floor(new Date().getTime() / 1000),
-		"create_time_to": tt,
-		"create_time_from": tf,
+		"create_time_to": dateToTs(tt),
+		"create_time_from": dateToTs(tf),
 		"pagination_entries_per_page": 100, //一頁呈現的訂單數目
 		"pagination_offset": Number(page) //第幾頁
 	}
