@@ -2,17 +2,11 @@ var crypto = require('crypto');
 var request = require('request');
 var qs = require('querystring');
 var MCrypt = require('mcrypt').MCrypt;
-var secret = require('./config').secret;;
-var hashKey = require('./config').hashKey;
-var hashIV = require('./config').hashIV;
-var merchantID = require('./config').merchantID;
-
 var taxRate = 0.05;
 var rijEcb = new MCrypt('rijndael-128', 'cbc');
-rijEcb.open(hashKey, hashIV);
 var emailReg = new RegExp(/[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/i);
 
-function dateToTs(date){
+function dateToTs(date) {
 	if (date == "now") {
 		return Math.floor(new Date().getTime() / 1000);
 	} else {
@@ -20,28 +14,28 @@ function dateToTs(date){
 	}
 }
 
-function encode(url, data) {
+function encode(url, data, secret) {
 	var basestring = url.concat('|', JSON.stringify(data));
 	return crypto.createHmac('sha256', secret).update(basestring).digest('hex');
 }
 
-module.exports.getOrderList = function(tf, tt, page, cb) {
+module.exports.getOrderList = function(tf, tt, page, key, cb) {
 	var data = {
-		"shopid": require('./config').shopid,
-		"partner_id": require('./config').partner_id,
+		"shopid": parseInt(key.shopeeshopid),
+		"partner_id": parseInt(key.shopeepartnerid),
 		"timestamp": Math.floor(new Date().getTime() / 1000),
-		"order_status":"COMPLETED",
+		"order_status": "COMPLETED",
 		"create_time_to": dateToTs(tt),
 		"create_time_from": dateToTs(tf),
-		"pagination_entries_per_page":50, //一頁呈現的訂單數目
-		"pagination_offset": parseInt(page)*50 //第幾頁
+		"pagination_entries_per_page": 50, //一頁呈現的訂單數目
+		"pagination_offset": parseInt(page) * 50 //第幾頁
 	}
 	var url = 'https://partner.shopeemobile.com/api/v1/orders/get';
 	request({
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
-			'Authorization': encode(url, data)
+			'Authorization': encode(url, data, key.shopeesecret)
 		},
 		url: url,
 		json: data
@@ -51,13 +45,13 @@ module.exports.getOrderList = function(tf, tt, page, cb) {
 	});
 }
 
-module.exports.getOrderDetail = function(orders, cb) {
+module.exports.getOrderDetail = function(orders, key, cb) {
 	if (typeof orders == "string") {
 		orders = [orders];
 	}
 	var data = {
-		"shopid": require('./config').shopid,
-		"partner_id": require('./config').partner_id,
+		"shopid": parseInt(key.shopeeshopid),
+		"partner_id": parseInt(key.shopeepartnerid),
 		"timestamp": Math.floor(new Date().getTime() / 1000),
 		"ordersn_list": orders
 	}
@@ -66,7 +60,7 @@ module.exports.getOrderDetail = function(orders, cb) {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
-			'Authorization': encode(url, data)
+			'Authorization': encode(url, data, key.shopeesecret)
 		},
 		url: url,
 		json: data
@@ -97,7 +91,7 @@ function arrobjToStr(arr, title) {
 			if (title == "item_name") {
 				arr[i][title] = arr[i][title].split(" ")[0];
 			}
-			if(title == "item_sku") {
+			if (title == "item_sku") {
 				arr[i][title] = "件"
 			}
 			str += arr[i][title];
@@ -116,11 +110,12 @@ function padding(str) {
 	return str
 }
 
-function postdata(data) {
+function postdata(data, key, iv) {
+	rijEcb.open(key, iv);
 	return rijEcb.encrypt(padding(qs.stringify(data))).toString('hex').trim();
 }
 
-module.exports.genInvoice =function(shopeeData,cb) {
+module.exports.genInvoice = function(shopeeData, key, cb) {
 	var data = {
 		RespondType: "JSON",
 		Version: "1.4",
@@ -143,27 +138,30 @@ module.exports.genInvoice =function(shopeeData,cb) {
 		ItemAmt: arrobjToStr(shopeeData.items) //含稅金額以 | 分隔
 	}
 	if (shopeeData.order_status == "COMPLETED") {
-		request({
-			method: 'post',
-			url: 'https://cinv.pay2go.com/api/invoice_issue',
-			formData: {
-				MerchantID_: merchantID,
-				PostData_: postdata(data)
-			}
-		}, function(e, r, b) {
-			b = JSON.parse(b);
-			if(b.Message.indexOf("重覆")!==-1 || b.Message.indexOf("重複")!==-1){
-				console.log("已開過發票");
-				cb("已開過發票");
-			}else if(b.Message.indexOf("成功")!==-1){
-				console.log("發票開立成功");
-				cb("發票開立成功");
-			}
-			else{
-				console.log(b.Message);
-				cb(b.Message);
-			}
-		});
+		try {
+			request({
+				method: 'post',
+				url: 'https://cinv.pay2go.com/api/invoice_issue',
+				formData: {
+					MerchantID_: key.paytwogoid,
+					PostData_: postdata(data, key.paytwogohashkey, key.paytwogohashiv)
+				}
+			}, function(e, r, b) {
+				b = JSON.parse(b);
+				if (b.Message.indexOf("重覆") !== -1 || b.Message.indexOf("重複") !== -1) {
+					console.log("已開過發票");
+					cb("已開過發票");
+				} else if (b.Message.indexOf("成功") !== -1) {
+					console.log("發票開立成功");
+					cb("發票開立成功");
+				} else {
+					console.log(b.Message);
+					cb(b.Message);
+				}
+			});
+		} catch (err) {
+			cb("解密錯誤")
+		}
 	} else {
 		cb("訂單尚未完成");
 	}

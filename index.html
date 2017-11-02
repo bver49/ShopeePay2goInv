@@ -19,7 +19,7 @@
 
 <body>
   <div class="container">
-    <div class="col-md-8 col-md-offset-2">
+    <div class="col-md-10 col-md-offset-1">
       <form class="form-inline searchform">
         起始日期
         <div class="form-group">
@@ -40,6 +40,7 @@
           </div>
         </div>
         <div id="search" class="btn btn-primary">查詢</div>
+        <div id="setting" class="btn btn-primary">修改資料</div>
       </form>
     </div>
     <div class="col-md-12" style="padding-top:10px;">
@@ -91,6 +92,60 @@
     </div>
   </div>
 
+  <div id="settingForm" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">金鑰設定</h4>
+        </div>
+        <div class="modal-body">
+          <div style="color:red;">更改後請按儲存</div><br>
+          <form class="form-horizontal">
+            <div class="form-group">
+              <label class="col-sm-2 control-label">蝦皮Secret</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="shopeesecret">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-sm-2 control-label">蝦皮Shopid</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="shopeeshopid">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="inputPassword3" class="col-sm-2 control-label">蝦皮Partnerid</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="shopeepartnerid">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-sm-2 control-label">智付寶商店代號</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="paytwogoid">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-sm-2 control-label">智付寶HashKEY</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="paytwogohashkey">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-sm-2 control-label">智付寶IV</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="paytwogohashiv">
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <div id="save" class="btn btn-default" data-dismiss="modal">儲存</div>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
 
 </html>

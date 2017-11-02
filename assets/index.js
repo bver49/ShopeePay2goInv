@@ -3,14 +3,23 @@ $(document).ready(function() {
 	var List;
 	var CheckAmt = 0;
 
+	if (localStorage) {
+		$("#shopeesecret").val(localStorage.getItem("shopeesecret"));
+		$("#shopeeshopid").val(localStorage.getItem("shopeeshopid"));
+		$("#shopeepartnerid").val(localStorage.getItem("shopeepartnerid"));
+		$("#paytwogoid").val(localStorage.getItem("paytwogoid"));
+		$("#paytwogohashkey").val(localStorage.getItem("paytwogohashkey"));
+		$("#paytwogohashiv").val(localStorage.getItem("paytwogohashiv"));
+	}
+
 	toastr.options = {
-    "closeButton": true,
-    "positionClass": "toast-top-right",
-    "showDuration": "0",
-    "hideDuration": "1000",
-    "timeOut": "2000",
-    "extendedTimeOut": "1000"
-  }
+		"closeButton": true,
+		"positionClass": "toast-top-right",
+		"showDuration": "0",
+		"hideDuration": "1000",
+		"timeOut": "2000",
+		"extendedTimeOut": "1000"
+	}
 
 	function getAllpage(page, cb) {
 		$.ajax({
@@ -19,7 +28,13 @@ $(document).ready(function() {
 			data: {
 				tt: $("#tt").val(),
 				tf: $("#tf").val(),
-				page: page
+				page: page,
+				shopeesecret: $("#shopeesecret").val(),
+				shopeeshopid: $("#shopeeshopid").val(),
+				shopeepartnerid: $("#shopeepartnerid").val(),
+				paytwogoid: $("#paytwogoid").val(),
+				paytwogohashkey: $("#paytwogohashkey").val(),
+				paytwogohashiv: $("#paytwogohashiv").val()
 			},
 			success: function(response) {
 				Page.push(response.list);
@@ -115,7 +130,13 @@ $(document).ready(function() {
 			url: '/api/geninv',
 			type: 'POST',
 			data: {
-				ordersn: ordersn
+				ordersn: ordersn,
+				shopeesecret: $("#shopeesecret").val(),
+				shopeeshopid: $("#shopeeshopid").val(),
+				shopeepartnerid: $("#shopeepartnerid").val(),
+				paytwogoid: $("#paytwogoid").val(),
+				paytwogohashkey: $("#paytwogohashkey").val(),
+				paytwogohashiv: $("#paytwogohashiv").val()
 			},
 			success: function(response) {
 				if (response == "發票開立成功" || response == "已開過發票") {
@@ -123,7 +144,10 @@ $(document).ready(function() {
 					$(`.genInv[data-id=${ordersn}]`).remove();
 					$(`.orderCheck[data-id=${ordersn}]`).remove();
 					toastr.success(`訂單編號 ${ordersn} ${response}`)
-				}else{
+				} else if(response=="解密錯誤") {
+					toastr.warning("請檢查智付寶金鑰");
+				}
+				else{
 					toastr.warning(`訂單編號 ${ordersn} ${response}`)
 				}
 				console.log(ordersn + "-" + response);
@@ -136,7 +160,13 @@ $(document).ready(function() {
 			url: '/api/order',
 			type: 'POST',
 			data: {
-				ordersn: ordersn
+				ordersn: ordersn,
+				shopeesecret: $("#shopeesecret").val(),
+				shopeeshopid: $("#shopeeshopid").val(),
+				shopeepartnerid: $("#shopeepartnerid").val(),
+				paytwogoid: $("#paytwogoid").val(),
+				paytwogohashkey: $("#paytwogohashkey").val(),
+				paytwogohashiv: $("#paytwogohashiv").val()
 			},
 			success: function(response) {
 				$("#orderDetail .modal-body").empty();
@@ -205,14 +235,24 @@ $(document).ready(function() {
 					data: {
 						tt: $("#tt").val(),
 						tf: $("#tf").val(),
-						page: 0
+						page: 0,
+						shopeesecret: $("#shopeesecret").val(),
+						shopeeshopid: $("#shopeeshopid").val(),
+						shopeepartnerid: $("#shopeepartnerid").val(),
+						paytwogoid: $("#paytwogoid").val(),
+						paytwogohashkey: $("#paytwogohashkey").val(),
+						paytwogohashiv: $("#paytwogohashiv").val()
 					},
 					success: function(response) {
 						Page = [];
-						refreshTable(response.list);
-						if (response.more === true) {
-							$(".hint").show();
-							getAllpage(0)
+						if(response.list){
+							refreshTable(response.list);
+							if (response.more === true) {
+								$(".hint").show();
+								getAllpage(0)
+							}
+						}else{
+							toastr.warning("請檢查蝦皮金鑰是否出錯");
 						}
 					}
 				});
@@ -253,5 +293,18 @@ $(document).ready(function() {
 				genInv(Page[i][j].ordersn);
 			}
 		}
+	});
+
+	$("#setting").on("click", function() {
+		$("#settingForm").modal("show");
+	});
+
+	$("#save").on("click", function() {
+		localStorage.setItem("shopeesecret", $("#shopeesecret").val());
+		localStorage.setItem("shopeeshopid", $("#shopeeshopid").val());
+		localStorage.setItem("shopeepartnerid", $("#shopeepartnerid").val());
+		localStorage.setItem("paytwogoid", $("#paytwogoid").val());
+		localStorage.setItem("paytwogohashkey", $("#paytwogohashkey").val());
+		localStorage.setItem("paytwogohashiv", $("#paytwogohashiv").val());
 	});
 });
