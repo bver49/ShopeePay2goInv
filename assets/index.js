@@ -89,14 +89,14 @@ $(document).ready(function() {
 					CheckAmt -= 1;
 				}
 				if (CheckAmt > 1) {
-					$("#allGenInv").show();
+					$("#allSelectGenInv").show();
 				} else {
-					$("#allGenInv").hide();
+					$("#allSelectGenInv").hide();
 				}
 			});
-			$("#allcheck").prop("checked",false);
+			$("#allcheck").prop("checked", false);
 			CheckAmt = 0;
-			$("#allGenInv").hide();
+			$("#allSelectGenInv").hide();
 		}
 	}
 
@@ -114,7 +114,7 @@ $(document).ready(function() {
 					$(`.orderCheck[data-id=${ordersn}]`).remove();
 				}
 				alert(`訂單編號 ${ordersn} ${response}`);
-				console.log(ordersn+"-"+response);
+				console.log(ordersn + "-" + response);
 			}
 		});
 	}
@@ -196,6 +196,8 @@ $(document).ready(function() {
 						page: 0
 					},
 					success: function(response) {
+						Page = [];
+						$("#allDateGenInv").show();
 						refreshTable(response.list);
 						if (response.more === true) {
 							$(".hint").show();
@@ -215,25 +217,30 @@ $(document).ready(function() {
 			for (var i in checks) {
 				checks[i].checked = true;
 				CheckAmt += 1;
-				$("#allGenInv").show();
+				$("#allSelectGenInv").show();
 			}
 		} else {
 			for (var i in checks) {
 				checks[i].checked = false;
 				CheckAmt -= 1;
-				$("#allGenInv").hide();
+				$("#allSelectGenInv").hide();
 			}
 		}
 	});
 
-	$("#allGenInv").on("click", function() {
+	$("#allSelectGenInv").on("click", function() {
 		var checks = $(".orderCheck");
-		var genInvList =[];
-		for(var i in checks){
-			if(checks[i].checked) genInvList.push(checks[i].value);
+		var genInvList = [];
+		for (var i in checks) {
+			if (checks[i].checked) genInv(checks[i].value);
 		}
-		for(var j in genInvList){
-			genInv(genInvList[j]);
+	});
+
+	$("#allDateGenInv").on("click", function() {
+		for (var i in Page) {
+			for (var j in Page[i]) {
+				genInv(Page[i][j].ordersn);
+			}
 		}
 	});
 });

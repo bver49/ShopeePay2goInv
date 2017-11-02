@@ -5,6 +5,8 @@ var MCrypt = require('mcrypt').MCrypt;
 var secret = require('./config').secret;;
 var hashKey = require('./config').hashKey;
 var hashIV = require('./config').hashIV;
+var merchantID = require('./config').merchantID;
+
 var taxRate = 0.05;
 var rijEcb = new MCrypt('rijndael-128', 'cbc');
 rijEcb.open(hashKey, hashIV);
@@ -145,7 +147,7 @@ module.exports.genInvoice =function(shopeeData,cb) {
 			method: 'post',
 			url: 'https://cinv.pay2go.com/api/invoice_issue',
 			formData: {
-				MerchantID_: '3605531',
+				MerchantID_: merchantID,
 				PostData_: postdata(data)
 			}
 		}, function(e, r, b) {
