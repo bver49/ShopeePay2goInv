@@ -22,7 +22,7 @@ router.post("/geninv",function(req,res){
   getOrderDetail(req.body.ordersn,function(order){
     genInvoice(order,function(result){
       if(result == "發票開立成功"){
-        fs.appendFileSync('list.txt',req.body.ordersn+'\r\n');
+        fs.appendFileSync('list.txt',req.body.ordersn+'\n');
       }
       res.send(result);
     })

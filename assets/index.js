@@ -93,6 +93,7 @@ $(document).ready(function() {
 			},
 			success: function(response) {
 				if(response=="發票開立成功"){
+					List.push(ordersn);
 					$(`.genInv[data-id=${ordersn}]`).remove();
 				}
 				alert(response);
