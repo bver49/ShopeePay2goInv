@@ -108,12 +108,12 @@ $(document).ready(function() {
 				ordersn: ordersn
 			},
 			success: function(response) {
-				if (response == "發票開立成功") {
+				if (response == "發票開立成功" || response == "已開過發票") {
 					List.push(ordersn);
 					$(`.genInv[data-id=${ordersn}]`).remove();
 					$(`.orderCheck[data-id=${ordersn}]`).remove();
 				}
-				alert(`訂單編號 ${ordersn} 發票開立成功`);
+				alert(`訂單編號 ${ordersn} ${response}`);
 				console.log(ordersn+"-"+response);
 			}
 		});

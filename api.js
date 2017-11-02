@@ -21,7 +21,7 @@ router.post("/order",function(req,res){
 router.post("/geninv",function(req,res){
   getOrderDetail(req.body.ordersn,function(order){
     genInvoice(order,function(result){
-      if(result == "發票開立成功"){
+      if(result == "發票開立成功" || result == "已開過發票" ){
         fs.appendFileSync('list.txt',req.body.ordersn+'\n');
       }
       res.send(result);
