@@ -1,6 +1,7 @@
 $(document).ready(function() {
 	var Page = [];
-  var List;
+	var List;
+	var CheckAmt = 0;
 
 	function getAllpage(page, cb) {
 		$.ajax({
@@ -66,12 +67,12 @@ $(document).ready(function() {
 						data[i].order_status = "等待取消"
 						break;
 				}
-				var row = `<tr>
-									<td>${data[i].ordersn}</td>
-									<td>${datestring}</td>
-									<td>${data[i].order_status}</td>
-									<td>`;
-				if(List.indexOf(data[i].ordersn)==-1) row+=`<div class="btn btn-primary genInv" data-id="${data[i].ordersn}">開立發票</div> `;
+				var row = `<tr>`;
+				if (List.indexOf(data[i].ordersn) == -1) { row += `<td><input class="orderCheck" type="checkbox" data-id="${data[i].ordersn}" value="${data[i].ordersn}"></td>` } else { row += '<td></td>' }
+				row += `<td>${data[i].ordersn}</td>
+								<td>${datestring}</td>
+								<td>${data[i].order_status}</td><td>`;
+				if (List.indexOf(data[i].ordersn) == -1) row += `<div class="btn btn-primary genInv" data-id="${data[i].ordersn}">開立發票</div> `;
 				row += `<div class="btn btn-primary detail" data-id="${data[i].ordersn}">詳細資料</div></td></tr>`;
 				$("#orderlist").append(row);
 			}
@@ -81,6 +82,21 @@ $(document).ready(function() {
 			$(".detail").on("click", function() {
 				getOrder($(this).data("id"));
 			});
+			$(".orderCheck").change(function() {
+				if (this.checked) {
+					CheckAmt += 1;
+				} else {
+					CheckAmt -= 1;
+				}
+				if (CheckAmt > 1) {
+					$("#allGenInv").show();
+				} else {
+					$("#allGenInv").hide();
+				}
+			});
+			$("#allcheck").prop("checked",false);
+			CheckAmt = 0;
+			$("#allGenInv").hide();
 		}
 	}
 
@@ -89,15 +105,16 @@ $(document).ready(function() {
 			url: '/api/geninv',
 			type: 'POST',
 			data: {
-				ordersn:ordersn
+				ordersn: ordersn
 			},
 			success: function(response) {
-				if(response=="發票開立成功"){
+				if (response == "發票開立成功") {
 					List.push(ordersn);
 					$(`.genInv[data-id=${ordersn}]`).remove();
+					$(`.orderCheck[data-id=${ordersn}]`).remove();
 				}
-				alert(response);
-				console.log(response);
+				alert(`訂單編號 ${ordersn} 發票開立成功`);
+				console.log(ordersn+"-"+response);
 			}
 		});
 	}
@@ -111,7 +128,7 @@ $(document).ready(function() {
 			},
 			success: function(response) {
 				$("#orderDetail .modal-body").empty();
-				var detail =`
+				var detail = `
 				<p>訂購人 : ${response.recipient_address.name}</p><br>
 				<p>手機 : ${response.recipient_address.phone}</p><br>
         <p>訂單編號 : ${response.ordersn}</p><br>
@@ -121,8 +138,8 @@ $(document).ready(function() {
 				<p>運費：${response.estimated_shipping_fee}</p>
 				<hr>
 				`;
-				for(var i in response.items){
-        	detail+=`
+				for (var i in response.items) {
+					detail += `
 					<p>商品名稱：${response.items[i].item_name.split(" ")[0]}</p>
 					<p>商品單價(折扣後)：${response.items[i].variation_discounted_price}</p>
 					<p>商品銷售數量：${response.items[i].variation_quantity_purchased}</p><br>
@@ -189,6 +206,34 @@ $(document).ready(function() {
 			} else {
 				alert("日期間隔請設定在15天內");
 			}
+		}
+	});
+
+	$("#allcheck").change(function() {
+		var checks = $(".orderCheck");
+		if (this.checked) {
+			for (var i in checks) {
+				checks[i].checked = true;
+				CheckAmt += 1;
+				$("#allGenInv").show();
+			}
+		} else {
+			for (var i in checks) {
+				checks[i].checked = false;
+				CheckAmt -= 1;
+				$("#allGenInv").hide();
+			}
+		}
+	});
+
+	$("#allGenInv").on("click", function() {
+		var checks = $(".orderCheck");
+		var genInvList =[];
+		for(var i in checks){
+			if(checks[i].checked) genInvList.push(checks[i].value);
+		}
+		for(var j in genInvList){
+			genInv(genInvList[j]);
 		}
 	});
 });

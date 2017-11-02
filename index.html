@@ -40,16 +40,18 @@
         <div id="search" class="btn btn-primary">查詢</div>
       </form>
     </div>
-    <div class="col-md-10 col-md-offset-1" style="padding-top:10px;">
+    <div class="col-md-12" style="padding-top:10px;">
       <div class="text-center hint" style="display:none;">後面頁數尚在讀取中</div>
       <div class="col-md-1 col-md-offset-5">
         <div class="form-group">
           <select class="form-control" id="pageTop" style="display:none;"></select>
         </div>
+        <div id="allGenInv" class="btn btn-primary" style="display:none;margin-bottom:10px;">全部開立</div>
       </div>
       <table class="table table-hover table-bordered ordertable">
         <thead>
           <tr>
+            <th><input id="allcheck" type="checkbox" value="all"></th>
             <th>訂單編號</th>
             <th>更新時間</th>
             <th>訂單狀態</th>

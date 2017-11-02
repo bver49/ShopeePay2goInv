@@ -127,7 +127,7 @@ module.exports.genInvoice =function(shopeeData,cb) {
 		Status: "1",
 		Category: "B2C",
 		BuyerName: shopeeData.recipient_address.name,
-		BuyerEmail: shopeeData.message_to_seller.match(emailReg) ? shopeeData.message_to_seller.match(emailReg)[0] : "default@gmail.com",
+		BuyerEmail: shopeeData.message_to_seller.match(emailReg) ? shopeeData.message_to_seller.match(emailReg)[0] : "c.p.max.tw@gmail.com",
 		PrintFlag: "Y",
 		TaxType: "1",
 		TaxRate: "5",
