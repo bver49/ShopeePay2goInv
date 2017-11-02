@@ -18,6 +18,7 @@ $(document).ready(function() {
 					getAllpage(page + 1);
 				} else {
 					$(".hint").hide();
+					$("#allDateGenInv").show();
 					showPageSelect();
 				}
 			}
@@ -197,7 +198,6 @@ $(document).ready(function() {
 					},
 					success: function(response) {
 						Page = [];
-						$("#allDateGenInv").show();
 						refreshTable(response.list);
 						if (response.more === true) {
 							$(".hint").show();
