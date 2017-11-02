@@ -3,6 +3,15 @@ $(document).ready(function() {
 	var List;
 	var CheckAmt = 0;
 
+	toastr.options = {
+    "closeButton": true,
+    "positionClass": "toast-top-right",
+    "showDuration": "0",
+    "hideDuration": "1000",
+    "timeOut": "2000",
+    "extendedTimeOut": "1000"
+  }
+
 	function getAllpage(page, cb) {
 		$.ajax({
 			url: '/api/orders',
@@ -113,8 +122,10 @@ $(document).ready(function() {
 					List.push(ordersn);
 					$(`.genInv[data-id=${ordersn}]`).remove();
 					$(`.orderCheck[data-id=${ordersn}]`).remove();
+					toastr.success(`訂單編號 ${ordersn} ${response}`)
+				}else{
+					toastr.warning(`訂單編號 ${ordersn} ${response}`)
 				}
-				alert(`訂單編號 ${ordersn} ${response}`);
 				console.log(ordersn + "-" + response);
 			}
 		});
