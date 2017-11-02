@@ -6,13 +6,83 @@
   <title></title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-  <link rel="stylesheet" href="/assets/style.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+  <link rel="stylesheet" href="assets/style.css">
+  <script type="text/javascript" src="assets/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-  <script src="/assets/index.js"></script>
+  <script src="assets/index.js"></script>
+  <script type="text/javascript" src="assets/moment.min.js"></script>
+  <script type="text/javascript" src="assets/bootstrap-datetimepicker.min.js"></script>
+  <link rel="stylesheet" href="assets/bootstrap-datetimepicker.min.css" />
 </head>
 
 <body>
+  <div class="container">
+    <div class="col-md-8 col-md-offset-2">
+      <form class="form-inline searchform">
+        起始日期
+        <div class="form-group">
+          <div class='input-group date' id='datetimepickertf'>
+            <input type='text' class="form-control" id="tf" />
+            <span class="input-group-addon">
+              <span class="glyphicon glyphicon-calendar"></span>
+            </span>
+          </div>
+        </div>
+        結束日期
+        <div class="form-group">
+          <div class='input-group date' id='datetimepickertt'>
+            <input type='text' class="form-control" id="tt" />
+            <span class="input-group-addon">
+              <span class="glyphicon glyphicon-calendar"></span>
+            </span>
+          </div>
+        </div>
+        <div id="search" class="btn btn-primary">查詢</div>
+      </form>
+    </div>
+    <div class="col-md-10 col-md-offset-1" style="padding-top:10px;">
+      <div class="text-center hint" style="display:none;">後面頁數尚在讀取中</div>
+      <div class="col-md-1 col-md-offset-5">
+        <div class="form-group">
+          <select class="form-control" id="pageTop" style="display:none;"></select>
+        </div>
+      </div>
+      <table class="table table-hover table-bordered ordertable">
+        <thead>
+          <tr>
+            <th>訂單編號</th>
+            <th>更新時間</th>
+            <th>訂單狀態</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="orderlist">
+        </tbody>
+      </table>
+      <div class="text-center  hint" style="display:none;">後面頁數尚在讀取中</div>
+      <div class="col-md-1 col-md-offset-5" style="margin-bottom:50px;">
+        <div class="form-group">
+          <select class="form-control" id="pageBot" style="display:none;">
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="orderDetail" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="myModalLabel">訂單資料</h4>
+        </div>
+        <div class="modal-body">
+        </div>
+        <div class="modal-footer">
+          <div class="btn btn-default" data-dismiss="modal">關閉</div>
+        </div>
+      </div>
+    </div>
+  </div>
 
 </body>
 

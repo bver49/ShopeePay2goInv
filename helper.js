@@ -10,7 +10,7 @@ var rijEcb = new MCrypt('rijndael-128', 'cbc');
 rijEcb.open(hashKey, hashIV);
 var emailReg = new RegExp(/[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/i);
 
-module.exports.dateToTs = function(date){
+function dateToTs(date){
 	if (date == "now") {
 		return Math.floor(new Date().getTime() / 1000);
 	} else {
@@ -28,13 +28,13 @@ module.exports.getOrderList = function(tf, tt, page, cb) {
 		"shopid": require('./config').shopid,
 		"partner_id": require('./config').partner_id,
 		"timestamp": Math.floor(new Date().getTime() / 1000),
+		"order_status":"COMPLETED",
 		"create_time_to": dateToTs(tt),
 		"create_time_from": dateToTs(tf),
-		"pagination_entries_per_page": 100, //一頁呈現的訂單數目
-		"pagination_offset": Number(page) //第幾頁
+		"pagination_entries_per_page":50, //一頁呈現的訂單數目
+		"pagination_offset": parseInt(page)*50 //第幾頁
 	}
-	console.log(data);
-	var url = 'https://partner.shopeemobile.com/api/v1/orders/basics';
+	var url = 'https://partner.shopeemobile.com/api/v1/orders/get';
 	request({
 		method: 'POST',
 		headers: {
@@ -71,6 +71,7 @@ module.exports.getOrderDetail = function(orders, cb) {
 	}, function(e, r, b) {
 		if (b.error) console.log(b.error);
 		if (b.orders.length > 1) {
+			b.orders
 			cb(b.orders)
 		} else {
 			cb(b.orders[0]);
@@ -117,7 +118,7 @@ function postdata(data) {
 	return rijEcb.encrypt(padding(qs.stringify(data))).toString('hex').trim();
 }
 
-module.exports.genInvoice =function(shopeeData) {
+module.exports.genInvoice =function(shopeeData,cb) {
 	var data = {
 		RespondType: "JSON",
 		Version: "1.4",
@@ -151,14 +152,17 @@ module.exports.genInvoice =function(shopeeData) {
 			b = JSON.parse(b);
 			if(b.Message.indexOf("重覆")!==-1 || b.Message.indexOf("重複")!==-1){
 				console.log("已開過發票");
-				return 3;
-			}else{
-				console.log("開立發票成功");
-				return 1;
+				cb("已開過發票");
+			}else if(b.Message.indexOf("成功")!==-1){
+				console.log("發票開立成功");
+				cb("發票開立成功");
+			}
+			else{
+				console.log(b.Message);
+				cb(b.Message);
 			}
 		});
 	} else {
-		console.log("訂單尚未完成");
-		return 2;
+		cb("訂單尚未完成");
 	}
 }
