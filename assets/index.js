@@ -147,6 +147,9 @@ $(document).ready(function() {
 				} else if(response=="解密錯誤") {
 					toastr.warning("請檢查智付寶金鑰");
 				}
+				else if(response=="取得商店申請資格失敗"){
+					toastr.warning("請確認商店已開通電子發票功能");
+				}
 				else{
 					toastr.warning(`訂單編號 ${ordersn} ${response}`)
 				}

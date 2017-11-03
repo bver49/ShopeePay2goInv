@@ -141,7 +141,7 @@ module.exports.genInvoice = function(shopeeData, key, cb) {
 		try {
 			request({
 				method: 'post',
-				url: 'https://cinv.pay2go.com/api/invoice_issue',
+				url: 'https://inv.pay2go.com/api/invoice_issue',
 				formData: {
 					MerchantID_: key.paytwogoid,
 					PostData_: postdata(data, key.paytwogohashkey, key.paytwogohashiv)
