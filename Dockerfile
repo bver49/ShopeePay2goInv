@@ -1,4 +1,4 @@
-FROM node:boron
+FROM mhart/alpine-node:6
 
 WORKDIR /src
 
