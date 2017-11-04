@@ -7,15 +7,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-  <link rel="stylesheet" href="assets/style.css">
-  <script type="text/javascript" src="assets/jquery.min.js"></script>
+  <link rel="stylesheet" href="/assets/style.css">
+  <script type="text/javascript" src="/assets/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-  <script src="assets/index.js"></script>
-  <script type="text/javascript" src="assets/moment.min.js"></script>
-  <script type="text/javascript" src="assets/bootstrap-datetimepicker.min.js"></script>
-  <script type="text/javascript" src="assets/toastr.min.js"></script>
-  <link rel="stylesheet" href="assets/toastr.min.css" />
-  <link rel="stylesheet" href="assets/bootstrap-datetimepicker.min.css" />
+  <script src="/assets/index.js"></script>
+  <script type="text/javascript" src="/assets/moment.min.js"></script>
+  <script type="text/javascript" src="/assets/bootstrap-datetimepicker.min.js"></script>
+  <script type="text/javascript" src="/assets/toastr.min.js"></script>
+  <link rel="stylesheet" href="/assets/toastr.min.css" />
+  <link rel="stylesheet" href="/assets/bootstrap-datetimepicker.min.css" />
 </head>
 
 <body>
@@ -41,7 +41,11 @@
           </div>
         </div>
         <div id="search" class="btn btn-primary">查詢</div>
-        <div id="setting" class="btn btn-primary">修改資料</div>
+        <div id="setting" class="btn btn-primary">修改金鑰</div>
+        <a href="/users/profile" class="btn btn-primary">個人資料</a>
+        <% if(me.role==2){ %>
+          <a href="/users" class="btn btn-primary">管理用戶</a>
+        <% } %>
       </form>
     </div>
     <div class="col-md-12" style="padding-top:10px;">
