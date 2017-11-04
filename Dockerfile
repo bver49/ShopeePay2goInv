@@ -1,5 +1,8 @@
-FROM node:boron
+FROM mhart/alpine-node:6
 
+RUN apk update \
+  && apk add --no-cache curl bash make gcc g++ git python
+  
 WORKDIR /src
 
 # Copy source code
