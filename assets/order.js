@@ -40,18 +40,18 @@ $(document).ready(function() {
       success: function(response) {
         for (var i in response.list) {
           if (response.list[i].order_status == 'READY_TO_SHIP') {
-            response.list[i].detail = getData(response.list[i].ordersn);
             temppage.push(response.list[i]);
           }
         }
         if (response.more === true) {
           getAllpage(page + 1);
         } else {
+          getData(temppage,0);
+          /*
           slicePage();
           refreshTable(Page[0]);
           $(".hint").hide();
-          $("#allDateGenInv").show();
-          showPageSelect();
+          showPageSelect();*/
         }
       }
     });
@@ -232,8 +232,7 @@ $(document).ready(function() {
                 $(".hint").show();
                 getAllpage(0)
               } else {
-                slicePage();
-                refreshTable(Page[0]);
+                getData(temppage,0);
               }
             } else {
               toastr.warning("請檢查蝦皮金鑰是否出錯");
@@ -260,11 +259,9 @@ $(document).ready(function() {
   });
 
   function slicePage() {
-    console.log(Page);
-    /*
     temppage.sort(function(a, b) {
-      return a.detail.total_amount - b.detail.total_amount;
-    });*/
+      return b.details.total_amount - a.details.total_amount;
+    });
     var subpage = [];
     for (var i in temppage) {
       if (subpage.length == 50) {
@@ -277,12 +274,12 @@ $(document).ready(function() {
       Page.push(subpage);
   }
 
-  function getData(sn){
+  function getData(arr, index,stop) {
     $.ajax({
       url: '/api/order',
       type: 'POST',
       data: {
-        ordersn: sn,
+        ordersn: arr[index].ordersn,
         shopeesecret: $("#shopeesecret").val(),
         shopeeshopid: $("#shopeeshopid").val(),
         shopeepartnerid: $("#shopeepartnerid").val(),
@@ -291,7 +288,24 @@ $(document).ready(function() {
         paytwogohashiv: $("#paytwogohashiv").val()
       },
       success: function(response) {
-        return response;
+        temppage[index].details = response;
+        if(!stop){
+          if(index!=arr.length-1){
+            getData(arr, index + 1,1);
+            if (index != arr.length - 2){
+              getData(arr, index + 2,1);
+              if (index != arr.length - 3)
+                getData(arr, index + 3);
+            }
+          }
+        }
+        if(index==arr.length-1){
+          console.log(temppage);
+          slicePage();
+          refreshTable(Page[0]);
+          $(".hint").hide();
+          showPageSelect();
+        }
       }
     });
   }

@@ -15,15 +15,19 @@ app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 
 app.use(function(req, res, next) {
-  if (req.cookies.isLogin) {
-    User.findOne({
-      where: { id: req.cookies.id },
-      attributes:["id","username","role"]
-    }).then(function(user) {
-      req.user = user;
+  if(!req.body.shopeesecret){
+    if (req.cookies.isLogin) {
+      User.findOne({
+        where: { id: req.cookies.id },
+        attributes:["id","username","role"]
+      }).then(function(user) {
+        req.user = user;
+        next();
+      });
+    } else {
       next();
-    });
-  } else {
+    }
+  }else{
     next();
   }
 });
