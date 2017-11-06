@@ -10,7 +10,7 @@ function dateToTs(date) {
 	if (date == "now") {
 		return Math.floor(new Date().getTime() / 1000);
 	} else {
-		return Math.floor((new Date(date).getTime() + (480 * 60 * 1000)) / 1000);
+		return Math.floor((new Date(date).getTime() - (60 * 8 * 60000)) / 1000);
 	}
 }
 
@@ -24,13 +24,12 @@ module.exports.getOrderList = function(tf, tt, page, key, cb) {
 		"shopid": parseInt(key.shopeeshopid),
 		"partner_id": parseInt(key.shopeepartnerid),
 		"timestamp": Math.floor(new Date().getTime() / 1000),
-		"order_status": "COMPLETED",
-		"create_time_to": dateToTs(tt),
-		"create_time_from": dateToTs(tf),
+		"update_time_to": dateToTs(tt),
+		"update_time_from": dateToTs(tf),
 		"pagination_entries_per_page": 50, //一頁呈現的訂單數目
 		"pagination_offset": parseInt(page) * 50 //第幾頁
 	}
-	var url = 'https://partner.shopeemobile.com/api/v1/orders/get';
+	var url = 'https://partner.shopeemobile.com/api/v1/orders/basics';
 	request({
 		method: 'POST',
 		headers: {

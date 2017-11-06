@@ -8,8 +8,8 @@ router.get("/", function(req, res) {
   if (req.user && req.user.role == 2) {
     User.findAll({
       where: {
-        id: {
-          [Op.ne]:req.user.id
+        role: {
+          [Op.ne]:2
         }
       },
       attributes: ["id", "username", "role"]

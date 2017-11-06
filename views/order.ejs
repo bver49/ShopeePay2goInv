@@ -10,7 +10,8 @@
   <link rel="stylesheet" href="/assets/style.css">
   <script type="text/javascript" src="/assets/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-  <script src="/assets/index.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script>
+  <script src="/assets/order.js"></script>
   <script type="text/javascript" src="/assets/moment.min.js"></script>
   <script type="text/javascript" src="/assets/bootstrap-datetimepicker.min.js"></script>
   <script type="text/javascript" src="/assets/toastr.min.js"></script>
@@ -44,28 +45,18 @@
       <div class="col-md-10 col-md-offset-1" style="margin-top:30px;text-align:center;">
         <div id="search" class="btn btn-primary">查詢</div>
         <div id="setting" class="btn btn-primary">修改金鑰</div>
-        <a href="/users/profile" class="btn btn-primary">個人資料</a>
-        <% if(me.role==2){ %>
-          <a href="/users" class="btn btn-primary">管理用戶</a>
-        <% } %>
-        <a href="/users/logout" class="btn btn-primary">登出</a>
       </form>
     </div>
     <div class="col-md-12" style="padding-top:10px;">
-      <div class="text-center hint" style="display:none;">後面頁數尚在讀取中</div>
+      <div class="text-center hint" style="display:none;">資料讀取中</div>
       <div class="col-md-1 col-md-offset-5" style="text-align:center;">
         <div class="form-group">
           <select class="form-control" id="pageTop" style="display:none;"></select>
         </div>
       </div>
-      <div class="col-md-6 col-md-offset-3" style="text-align:center;">
-          <div id="allSelectGenInv" class="btn btn-primary" style="display:none;margin-bottom:10px;">已選訂單全部開立</div>
-          <div id="allDateGenInv" class="btn btn-primary" style="display:none;margin-bottom:10px;">已選日期區間全部開立</div>
-      </div>
       <table class="table table-hover table-bordered ordertable">
         <thead>
           <tr>
-            <th><input id="allcheck" type="checkbox" value="all"></th>
             <th>訂單編號</th>
             <th>更新時間</th>
             <th>訂單狀態</th>
@@ -75,7 +66,7 @@
         <tbody id="orderlist">
         </tbody>
       </table>
-      <div class="text-center  hint" style="display:none;">後面頁數尚在讀取中</div>
+      <div class="text-center  hint" style="display:none;">資料讀取中</div>
       <div class="col-md-1 col-md-offset-5" style="margin-bottom:50px;">
         <div class="form-group">
           <select class="form-control" id="pageBot" style="display:none;">

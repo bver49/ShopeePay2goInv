@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>開立發票平台</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+  <link rel="stylesheet" href="/assets/style.css">
+  <script type="text/javascript" src="/assets/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script>
+  <script src="/assets/inv.js"></script>
+  <script type="text/javascript" src="/assets/moment.min.js"></script>
+  <script type="text/javascript" src="/assets/bootstrap-datetimepicker.min.js"></script>
+  <script type="text/javascript" src="/assets/toastr.min.js"></script>
+  <link rel="stylesheet" href="/assets/toastr.min.css" />
+  <link rel="stylesheet" href="/assets/bootstrap-datetimepicker.min.css" />
+</head>
+
+<body>
+  <div class="container">
+    <div class="col-md-10 col-md-offset-1" style="text-align:center;">
+      <form class="form-inline searchform">
+        起始日期
+        <div class="form-group">
+          <div class='input-group date' id='datetimepickertf'>
+            <input type='text' class="form-control" id="tf" />
+            <span class="input-group-addon">
+              <span class="glyphicon glyphicon-calendar"></span>
+            </span>
+          </div>
+        </div>
+        結束日期
+        <div class="form-group">
+          <div class='input-group date' id='datetimepickertt'>
+            <input type='text' class="form-control" id="tt" />
+            <span class="input-group-addon">
+              <span class="glyphicon glyphicon-calendar"></span>
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-10 col-md-offset-1" style="margin-top:30px;text-align:center;">
+        <div id="search" class="btn btn-primary">查詢</div>
+        <div id="setting" class="btn btn-primary">修改金鑰</div>
+        <a href="/users/profile" class="btn btn-primary">個人資料</a>
+        <% if(me.role==2){ %>
+          <a href="/users" class="btn btn-primary">管理用戶</a>
+        <% } %>
+        <a href="/users/logout" class="btn btn-primary">登出</a>
+      </form>
+    </div>
+    <div class="col-md-12" style="padding-top:10px;">
+      <div class="text-center hint" style="display:none;">資料讀取中</div>
+      <div class="col-md-1 col-md-offset-5" style="text-align:center;">
+        <div class="form-group">
+          <select class="form-control" id="pageTop" style="display:none;"></select>
+        </div>
+      </div>
+      <div class="col-md-6 col-md-offset-3" style="text-align:center;">
+          <div id="allSelectGenInv" class="btn btn-primary" style="display:none;margin-bottom:10px;">已選訂單全部開立</div>
+          <div id="allDateGenInv" class="btn btn-primary" style="display:none;margin-bottom:10px;">已選日期區間全部開立</div>
+      </div>
+      <table class="table table-hover table-bordered ordertable">
+        <thead>
+          <tr>
+            <th><input id="allcheck" type="checkbox" value="all"></th>
+            <th>訂單編號</th>
+            <th>更新時間</th>
+            <th>訂單狀態</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="orderlist">
+        </tbody>
+      </table>
+      <div class="text-center  hint" style="display:none;">資料讀取中</div>
+      <div class="col-md-1 col-md-offset-5" style="margin-bottom:50px;">
+        <div class="form-group">
+          <select class="form-control" id="pageBot" style="display:none;">
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="orderDetail" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="myModalLabel">訂單資料</h4>
+        </div>
+        <div class="modal-body">
+        </div>
+        <div class="modal-footer">
+          <div class="btn btn-default" data-dismiss="modal">關閉</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="settingForm" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">金鑰設定</h4>
+        </div>
+        <div class="modal-body">
+          <div style="color:red;">更改後請按儲存</div><br>
+          <form class="form-horizontal">
+            <div class="form-group">
+              <label class="col-sm-2 control-label">蝦皮Secret</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="shopeesecret">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-sm-2 control-label">蝦皮Shopid</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="shopeeshopid">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="inputPassword3" class="col-sm-2 control-label">蝦皮Partnerid</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="shopeepartnerid">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-sm-2 control-label">智付寶商店代號</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="paytwogoid">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-sm-2 control-label">智付寶HashKEY</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="paytwogohashkey">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-sm-2 control-label">智付寶IV</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="paytwogohashiv">
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <div id="save" class="btn btn-default" data-dismiss="modal">儲存</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

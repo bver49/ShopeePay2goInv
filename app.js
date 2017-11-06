@@ -20,7 +20,6 @@ app.use(function(req, res, next) {
       where: { id: req.cookies.id },
       attributes:["id","username","role"]
     }).then(function(user) {
-      console.log(user);
       req.user = user;
       next();
     });
@@ -34,13 +33,34 @@ app.use("/users", require('./user'));
 
 app.get("/", function(req, res) {
   if (req.user) {
-    res.render("index",{
+    res.render("main",{
       me:req.user
     });
   } else {
     res.redirect("/users/login");
   }
 });
+
+app.get("/inv", function(req, res) {
+  if (req.user) {
+    res.render("inv",{
+      me:req.user
+    });
+  } else {
+    res.redirect("/users/login");
+  }
+});
+
+app.get("/order", function(req, res) {
+  if (req.user) {
+    res.render("order",{
+      me:req.user
+    });
+  } else {
+    res.redirect("/users/login");
+  }
+});
+
 
 app.use(function(err, req, res, next) {
   res.status(500).send('Something broke!')
