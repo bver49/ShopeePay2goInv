@@ -9,6 +9,7 @@ WORKDIR /src
 COPY . .
 
 RUN npm install
+RUN npm rebuild bcrypt --build-from-source
 
 RUN touch list.txt
 
