@@ -72,6 +72,7 @@ $(document).ready(function() {
     $("#pageBot").empty();
     $("#pageTop").show();
     $("#pageBot").show();
+    $("#search").show();
     for (var i = 1; i <= pageAmt; i++) {
       $("#pageTop").append(`<option>${i}</option>`);
       $("#pageBot").append(`<option>${i}</option>`);
@@ -177,6 +178,7 @@ $(document).ready(function() {
         console.time("count");
         $("#pageTop").hide();
         $("#pageBot").hide();
+        $("#search").hide();
         $("#orderlist").empty();
         $(".hint").show();
         $.ajax({
@@ -240,6 +242,7 @@ $(document).ready(function() {
   });
 
   $("#itemsdetail").on("click", function() {
+    $("#itemlist").empty();
     var result = "";
     var count = 0;
     for (var i in shopList) {

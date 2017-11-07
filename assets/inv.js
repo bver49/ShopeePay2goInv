@@ -61,6 +61,7 @@ $(document).ready(function() {
     $("#pageBot").empty();
     $("#pageTop").show();
     $("#pageBot").show();
+    $("#search").show();
     for (var i = 1; i <= pageAmt; i++) {
       $("#pageTop").append(`<option>${i}</option>`);
       $("#pageBot").append(`<option>${i}</option>`);
@@ -222,6 +223,7 @@ $(document).ready(function() {
         $("#pageTop").hide();
         $("#pageBot").hide();
         $("#allDateGenInv").hide();
+        $("#search").hide();
         $("#orderlist").empty();
         $(".hint").show();
         $.ajax({
