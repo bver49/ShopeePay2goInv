@@ -179,4 +179,14 @@ $(document).ready(function() {
 			});
 		}
 	});
+
+	$("#editprofile").on("click", function() {
+		$("#profile").hide();
+		$("#profileform").show();
+	});
+
+	$("#showprofile").on("click", function() {
+		$("#profile").show();
+		$("#profileform").hide();
+	});
 });
