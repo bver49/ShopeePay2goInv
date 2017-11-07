@@ -146,7 +146,7 @@ $(document).ready(function() {
 
   function getOrder(ordersn) {
     $.ajax({
-      url: '/api/order',
+      url: '/api/order/detail',
       type: 'POST',
       data: {
         ordersn: ordersn,

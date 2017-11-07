@@ -70,10 +70,7 @@ module.exports.getOrderListStatus = function(tf, tt, page, key, cb) {
 	});
 }
 
-module.exports.getOrderDetail = function(orders, key, cb) {
-	if (typeof orders == "string") {
-		orders = [orders];
-	}
+module.exports.getOrdersDetail = function(orders, key, cb) {
 	var data = {
 		"shopid": parseInt(key.shopeeshopid),
 		"partner_id": parseInt(key.shopeepartnerid),
@@ -91,11 +88,44 @@ module.exports.getOrderDetail = function(orders, key, cb) {
 		json: data
 	}, function(e, r, b) {
 		if (b.error) console.log(b.error);
-		if (b.orders.length > 1) {
-			b.orders
-			cb(b.orders)
-		} else {
-			cb(b.orders[0]);
+		if(b.orders){
+			if (b.orders.length > 1) {
+				cb(b.orders);
+			}else{
+				cb([]);
+			}
+		}else{
+			cb([]);
+		}
+	});
+}
+
+module.exports.getOrderDetail = function(ordersn, key, cb) {
+	var data = {
+		"shopid": parseInt(key.shopeeshopid),
+		"partner_id": parseInt(key.shopeepartnerid),
+		"timestamp": Math.floor(new Date().getTime() / 1000),
+		"ordersn_list": [ordersn]
+	}
+	var url = 'https://partner.shopeemobile.com/api/v1/orders/detail';
+	request({
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+			'Authorization': encode(url, data, key.shopeesecret)
+		},
+		url: url,
+		json: data
+	}, function(e, r, b) {
+		if (b.error) console.log(b.error);
+		if(b.orders){
+			if (b.orders.length > 0) {
+				cb(b.orders[0]);
+			}else{
+				cb([]);
+			}
+		}else{
+			cb([]);
 		}
 	});
 }

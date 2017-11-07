@@ -74,6 +74,11 @@
           <select class="form-control" id="orderamount">
             <option>否</option>
             <option>是</option>
+          </select>&nbsp;&nbsp;&nbsp;
+          <label>統計商品數量:</label>
+          <select class="form-control" id="itemscount">
+            <option>否</option>
+            <option>是</option>
           </select>
           <br><br>
           <h1 class="text-center" style="color:red;">若有使用篩選或排序會耗費較多時間查詢</h1>
@@ -81,6 +86,7 @@
         <div class="col-md-10 col-md-offset-1" style="margin-top:30px;text-align:center;">
           <div id="search" class="btn btn-primary">查詢</div>
           <div id="setting" class="btn btn-primary">修改金鑰</div>
+          <div id="itemsdetail" class="btn btn-primary" style="display:none;">統計商品數量</div>
         </div>
       </form>
     </div>
@@ -121,6 +127,33 @@
           <h4 class="modal-title" id="myModalLabel">訂單資料</h4>
         </div>
         <div class="modal-body">
+        </div>
+        <div class="modal-footer">
+          <div class="btn btn-default" data-dismiss="modal">關閉</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="items" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="myModalLabel">商品資料</h4>
+        </div>
+        <div class="modal-body">
+          <table class="table table-hover table-bordered ordertable">
+            <thead>
+              <tr>
+                <th>名稱</th>
+                <th>數量</th>
+                <th>類型</th>
+              </tr>
+            </thead>
+            <tbody id="itemlist">
+            </tbody>
+          </table>
         </div>
         <div class="modal-footer">
           <div class="btn btn-default" data-dismiss="modal">關閉</div>
