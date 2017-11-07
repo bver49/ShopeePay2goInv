@@ -52,7 +52,7 @@ $(document).ready(function() {
             showPageSelect();
           } else {
             if (Page.length > 0) {
-              getOrdersDetail(orderSn,0);
+              getOrdersDetail(orderSn, 0);
             } else {
               refreshTable(0);
               showPageSelect();
@@ -66,7 +66,7 @@ $(document).ready(function() {
   function showPageSelect() {
     console.log(shopList);
     var pageAmt = Math.floor(Page.length / 50) + 1;
-    if($("#itemscount").val() == "是") $("#itemsdetail").show();
+    if ($("#itemscount").val() == "是") $("#itemsdetail").show();
     $(".hint").hide();
     $("#pageTop").empty();
     $("#pageBot").empty();
@@ -203,12 +203,12 @@ $(document).ready(function() {
               if (response.more === true) {
                 getNextPage(0)
               } else {
-                if ($("#carrier").val() == "否" && $("#orderamount").val() == "否"  && $("#itemscount").val() == "否") {
+                if ($("#carrier").val() == "否" && $("#orderamount").val() == "否" && $("#itemscount").val() == "否") {
                   refreshTable(0);
                   showPageSelect();
                 } else {
                   if (Page.length > 0) {
-                    getOrdersDetail(orderSn,0);
+                    getOrdersDetail(orderSn, 0);
                   } else {
                     refreshTable(0);
                     showPageSelect();
@@ -239,11 +239,24 @@ $(document).ready(function() {
     localStorage.setItem("paytwogohashiv", $("#paytwogohashiv").val());
   });
 
-  $("#itemsdetail").on("click",function(){
-    var result ="";
-    for(var i in shopList){
-      result+=`<tr><td>${shopList[i].name}</td><td>${shopList[i].amount}</td><td>${shopList[i].type}</td></tr>`;
+  $("#itemsdetail").on("click", function() {
+    var result = "";
+    var count = 0;
+    for (var i in shopList) {
+      var typeamt = Object.keys(shopList[i].type).length;
+      result += `<tr><td rowspan="${typeamt}">${shopList[i].name}</td>`
+      for(var j in shopList[i].type){
+        if(count==0){
+          count=1;
+          result+=`<td>${shopList[i].type[j].typename}</td><td>${shopList[i].type[j].amount}</td></tr>`;
+        }
+        else{
+          result+=`<tr><td>${shopList[i].type[j].typename}</td><td>${shopList[i].type[j].amount}</td></tr>`;
+        }
+      }
+      count=0;
     }
+    result+='</tr>';
     $("#itemlist").append(result);
     $("#items").modal('show');
   });
@@ -263,9 +276,9 @@ $(document).ready(function() {
     }
   }
 
-  function getOrdersDetail(ordersns,page) {
-		var data = ordersns.slice(page*50,(page+1)*50);
-		var index = page*50;
+  function getOrdersDetail(ordersns, page) {
+    var data = ordersns.slice(page * 50, (page + 1) * 50);
+    var index = page * 50;
     $.ajax({
       url: '/api/orders/detail',
       type: 'POST',
@@ -280,28 +293,39 @@ $(document).ready(function() {
       },
       success: function(response) {
         for (var x in response) {
-          if(parseInt(x)+(page*50)>=Page.length) break;
-					Page[parseInt(x)+(page*50)].detail = response[x];
+          if (parseInt(x) + (page * 50) >= Page.length) break;
+          Page[parseInt(x) + (page * 50)].detail = response[x];
           index++;
-					for(var y in response[x].items){
-						if (shopList[response[x].items[y].variation_id]) {
-	            shopList[response[x].items[y].variation_id].amount += response[x].items[y].variation_quantity_purchased;
-	          } else {
-	            shopList[response[x].items[y].variation_id] = {
-	              amount: response[x].items[y].variation_quantity_purchased,
-	              name: response[x].items[y].item_name,
-	              type: response[x].items[y].variation_name
-	            }
-	          }
-					}
+          for (var y in response[x].items) {
+            var item = response[x].items[y];
+            if (shopList[item.item_id]) {
+              if (shopList[item.item_id].type[item.variation_id]) {
+                shopList[item.item_id].type[item.variation_id].amount += item.variation_quantity_purchased;
+              } else {
+                shopList[item.item_id].type[item.variation_id] = {
+                  amount: item.variation_quantity_purchased,
+                  typename: item.variation_name
+                }
+              }
+            } else {
+              shopList[item.item_id] = {
+                name: item.item_name,
+                type: {}
+              }
+              shopList[item.item_id].type[item.variation_id] = {
+                amount: item.variation_quantity_purchased,
+                typename: item.variation_name
+              }
+            }
+          }
         }
-				if(index >= ordersns.length-1){
-					sortPage();
-					refreshTable(0);
-					showPageSelect();
-				}else{
-					getOrdersDetail(orderSn,page+1);
-				}
+        if (index >= ordersns.length - 1) {
+          sortPage();
+          refreshTable(0);
+          showPageSelect();
+        } else {
+          getOrdersDetail(orderSn, page + 1);
+        }
       }
     });
   }
