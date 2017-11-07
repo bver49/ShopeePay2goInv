@@ -5,6 +5,7 @@ var helper = require('./helper');
 var getOrderList = helper.getOrderList;
 var getOrderDetail = helper.getOrderDetail;
 var genInvoice = helper.genInvoice;
+var getOrderListStatus = helper.getOrderListStatus;
 
 router.post("/orders", function(req, res) {
 	var key = {
@@ -16,6 +17,20 @@ router.post("/orders", function(req, res) {
 		paytwogohashiv: req.body.paytwogohashiv
 	}
 	getOrderList(req.body.tf, req.body.tt, req.body.page, key, function(list, more) {
+		res.json({ list: list, more: more });
+	})
+});
+
+router.post("/ordersstatus", function(req, res) {
+	var key = {
+		shopeesecret: req.body.shopeesecret,
+		shopeeshopid: req.body.shopeeshopid,
+		shopeepartnerid: req.body.shopeepartnerid,
+		paytwogoid: req.body.paytwogoid,
+		paytwogohashkey: req.body.paytwogohashkey,
+		paytwogohashiv: req.body.paytwogohashiv
+	}
+	getOrderListStatus(req.body.tf, req.body.tt, req.body.page,key, function(list, more) {
 		res.json({ list: list, more: more });
 	})
 });

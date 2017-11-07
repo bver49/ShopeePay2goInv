@@ -44,6 +44,32 @@ module.exports.getOrderList = function(tf, tt, page, key, cb) {
 	});
 }
 
+module.exports.getOrderListStatus = function(tf, tt, page, key, cb) {
+	var data = {
+		"shopid": parseInt(key.shopeeshopid),
+		"partner_id": parseInt(key.shopeepartnerid),
+		"timestamp": Math.floor(new Date().getTime() / 1000),
+		"create_time_to": dateToTs(tt),
+		"create_time_from": dateToTs(tf),
+		"pagination_entries_per_page": 100, //一頁呈現的訂單數目
+		"pagination_offset": parseInt(page) * 100, //第幾頁
+		"order_status":"READY_TO_SHIP"
+	}
+	var url = 'https://partner.shopeemobile.com/api/v1/orders/get';
+	request({
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+			'Authorization': encode(url, data, key.shopeesecret)
+		},
+		url: url,
+		json: data
+	}, function(e, r, b) {
+		if (b.error) console.log(b.error);
+		cb(b.orders, b.more);
+	});
+}
+
 module.exports.getOrderDetail = function(orders, key, cb) {
 	if (typeof orders == "string") {
 		orders = [orders];

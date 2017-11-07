@@ -23,7 +23,7 @@ $(document).ready(function() {
 
 	function getNextPage(page) {
 		$.ajax({
-			url: '/api/orders',
+			url: '/api/ordersstatus',
 			type: 'POST',
 			data: {
 				tt: $("#tt").val(),
@@ -49,7 +49,12 @@ $(document).ready(function() {
 						refreshTable(0);
 						showPageSelect();
 					} else {
-						getOrderDetail(Page, 0);
+						if (Page.length > 0) {
+							getOrderDetail(Page, 0);
+						} else {
+							refreshTable(0);
+							showPageSelect();
+						}
 					}
 				}
 			}
@@ -73,15 +78,15 @@ $(document).ready(function() {
 		$("#orderlist").empty();
 		if (Page.length < 1) {
 			var row = `<tr>
-									<td colspan="4" class="text-center">查無資料</td>
+									<td colspan="5" class="text-center">查無資料</td>
 								</tr>`
 			$("#orderlist").append(row);
 		} else {
 			for (var i = page * 50; i < (page + 1) * 50 && i < Page.length; i++) {
-				if (Page[i].order_status == 'READY_TO_SHIP' || Page[i].order_status == '準備出貨') {
+				if (Page[i].order_status == 'READY_TO_SHIP') {
 					var update = new Date(Page[i].update_time * 1000);
 					var updatestring = update.getFullYear() + "/" + (update.getMonth() + 1) + "/" + update.getDate() + " " + ((update.getHours() < 10) ? ("0" + update.getHours()) : (update.getHours())) + ":" + ((update.getMinutes() < 10) ? ("0" + update.getMinutes()) : (update.getMinutes()));
-					var row = `<tr><td>${Page[i].ordersn}</td>
+					var row = `<tr><td>${i+1}</td><td>${Page[i].ordersn}</td>
 						<td>${updatestring}</td>
 						<td>準備出貨</td><td>
             <a href="https://seller.shopee.tw/portal/sale?search=${Page[i].ordersn}" target="_blank" class="btn btn-primary">出貨</a>
@@ -171,7 +176,7 @@ $(document).ready(function() {
 				$("#orderlist").empty();
 				$(".hint").show();
 				$.ajax({
-					url: '/api/orders',
+					url: '/api/ordersstatus',
 					type: 'POST',
 					data: {
 						tt: $("#tt").val(),
@@ -188,9 +193,7 @@ $(document).ready(function() {
 						Page = [];
 						if (response.list) {
 							for (var i in response.list) {
-								if (response.list[i].order_status == 'READY_TO_SHIP') {
-									Page.push(response.list[i]);
-								}
+								Page.push(response.list[i]);
 							}
 							if (response.more === true) {
 								getNextPage(0)
@@ -199,7 +202,12 @@ $(document).ready(function() {
 									refreshTable(0);
 									showPageSelect();
 								} else {
-									getOrderDetail(Page, 0);
+									if (Page.length > 0) {
+										getOrderDetail(Page, 0);
+									} else {
+										refreshTable(0);
+										showPageSelect();
+									}
 								}
 							}
 						} else {
