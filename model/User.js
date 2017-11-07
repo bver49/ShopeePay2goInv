@@ -30,6 +30,14 @@ var userSchema = {
 		type: Sequelize.STRING,
     defaultValue:0
 	},
+	ship: {
+		type: Sequelize.INTEGER,
+    defaultValue:0
+	},
+	inv: {
+		type: Sequelize.INTEGER,
+    defaultValue:0
+	},
 	created_at: {
 		type: 'TIMESTAMP',
 		defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),

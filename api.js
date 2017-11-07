@@ -59,7 +59,7 @@ router.post("/geninv", function(req, res) {
 
 router.get("/invlist", function(req, res) {
 	var list = fs.readFileSync('list.txt', 'utf8');
-	res.send(list.split(/\r?\n/));
+	res.send(list.split(/\n/));
 });
 
 module.exports = router;

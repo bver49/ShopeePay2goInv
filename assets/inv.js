@@ -1,6 +1,5 @@
 $(document).ready(function() {
   var Page = [];
-  var temppage = [];
   var List;
   var CheckAmt = 0;
 
@@ -22,7 +21,7 @@ $(document).ready(function() {
     "extendedTimeOut": "1000"
   }
 
-  function getAllpage(page, cb) {
+  function getNextPage(page, cb) {
     $.ajax({
       url: '/api/orders',
       type: 'POST',
@@ -40,14 +39,14 @@ $(document).ready(function() {
       success: function(response) {
         for (var i in response.list) {
           if (response.list[i].order_status == 'COMPLETED') {
-            temppage.push(response.list[i]);
+            Page.push(response.list[i]);
           }
         }
         if (response.more === true) {
-          getAllpage(page + 1);
+          getNextPage(page + 1);
         } else {
-          slicePage();
-          refreshTable(Page[0]);
+          sortPage();
+          refreshTable(0);
           $(".hint").hide();
           $("#allDateGenInv").show();
           showPageSelect();
@@ -57,7 +56,7 @@ $(document).ready(function() {
   }
 
   function showPageSelect() {
-    var pageAmt = Page.length;
+    var pageAmt = Math.floor(Page.length/50)+1;
     $("#pageTop").empty();
     $("#pageBot").empty();
     $("#pageTop").show();
@@ -68,45 +67,25 @@ $(document).ready(function() {
     }
   }
 
-  function refreshTable(data) {
+  function refreshTable(page) {
     $("#orderlist").empty();
-    if (data.length < 1) {
+    if (Page.length < 1) {
       var row = `<tr>
 									<td colspan="4" class="text-center">查無資料</td>
 								</tr>`
       $("#orderlist").append(row);
     } else {
-      for (var i in data) {
-        if (data[i].order_status == 'COMPLETED' || data[i].order_status == '完成') {
-          var update = new Date(data[i].update_time * 1000 );
+      for (var i = page * 50 ; i < (page+1) * 50 && i < Page.length ; i++) {
+        if (Page[i].order_status == 'COMPLETED') {
+          var update = new Date(Page[i].update_time * 1000 );
           var updatestring = update.getFullYear() + "/" + (update.getMonth() + 1) + "/" + update.getDate() + " " + ((update.getHours() < 10) ? ("0" + update.getHours()) : (update.getHours())) + ":" + ((update.getMinutes() < 10) ? ("0" + update.getMinutes()) : (update.getMinutes()));
-          switch (data[i].order_status) {
-            case 'READY_TO_SHIP':
-              data[i].order_status = "準備出貨"
-              break;
-            case 'SHIPPED':
-              data[i].order_status = "運送中"
-              break;
-            case 'TO_CONFIRM_RECEIVE':
-              data[i].order_status = "等待買家確認"
-              break;
-            case 'CANCELLED':
-              data[i].order_status = "取消"
-              break;
-            case 'COMPLETED':
-              data[i].order_status = "完成"
-              break;
-            case 'IN_CANCEL':
-              data[i].order_status = "等待取消"
-              break;
-          }
           var row = `<tr>`;
-          if (List.indexOf(data[i].ordersn) == -1) { row += `<td><input class="orderCheck" type="checkbox" data-id="${data[i].ordersn}" value="${data[i].ordersn}"></td>` } else { row += '<td></td>' }
-          row += `<td>${data[i].ordersn}</td>
+          if (List.indexOf(Page[i].ordersn) == -1) { row += `<td><input class="orderCheck" type="checkbox" data-id="${Page[i].ordersn}" value="${Page[i].ordersn}"></td>` } else { row += '<td></td>' }
+          row += `<td>${Page[i].ordersn}</td>
 								<td>${updatestring}</td>
-								<td>${data[i].order_status}</td><td>`;
-          if (List.indexOf(data[i].ordersn) == -1) row += `<div class="btn btn-primary genInv" data-id="${data[i].ordersn}">開立發票</div> `;
-          row += `<div class="btn btn-primary detail" data-id="${data[i].ordersn}">詳細資料</div></td></tr>`;
+								<td>完成</td><td>`;
+          if (List.indexOf(Page[i].ordersn) == -1) row += `<div class="btn btn-primary genInv" data-id="${Page[i].ordersn}">開立發票</div> `;
+          row += `<div class="btn btn-primary detail" data-id="${Page[i].ordersn}">詳細資料</div></td></tr>`;
           $("#orderlist").append(row);
         }
       }
@@ -234,7 +213,7 @@ $(document).ready(function() {
   $("#pageTop,#pageBot").on("change", function() {
     var page = $(this).val() - 1;
     $("#pageTop,#pageBot").val($(this).val());
-    refreshTable(Page[page]);
+    refreshTable(page);
   });
 
   $("#search").on('click', function() {
@@ -242,7 +221,9 @@ $(document).ready(function() {
       if ((Math.floor(new Date($("#tt").val()).getTime() / 1000) - Math.floor(new Date($("#tf").val()).getTime() / 1000)) <= 15 * 24 * 3600) {
         $("#pageTop").hide();
         $("#pageBot").hide();
+        $("#allDateGenInv").hide();
         $("#orderlist").empty();
+        $(".hint").show();
         $.ajax({
           url: '/api/orders',
           type: 'POST',
@@ -259,19 +240,17 @@ $(document).ready(function() {
           },
           success: function(response) {
             Page = [];
-            temppage = [];
             if (response.list) {
               for (var i in response.list) {
                 if (response.list[i].order_status == 'COMPLETED') {
-                  temppage.push(response.list[i]);
+                  Page.push(response.list[i]);
                 }
               }
               if (response.more === true) {
-                $(".hint").show();
-                getAllpage(0)
+                getNextPage(0)
               } else {
-                slicePage();
-                refreshTable(Page[0]);
+                sortPage();
+                refreshTable(0);
               }
             } else {
               toastr.warning("請檢查蝦皮金鑰是否出錯");
@@ -311,10 +290,8 @@ $(document).ready(function() {
 
   $("#allDateGenInv").on("click", function() {
     for (var i in Page) {
-      for (var j in Page[i]) {
-        if (Page[i][j].order_status == 'COMPLETED') {
-          genInv(Page[i][j].ordersn);
-        }
+      if (Page[i].order_status == 'COMPLETED') {
+        genInv(Page[i].ordersn);
       }
     }
   });
@@ -332,19 +309,9 @@ $(document).ready(function() {
     localStorage.setItem("paytwogohashiv", $("#paytwogohashiv").val());
   });
 
-  function slicePage() {
-    temppage.sort(function(a,b) {
+  function sortPage() {
+    Page.sort(function(a,b) {
       return a.update_time - b.update_time
     });
-    var subpage = [];
-    for (var i in temppage) {
-      if (subpage.length == 50) {
-        Page.push(subpage);
-        subpage = [];
-      }
-      subpage.push(temppage[i]);
-    }
-    if (subpage.length > 0)
-      Page.push(subpage);
   }
 });

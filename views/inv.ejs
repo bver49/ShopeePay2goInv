@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="utf-8">
-  <title>開立發票平台</title>
+  <title>開立發票</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
@@ -20,6 +20,26 @@
 </head>
 
 <body>
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="/">CPMAX</a>
+      </div>
+      <ul class="nav navbar-nav">
+        <% if(me.role ==2 ){ %>
+          <li><a href="/users">用戶管理</a></li>
+        <% } %>
+        <% if(me.inv == 1 || me.role ==2){ %>
+          <li><a href="/inv">開立發票</a></li>
+        <% } %>
+        <% if(me.ship == 1 || me.role ==2 ){ %>
+          <li><a href="/ship">出貨管理</a></li>
+        <% } %>
+        <li><a href="/">個人資料</a></li>
+        <li><a href="/users/logout">登出</a></li>
+      </ul>
+    </div>
+  </nav>
   <div class="container">
     <div class="col-md-10 col-md-offset-1" style="text-align:center;">
       <form class="form-inline searchform">
@@ -32,7 +52,7 @@
             </span>
           </div>
         </div>
-        結束日期
+        &nbsp;&nbsp;&nbsp; 結束日期
         <div class="form-group">
           <div class='input-group date' id='datetimepickertt'>
             <input type='text' class="form-control" id="tt" />
@@ -41,15 +61,10 @@
             </span>
           </div>
         </div>
-      </div>
-      <div class="col-md-10 col-md-offset-1" style="margin-top:30px;text-align:center;">
-        <div id="search" class="btn btn-primary">查詢</div>
-        <div id="setting" class="btn btn-primary">修改金鑰</div>
-        <a href="/users/profile" class="btn btn-primary">個人資料</a>
-        <% if(me.role==2){ %>
-          <a href="/users" class="btn btn-primary">管理用戶</a>
-        <% } %>
-        <a href="/users/logout" class="btn btn-primary">登出</a>
+    </div>
+    <div class="col-md-10 col-md-offset-1" style="margin-top:30px;text-align:center;">
+      <div id="search" class="btn btn-primary">查詢</div>
+      <div id="setting" class="btn btn-primary">修改金鑰</div>
       </form>
     </div>
     <div class="col-md-12" style="padding-top:10px;">
@@ -60,8 +75,8 @@
         </div>
       </div>
       <div class="col-md-6 col-md-offset-3" style="text-align:center;">
-          <div id="allSelectGenInv" class="btn btn-primary" style="display:none;margin-bottom:10px;">已選訂單全部開立</div>
-          <div id="allDateGenInv" class="btn btn-primary" style="display:none;margin-bottom:10px;">已選日期區間全部開立</div>
+        <div id="allSelectGenInv" class="btn btn-primary" style="display:none;margin-bottom:10px;">已選訂單全部開立</div>
+        <div id="allDateGenInv" class="btn btn-primary" style="display:none;margin-bottom:10px;">已選日期區間全部開立</div>
       </div>
       <table class="table table-hover table-bordered ordertable">
         <thead>

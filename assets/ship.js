@@ -1,0 +1,279 @@
+$(document).ready(function() {
+	var Page = [];
+	var List;
+	var CheckAmt = 0;
+
+	if (localStorage) {
+		$("#shopeesecret").val(localStorage.getItem("shopeesecret"));
+		$("#shopeeshopid").val(localStorage.getItem("shopeeshopid"));
+		$("#shopeepartnerid").val(localStorage.getItem("shopeepartnerid"));
+		$("#paytwogoid").val(localStorage.getItem("paytwogoid"));
+		$("#paytwogohashkey").val(localStorage.getItem("paytwogohashkey"));
+		$("#paytwogohashiv").val(localStorage.getItem("paytwogohashiv"));
+	}
+
+	toastr.options = {
+		"closeButton": true,
+		"positionClass": "toast-top-right",
+		"showDuration": "0",
+		"hideDuration": "1000",
+		"timeOut": "2000",
+		"extendedTimeOut": "1000"
+	}
+
+	function getNextPage(page) {
+		$.ajax({
+			url: '/api/orders',
+			type: 'POST',
+			data: {
+				tt: $("#tt").val(),
+				tf: $("#tf").val(),
+				page: page,
+				shopeesecret: $("#shopeesecret").val(),
+				shopeeshopid: $("#shopeeshopid").val(),
+				shopeepartnerid: $("#shopeepartnerid").val(),
+				paytwogoid: $("#paytwogoid").val(),
+				paytwogohashkey: $("#paytwogohashkey").val(),
+				paytwogohashiv: $("#paytwogohashiv").val()
+			},
+			success: function(response) {
+				for (var i in response.list) {
+					if (response.list[i].order_status == 'READY_TO_SHIP') {
+						Page.push(response.list[i]);
+					}
+				}
+				if (response.more === true) {
+					getNextPage(page + 1);
+				} else {
+					if ($("#carrier").val() == "否" && $("#orderamount").val() == "否") {
+						refreshTable(0);
+						showPageSelect();
+					} else {
+						getOrderDetail(Page, 0);
+					}
+				}
+			}
+		});
+	}
+
+	function showPageSelect() {
+		var pageAmt = Math.floor(Page.length / 50) + 1;
+		$(".hint").hide();
+		$("#pageTop").empty();
+		$("#pageBot").empty();
+		$("#pageTop").show();
+		$("#pageBot").show();
+		for (var i = 1; i <= pageAmt; i++) {
+			$("#pageTop").append(`<option>${i}</option>`);
+			$("#pageBot").append(`<option>${i}</option>`);
+		}
+	}
+
+	function refreshTable(page) {
+		$("#orderlist").empty();
+		if (Page.length < 1) {
+			var row = `<tr>
+									<td colspan="4" class="text-center">查無資料</td>
+								</tr>`
+			$("#orderlist").append(row);
+		} else {
+			for (var i = page * 50; i < (page + 1) * 50 && i < Page.length; i++) {
+				if (Page[i].order_status == 'READY_TO_SHIP' || Page[i].order_status == '準備出貨') {
+					var update = new Date(Page[i].update_time * 1000);
+					var updatestring = update.getFullYear() + "/" + (update.getMonth() + 1) + "/" + update.getDate() + " " + ((update.getHours() < 10) ? ("0" + update.getHours()) : (update.getHours())) + ":" + ((update.getMinutes() < 10) ? ("0" + update.getMinutes()) : (update.getMinutes()));
+					var row = `<tr><td>${Page[i].ordersn}</td>
+						<td>${updatestring}</td>
+						<td>準備出貨</td><td>
+            <a href="https://seller.shopee.tw/portal/sale?search=${Page[i].ordersn}" target="_blank" class="btn btn-primary">出貨</a>
+            <div class="btn btn-primary detail" data-id="${Page[i].ordersn}">詳細資料</div></td></tr>`;
+					$("#orderlist").append(row);
+				}
+			}
+			$(".detail").on("click", function() {
+				getOrder($(this).data("id"));
+			});
+			console.timeEnd("count");
+		}
+	}
+
+	function getOrder(ordersn) {
+		$.ajax({
+			url: '/api/order',
+			type: 'POST',
+			data: {
+				ordersn: ordersn,
+				shopeesecret: $("#shopeesecret").val(),
+				shopeeshopid: $("#shopeeshopid").val(),
+				shopeepartnerid: $("#shopeepartnerid").val(),
+				paytwogoid: $("#paytwogoid").val(),
+				paytwogohashkey: $("#paytwogohashkey").val(),
+				paytwogohashiv: $("#paytwogohashiv").val()
+			},
+			success: function(response) {
+				console.log(response);
+				var create = new Date(response.create_time * 1000);
+				var create_time = create.getFullYear() + "/" + (create.getMonth() + 1) + "/" + create.getDate() + " " + ((create.getHours() < 10) ? ("0" + create.getHours()) : (create.getHours())) + ":" + ((create.getMinutes() < 10) ? ("0" + create.getMinutes()) : (create.getMinutes()));
+				$("#orderDetail .modal-body").empty();
+				var detail = `
+        <p>成立時間 : ${create_time}</p><br>
+				<p>訂購人 : ${response.recipient_address.name}</p><br>
+				<p>手機 : ${response.recipient_address.phone}</p><br>
+        <p>訂單編號 : ${response.ordersn}</p><br>
+				<p>銷售額(未稅) : ${Math.round(response.total_amount / 1.05)}</p><br>
+				<p>發票稅額 : ${Math.round(response.total_amount - (response.total_amount / 1.05))}</p><br>
+				<p>發票總金額(商品價格+運費) : ${response.total_amount}</p><br>
+				<p>運費：${response.estimated_shipping_fee}</p><br>
+        <p>物流：${response.shipping_carrier}</p>
+				<hr>
+				`;
+				for (var i in response.items) {
+					detail += `
+					<p>商品名稱：${response.items[i].item_name.split(" ")[0]+" "+response.items[i].item_name.split(" ")[1]}</p>
+					<p>商品單價(折扣後)：${response.items[i].variation_discounted_price}</p>
+					<p>商品銷售數量：${response.items[i].variation_quantity_purchased}</p><br>
+					`;
+				}
+				$("#orderDetail .modal-body").append(detail);
+				$("#orderDetail").modal('show');
+			}
+		});
+	}
+
+	$('#datetimepickertf').datetimepicker({
+		format: "YYYY/MM/DD"
+	});
+
+	$('#datetimepickertt').datetimepicker({
+		format: "YYYY/MM/DD",
+		useCurrent: false
+	});
+
+	$("#datetimepickertf").on("dp.change", function(e) {
+		$('#datetimepickertt').data("DateTimePicker").minDate(e.date);
+	});
+
+	$("#datetimepickertt").on("dp.change", function(e) {
+		$('#datetimepickertf').data("DateTimePicker").maxDate(e.date);
+	});
+
+	$("#pageTop,#pageBot").on("change", function() {
+		var page = $(this).val() - 1;
+		$("#pageTop,#pageBot").val($(this).val());
+		refreshTable(page);
+	});
+
+	$("#search").on('click', function() {
+		if ($("#tt").val() != "" && $("#tf").val() != "") {
+			if ((Math.floor(new Date($("#tt").val()).getTime() / 1000) - Math.floor(new Date($("#tf").val()).getTime() / 1000)) <= 15 * 24 * 3600) {
+				console.time("count");
+				$("#pageTop").hide();
+				$("#pageBot").hide();
+				$("#orderlist").empty();
+				$(".hint").show();
+				$.ajax({
+					url: '/api/orders',
+					type: 'POST',
+					data: {
+						tt: $("#tt").val(),
+						tf: $("#tf").val(),
+						page: 0,
+						shopeesecret: $("#shopeesecret").val(),
+						shopeeshopid: $("#shopeeshopid").val(),
+						shopeepartnerid: $("#shopeepartnerid").val(),
+						paytwogoid: $("#paytwogoid").val(),
+						paytwogohashkey: $("#paytwogohashkey").val(),
+						paytwogohashiv: $("#paytwogohashiv").val()
+					},
+					success: function(response) {
+						Page = [];
+						if (response.list) {
+							for (var i in response.list) {
+								if (response.list[i].order_status == 'READY_TO_SHIP') {
+									Page.push(response.list[i]);
+								}
+							}
+							if (response.more === true) {
+								getNextPage(0)
+							} else {
+								if ($("#carrier").val() == "否" && $("#orderamount").val() == "否") {
+									refreshTable(0);
+									showPageSelect();
+								} else {
+									getOrderDetail(Page, 0);
+								}
+							}
+						} else {
+							toastr.warning("請檢查蝦皮金鑰是否出錯");
+						}
+					}
+				});
+			} else {
+				alert("日期間隔請設定在15天內");
+			}
+		}
+	});
+
+	$("#setting").on("click", function() {
+		$("#settingForm").modal("show");
+	});
+
+	$("#save").on("click", function() {
+		localStorage.setItem("shopeesecret", $("#shopeesecret").val());
+		localStorage.setItem("shopeeshopid", $("#shopeeshopid").val());
+		localStorage.setItem("shopeepartnerid", $("#shopeepartnerid").val());
+		localStorage.setItem("paytwogoid", $("#paytwogoid").val());
+		localStorage.setItem("paytwogohashkey", $("#paytwogohashkey").val());
+		localStorage.setItem("paytwogohashiv", $("#paytwogohashiv").val());
+	});
+
+	function sortPage() {
+		if ($("#carrier").val() != "否") {
+			for (var i in Page) {
+				if (Page[i].details.shipping_carrier != $("#carrier").val()) {
+					Page.splice(i, 1);
+				}
+			}
+		}
+		if ($("#orderamount").val() != "否") {
+			Page.sort(function(a, b) {
+				return b.details.total_amount - a.details.total_amount;
+			});
+		}
+	}
+
+	function getOrderDetail(arr, index, stop) {
+		$.ajax({
+			url: '/api/order',
+			type: 'POST',
+			data: {
+				ordersn: arr[index].ordersn,
+				shopeesecret: $("#shopeesecret").val(),
+				shopeeshopid: $("#shopeeshopid").val(),
+				shopeepartnerid: $("#shopeepartnerid").val(),
+				paytwogoid: $("#paytwogoid").val(),
+				paytwogohashkey: $("#paytwogohashkey").val(),
+				paytwogohashiv: $("#paytwogohashiv").val()
+			},
+			success: function(response) {
+				Page[index].details = response;
+				if (!stop) {
+					if (index != arr.length - 1) {
+						getOrderDetail(arr, index + 1, 1);
+						if (index != arr.length - 2) {
+							getOrderDetail(arr, index + 2, 1);
+							if (index != arr.length - 3)
+								getOrderDetail(arr, index + 3);
+						}
+					}
+				}
+				if (index == arr.length - 1) {
+					setTimeout(function() {
+						sortPage();
+						refreshTable(0);
+						showPageSelect();
+					}, 2000);
+				}
+			}
+		});
+	}
+});

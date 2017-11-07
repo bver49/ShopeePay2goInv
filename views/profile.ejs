@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="utf-8">
-  <title>開立發票平台</title>
+  <title>個人資料</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
@@ -16,6 +16,26 @@
 </head>
 
 <body>
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="/">CPMAX</a>
+      </div>
+      <ul class="nav navbar-nav">
+        <% if(me.role ==2 ){ %>
+          <li><a href="/users">用戶管理</a></li>
+        <% } %>
+        <% if(me.inv == 1 || me.role ==2){ %>
+          <li><a href="/inv">開立發票</a></li>
+        <% } %>
+        <% if(me.ship == 1 || me.role ==2){ %>
+          <li><a href="/ship">出貨管理</a></li>
+        <% } %>
+        <li><a href="/">個人資料</a></li>
+        <li><a href="/users/logout">登出</a></li>
+      </ul>
+    </div>
+  </nav>
   <div class="container">
     <div class="col-md-4 col-md-offset-4" style="margin-top:50px;">
       <h1 class="h2 text-center">個人資料</h1><br><br>
@@ -29,8 +49,10 @@
           <input type="password" class="form-control" id="password" placeholder="password">
         </div>
         <div id="update" data-id="<%= me.id %>" class="btn btn-default">更改</div>
-        <a href="/" class="btn btn-default">返回</a>
       </form>
+      <div style="margin-top:50px;">
+        擁有權限&nbsp;&nbsp;:&nbsp;&nbsp;<%= (me.inv==1)?"開立發票":" " %>&nbsp;&nbsp;<%= (me.ship==1)?"出貨管理":" " %>&nbsp;&nbsp;<%= (me.role==2)?"用戶管理":" " %>
+      </div>
     </div>
   </div>
 </body>

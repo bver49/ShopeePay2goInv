@@ -26,8 +26,8 @@ module.exports.getOrderList = function(tf, tt, page, key, cb) {
 		"timestamp": Math.floor(new Date().getTime() / 1000),
 		"update_time_to": dateToTs(tt),
 		"update_time_from": dateToTs(tf),
-		"pagination_entries_per_page": 50, //一頁呈現的訂單數目
-		"pagination_offset": parseInt(page) * 50 //第幾頁
+		"pagination_entries_per_page": 100, //一頁呈現的訂單數目
+		"pagination_offset": parseInt(page) * 100 //第幾頁
 	}
 	var url = 'https://partner.shopeemobile.com/api/v1/orders/basics';
 	request({

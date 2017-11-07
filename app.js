@@ -15,65 +15,73 @@ app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 
 app.use(function(req, res, next) {
-  if(!req.body.shopeesecret){
-    if (req.cookies.isLogin) {
-      User.findOne({
-        where: { id: req.cookies.id },
-        attributes:["id","username","role"]
-      }).then(function(user) {
-        req.user = user;
-        next();
-      });
-    } else {
-      next();
-    }
-  }else{
-    next();
-  }
+	if (!req.body.shopeesecret) {
+		if (req.cookies.isLogin) {
+			User.findOne({
+				where: { id: req.cookies.id },
+				attributes: ["id", "username", "role", "ship","inv"]
+			}).then(function(user) {
+				req.user = user;
+				next();
+			});
+		} else {
+			next();
+		}
+	} else {
+		next();
+	}
 });
 
 app.use("/api", require("./api"));
 app.use("/users", require('./user'));
 
 app.get("/", function(req, res) {
-  if (req.user) {
-    res.render("main",{
-      me:req.user
-    });
-  } else {
-    res.redirect("/users/login");
-  }
+	if (req.user) {
+		res.render("profile", {
+			me: req.user
+		});
+	} else {
+		res.redirect("/users/login");
+	}
 });
 
 app.get("/inv", function(req, res) {
-  if (req.user) {
-    res.render("inv",{
-      me:req.user
-    });
-  } else {
-    res.redirect("/users/login");
-  }
+	if (req.user) {
+		if (req.user.role == 2 || req.user.inv == 1) {
+			res.render("inv", {
+				me: req.user
+			});
+		} else {
+			res.redirect("/");
+		}
+	} else {
+		res.redirect("/users/login");
+	}
 });
 
-app.get("/order", function(req, res) {
-  if (req.user) {
-    res.render("order",{
-      me:req.user
-    });
-  } else {
-    res.redirect("/users/login");
-  }
+app.get("/ship", function(req, res) {
+	if (req.user) {
+		if (req.user.role == 2 || req.user.ship == 1) {
+			res.render("ship", {
+				me: req.user
+			});
+		} else {
+			res.redirect("/");
+		}
+	} else {
+		res.redirect("/users/login");
+	}
 });
 
 
 app.use(function(err, req, res, next) {
-  res.status(500).send('Something broke!')
+	res.status(500).send('Something broke!')
 });
 
 app.get('*', function(req, res, next) {
-  res.status(404).send('Page not found');
+	res.status(404).send('Page not found');
 });
 
 app.listen(3000, function() {
-  console.log("Listen on port 3000!");
+	console.log("Listen on port 3000!");
 });
