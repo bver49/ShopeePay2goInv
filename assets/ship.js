@@ -80,8 +80,10 @@ $(document).ready(function() {
       },
       success: function(response) {
         for (var i in response.list) {
-          Page[response.list[i].ordersn] = response.list[i];
-          orderSn.push(response.list[i].ordersn);
+          if(!Page[response.list[i].ordersn]){
+            Page[response.list[i].ordersn] = response.list[i];
+            orderSn.push(response.list[i].ordersn);
+          }
         }
         if (response.more === true) {
           getNextPage(page + 1);
@@ -310,8 +312,10 @@ $(document).ready(function() {
             orderSn = [];
             if (response.list) {
               for (var i in response.list) {
-                Page[response.list[i].ordersn] = response.list[i];
-                orderSn.push(response.list[i].ordersn);
+                if(!Page[response.list[i].ordersn]){
+                  Page[response.list[i].ordersn] = response.list[i];
+                  orderSn.push(response.list[i].ordersn);
+                }
               }
               if (response.more === true) {
                 getNextPage(1);
@@ -323,7 +327,7 @@ $(document).ready(function() {
                   refreshTable(0);
                   showPageSelect();
                 } else {
-                  if (Page.length > 0) {
+                  if (Object.keys(Page).length > 0) {
                     getOrdersDetail(orderSn, 0);
                   } else {
 										Page = Object.keys(Page).map(function(key) {
