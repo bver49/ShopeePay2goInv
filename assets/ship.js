@@ -222,7 +222,7 @@ $(document).ready(function() {
 						}
 					}
 				}
-				if (index >= ordersns.length - 1) {
+				if (index >= orderSn.length - 1) {
 					sortPage();
 					refreshTable(0);
 					showPageSelect();
@@ -292,6 +292,7 @@ $(document).ready(function() {
 					},
 					success: function(response) {
 						Page = [];
+						orderSn = [];
 						if (response.list) {
 							for (var i in response.list) {
 								Page.push(response.list[i]);
