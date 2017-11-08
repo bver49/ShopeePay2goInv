@@ -53,6 +53,7 @@ $(document).ready(function() {
 	//顯示頁數選擇
 	function showPageSelect() {
 		console.log(shopList);
+		window.pg =Page;
 		stop();
 		var pageAmt = Math.floor(Page.length / 50) + 1;
 		for (var i = 1; i <= pageAmt; i++) {
@@ -236,16 +237,18 @@ $(document).ready(function() {
 	//訂單排序
 	function sortPage() {
 		if ($("#carrier").val() != "否") {
-			for (var i in Page) {
-				if (Page[i].detail.shipping_carrier != $("#carrier").val()) {
-					Page.splice(i, 1);
-				}
-			}
+			console.time("filter");
+			Page = Page.filter(function(ele){
+ 				return ele.detail.shipping_carrier == $("#carrier").val();
+			});
+			console.timeEnd("filter");
 		}
 		if ($("#orderamount").val() != "否") {
+			console.time("sort");
 			Page.sort(function(a, b) {
 				return b.detail.total_amount - a.detail.total_amount;
 			});
+			console.timeEnd("sort");
 		}
 	}
 
@@ -299,7 +302,7 @@ $(document).ready(function() {
 								orderSn.push(response.list[i].ordersn);
 							}
 							if (response.more === true) {
-								getNextPage(0)
+								getNextPage(1);
 							} else {
 								if ($("#carrier").val() == "否" && $("#orderamount").val() == "否" && $("#itemscount").val() == "否") {
 									refreshTable(0);

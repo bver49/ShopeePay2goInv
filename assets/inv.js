@@ -73,7 +73,7 @@ $(document).ready(function() {
 		$("#orderlist").empty();
 		if (Page.length < 1) {
 			var row = `<tr>
-									<td colspan="4" class="text-center">查無資料</td>
+									<td colspan="5" class="text-center">查無資料</td>
 								</tr>`
 			$("#orderlist").append(row);
 		} else {
@@ -256,10 +256,12 @@ $(document).ready(function() {
 								}
 							}
 							if (response.more === true) {
-								getNextPage(0)
+								getNextPage(1)
 							} else {
 								sortPage();
 								refreshTable(0);
+								showPageSelect();
+								$(".hint").hide();
 							}
 						} else {
 							toastr.warning("請檢查蝦皮金鑰是否出錯");
