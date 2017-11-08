@@ -44,7 +44,7 @@ module.exports.getOrderList = function(tf, tt, page, key, cb) {
 	});
 }
 
-module.exports.getOrderListStatus = function(tf, tt, page, key, cb) {
+module.exports.getOrderListByStatus = function(tf, tt, page, status, key, cb) {
 	var data = {
 		"shopid": parseInt(key.shopeeshopid),
 		"partner_id": parseInt(key.shopeepartnerid),
@@ -53,7 +53,7 @@ module.exports.getOrderListStatus = function(tf, tt, page, key, cb) {
 		"create_time_from": dateToTs(tf),
 		"pagination_entries_per_page": 100, //一頁呈現的訂單數目
 		"pagination_offset": parseInt(page) * 100, //第幾頁
-		"order_status":"READY_TO_SHIP"
+		"order_status": status
 	}
 	var url = 'https://partner.shopeemobile.com/api/v1/orders/get';
 	request({
@@ -88,13 +88,13 @@ module.exports.getOrdersDetail = function(orders, key, cb) {
 		json: data
 	}, function(e, r, b) {
 		if (b.error) console.log(b.error);
-		if(b.orders){
+		if (b.orders) {
 			if (b.orders.length > 1) {
 				cb(b.orders);
-			}else{
+			} else {
 				cb([]);
 			}
-		}else{
+		} else {
 			cb([]);
 		}
 	});
@@ -118,13 +118,13 @@ module.exports.getOrderDetail = function(ordersn, key, cb) {
 		json: data
 	}, function(e, r, b) {
 		if (b.error) console.log(b.error);
-		if(b.orders){
+		if (b.orders) {
 			if (b.orders.length > 0) {
 				cb(b.orders[0]);
-			}else{
+			} else {
 				cb([]);
 			}
-		}else{
+		} else {
 			cb([]);
 		}
 	});
