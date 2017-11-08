@@ -1,4 +1,12 @@
 $(document).ready(function() {
+
+	window.onerror = function(msg) {
+		console.log(msg);
+		stop();
+		$("#pageTop").hide();
+		$("#pageBot").hide();
+	};
+
 	var Page = [];
 	var shopList = {};
 	var orderSn = [];
@@ -257,7 +265,7 @@ $(document).ready(function() {
 		var count = 1;
 		for (var i in shopList) {
 			var typeamt = Object.keys(shopList[i].type).length;
-			result += `<tr><td rowspan="${typeamt}">${count}</td><td rowspan="${typeamt}">${shopList[i].name}</td>`
+			result += `<tr><td rowspan="${typeamt}">${count}</td><td rowspan="${typeamt}">${shopList[i].name}</td><td rowspan="${typeamt}">${shopList[i].sku}</td>`
 			for (var j in shopList[i].type) {
 				if (title == 0) {
 					title = 1;
@@ -324,12 +332,13 @@ $(document).ready(function() {
 						} else {
 							shopList[item.item_id] = {
 								name: item.item_name,
-								type: {}
+								type: {},
+								sku: item.item_sku
 							}
 							shopList[item.item_id].type[item.variation_id] = {
 								amount: item.variation_quantity_purchased,
 								typename: item.variation_name,
-                price: item.variation_original_price
+								price: item.variation_original_price
 							}
 						}
 					}

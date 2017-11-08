@@ -45,12 +45,15 @@ module.exports.getOrderList = function(tf, tt, page, key, cb) {
 }
 
 module.exports.getOrderListByStatus = function(tf, tt, page, status, key, cb) {
+	tt = dateToTs(tt);
+	tf = dateToTs(tf);
+	if(tt==tf) tt = tf + (24 *3600);
 	var data = {
 		"shopid": parseInt(key.shopeeshopid),
 		"partner_id": parseInt(key.shopeepartnerid),
 		"timestamp": Math.floor(new Date().getTime() / 1000),
-		"create_time_to": dateToTs(tt),
-		"create_time_from": dateToTs(tf),
+		"create_time_to": tt,
+		"create_time_from": tf,
 		"pagination_entries_per_page": 100, //一頁呈現的訂單數目
 		"pagination_offset": parseInt(page) * 100, //第幾頁
 		"order_status": status
