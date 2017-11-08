@@ -6,6 +6,7 @@ var taxRate = 0.05;
 var rijEcb = new MCrypt('rijndael-128', 'cbc');
 var emailReg = new RegExp(/[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/i);
 
+//shopee util
 function dateToTs(date) {
 	if (date == "now") {
 		return Math.floor(new Date().getTime() / 1000);
@@ -18,122 +19,9 @@ function encode(url, data, secret) {
 	var basestring = url.concat('|', JSON.stringify(data));
 	return crypto.createHmac('sha256', secret).update(basestring).digest('hex');
 }
+//shopee util
 
-module.exports.getOrderList = function(tf, tt, page, key, cb) {
-	var data = {
-		"shopid": parseInt(key.shopeeshopid),
-		"partner_id": parseInt(key.shopeepartnerid),
-		"timestamp": Math.floor(new Date().getTime() / 1000),
-		"update_time_to": dateToTs(tt),
-		"update_time_from": dateToTs(tf),
-		"pagination_entries_per_page": 100, //一頁呈現的訂單數目
-		"pagination_offset": parseInt(page) * 100 //第幾頁
-	}
-	var url = 'https://partner.shopeemobile.com/api/v1/orders/basics';
-	request({
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-			'Authorization': encode(url, data, key.shopeesecret)
-		},
-		url: url,
-		json: data
-	}, function(e, r, b) {
-		if (b.error) console.log(b.error);
-		cb(b.orders, b.more);
-	});
-}
-
-module.exports.getOrderListByStatus = function(tf, tt, page, status, key, cb) {
-	tt = dateToTs(tt);
-	tf = dateToTs(tf);
-	if(tt==tf) tt = tf + (24 *3600);
-	var data = {
-		"shopid": parseInt(key.shopeeshopid),
-		"partner_id": parseInt(key.shopeepartnerid),
-		"timestamp": Math.floor(new Date().getTime() / 1000),
-		"create_time_to": tt,
-		"create_time_from": tf,
-		"pagination_entries_per_page": 100, //一頁呈現的訂單數目
-		"pagination_offset": parseInt(page) * 100, //第幾頁
-		"order_status": status
-	}
-	var url = 'https://partner.shopeemobile.com/api/v1/orders/get';
-	request({
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-			'Authorization': encode(url, data, key.shopeesecret)
-		},
-		url: url,
-		json: data
-	}, function(e, r, b) {
-		if (b.error) console.log(b.error);
-		cb(b.orders, b.more);
-	});
-}
-
-module.exports.getOrdersDetail = function(orders, key, cb) {
-	var data = {
-		"shopid": parseInt(key.shopeeshopid),
-		"partner_id": parseInt(key.shopeepartnerid),
-		"timestamp": Math.floor(new Date().getTime() / 1000),
-		"ordersn_list": orders
-	}
-	var url = 'https://partner.shopeemobile.com/api/v1/orders/detail';
-	request({
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-			'Authorization': encode(url, data, key.shopeesecret)
-		},
-		url: url,
-		json: data
-	}, function(e, r, b) {
-		if (b.error) console.log(b.error);
-		if (b.orders) {
-			if (b.orders.length > 1) {
-				cb(b.orders);
-			} else {
-				cb([]);
-			}
-		} else {
-			cb([]);
-		}
-	});
-}
-
-module.exports.getOrderDetail = function(ordersn, key, cb) {
-	var data = {
-		"shopid": parseInt(key.shopeeshopid),
-		"partner_id": parseInt(key.shopeepartnerid),
-		"timestamp": Math.floor(new Date().getTime() / 1000),
-		"ordersn_list": [ordersn]
-	}
-	var url = 'https://partner.shopeemobile.com/api/v1/orders/detail';
-	request({
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-			'Authorization': encode(url, data, key.shopeesecret)
-		},
-		url: url,
-		json: data
-	}, function(e, r, b) {
-		if (b.error) console.log(b.error);
-		if (b.orders) {
-			if (b.orders.length > 0) {
-				cb(b.orders[0]);
-			} else {
-				cb([]);
-			}
-		} else {
-			cb([]);
-		}
-	});
-}
-
-//pay2go
+//pay2go util
 function countOrigin(amount) {
 	return Math.round(amount / 1.05);
 }
@@ -172,7 +60,139 @@ function postdata(data, key, iv) {
 	rijEcb.open(key, iv);
 	return rijEcb.encrypt(padding(qs.stringify(data))).toString('hex').trim();
 }
+//pay2go util
 
+//依照訂單更新時間查找
+module.exports.getOrderList = function(tf, tt, page, key, cb) {
+	var data = {
+		"shopid": parseInt(key.shopeeshopid),
+		"partner_id": parseInt(key.shopeepartnerid),
+		"timestamp": Math.floor(new Date().getTime() / 1000),
+		"update_time_to": dateToTs(tt),
+		"update_time_from": dateToTs(tf),
+		"pagination_entries_per_page": 100, //一頁呈現的訂單數目
+		"pagination_offset": parseInt(page) * 100 //第幾頁
+	}
+	var url = 'https://partner.shopeemobile.com/api/v1/orders/basics';
+	request({
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+			'Authorization': encode(url, data, key.shopeesecret)
+		},
+		url: url,
+		json: data
+	}, function(e, r, b) {
+		if (!b.orders || b.error) {
+			console.log(b.error);
+			console.log(data);
+			cb([], false);
+		} else {
+			cb(b.orders, b.more);
+		}
+	});
+}
+
+//依照訂單狀態查找
+module.exports.getOrderListByStatus = function(tf, tt, page, status, key, cb) {
+	tt = dateToTs(tt);
+	tf = dateToTs(tf);
+	if (tt == tf) tt = tf + (24 * 3600);
+	var data = {
+		"shopid": parseInt(key.shopeeshopid),
+		"partner_id": parseInt(key.shopeepartnerid),
+		"timestamp": Math.floor(new Date().getTime() / 1000),
+		"create_time_to": tt,
+		"create_time_from": tf,
+		"pagination_entries_per_page": 100, //一頁呈現的訂單數目
+		"pagination_offset": parseInt(page) * 100, //第幾頁
+		"order_status": status
+	}
+	var url = 'https://partner.shopeemobile.com/api/v1/orders/get';
+	request({
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+			'Authorization': encode(url, data, key.shopeesecret)
+		},
+		url: url,
+		json: data
+	}, function(e, r, b) {
+		if (!b.orders || b.error) {
+			console.log(b.error);
+			console.log(data);
+			cb([], false);
+		} else {
+			cb(b.orders, b.more);
+		}
+	});
+}
+
+//多筆訂單查找詳細資料
+module.exports.getOrdersDetail = function(orders, key, cb) {
+	var data = {
+		"shopid": parseInt(key.shopeeshopid),
+		"partner_id": parseInt(key.shopeepartnerid),
+		"timestamp": Math.floor(new Date().getTime() / 1000),
+		"ordersn_list": orders
+	}
+	var url = 'https://partner.shopeemobile.com/api/v1/orders/detail';
+	request({
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+			'Authorization': encode(url, data, key.shopeesecret)
+		},
+		url: url,
+		json: data
+	}, function(e, r, b) {
+		if (!b.orders || b.error) {
+			console.log(b.error);
+			console.log(data);
+			cb([]);
+		} else {
+			if (b.orders.length > 0) {
+				cb(b.orders);
+			} else {
+				cb([]);
+			}
+		}
+	});
+}
+
+//單筆訂單查找詳細資料
+module.exports.getOrderDetail = function(ordersn, key, cb) {
+	var data = {
+		"shopid": parseInt(key.shopeeshopid),
+		"partner_id": parseInt(key.shopeepartnerid),
+		"timestamp": Math.floor(new Date().getTime() / 1000),
+		"ordersn_list": [ordersn]
+	}
+	var url = 'https://partner.shopeemobile.com/api/v1/orders/detail';
+	request({
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+			'Authorization': encode(url, data, key.shopeesecret)
+		},
+		url: url,
+		json: data
+	}, function(e, r, b) {
+		if (!b.orders || b.error) {
+			console.log(b.error);
+			console.log(data);
+			cb([]);
+		} else {
+			if (b.orders.length > 0) {
+				cb(b.orders[0]);
+			} else {
+				cb([]);
+			}
+		}
+	});
+}
+
+//開發票
 module.exports.genInvoice = function(shopeeData, key, cb) {
 	var data = {
 		RespondType: "JSON",

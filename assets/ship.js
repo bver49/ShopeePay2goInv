@@ -1,15 +1,15 @@
 $(document).ready(function() {
 
+	var Page = [];
+	var shopList = {};
+	var orderSn = [];
+
 	window.onerror = function(msg) {
 		console.log(msg);
 		stop();
 		$("#pageTop").hide();
 		$("#pageBot").hide();
 	};
-
-	var Page = [];
-	var shopList = {};
-	var orderSn = [];
 
 	if (localStorage) {
 		$("#shopeesecret").val(localStorage.getItem("shopeesecret"));
@@ -29,6 +29,39 @@ $(document).ready(function() {
 		"extendedTimeOut": "1000"
 	}
 
+
+	function start() {
+		console.time("count");
+		$("#pageTop").hide();
+		$("#pageBot").hide();
+		$("#search").hide();
+		$("#itemsdetail").hide();
+		$("#orderlist").empty();
+		$(".hint").show();
+	}
+
+	function stop() {
+		if ($("#itemscount").val() == "是") $("#itemsdetail").show();
+		$(".hint").hide();
+		$("#pageTop").empty();
+		$("#pageBot").empty();
+		$("#pageTop").show();
+		$("#pageBot").show();
+		$("#search").show();
+	}
+
+	//顯示頁數選擇
+	function showPageSelect() {
+		console.log(shopList);
+		stop();
+		var pageAmt = Math.floor(Page.length / 50) + 1;
+		for (var i = 1; i <= pageAmt; i++) {
+			$("#pageTop").append(`<option>${i}</option>`);
+			$("#pageBot").append(`<option>${i}</option>`);
+		}
+	}
+
+	//撈出下一頁的資料
 	function getNextPage(page) {
 		$.ajax({
 			url: '/api/orders?status=2',
@@ -70,36 +103,7 @@ $(document).ready(function() {
 		});
 	}
 
-	function showPageSelect() {
-		console.log(shopList);
-		stop();
-		var pageAmt = Math.floor(Page.length / 50) + 1;
-		for (var i = 1; i <= pageAmt; i++) {
-			$("#pageTop").append(`<option>${i}</option>`);
-			$("#pageBot").append(`<option>${i}</option>`);
-		}
-	}
-
-	function start() {
-		console.time("count");
-		$("#pageTop").hide();
-		$("#pageBot").hide();
-		$("#search").hide();
-		$("#itemsdetail").hide();
-		$("#orderlist").empty();
-		$(".hint").show();
-	}
-
-	function stop() {
-		if ($("#itemscount").val() == "是") $("#itemsdetail").show();
-		$(".hint").hide();
-		$("#pageTop").empty();
-		$("#pageBot").empty();
-		$("#pageTop").show();
-		$("#pageBot").show();
-		$("#search").show();
-	}
-
+	//更新table資料
 	function refreshTable(page) {
 		$("#orderlist").empty();
 		if (Page.length < 1) {
@@ -127,6 +131,7 @@ $(document).ready(function() {
 		}
 	}
 
+	//查找單筆訂單詳細資料
 	function getOrder(ordersn) {
 		$.ajax({
 			url: '/api/order/detail',
@@ -168,6 +173,80 @@ $(document).ready(function() {
 				$("#orderDetail").modal('show');
 			}
 		});
+	}
+
+	//查找多筆訂單詳細資料
+	function getOrdersDetail(ordersns, page) {
+		var data = ordersns.slice(page * 50, (page + 1) * 50);
+		var index = page * 50;
+		$.ajax({
+			url: '/api/orders/detail',
+			type: 'POST',
+			data: {
+				ordersn: data,
+				shopeesecret: $("#shopeesecret").val(),
+				shopeeshopid: $("#shopeeshopid").val(),
+				shopeepartnerid: $("#shopeepartnerid").val(),
+				paytwogoid: $("#paytwogoid").val(),
+				paytwogohashkey: $("#paytwogohashkey").val(),
+				paytwogohashiv: $("#paytwogohashiv").val()
+			},
+			success: function(response) {
+				for (var x in response) {
+					if (parseInt(x) + (page * 50) >= Page.length) break;
+					Page[parseInt(x) + (page * 50)].detail = response[x];
+					index++;
+					for (var y in response[x].items) {
+						var item = response[x].items[y];
+						if (shopList[item.item_id]) {
+							if (shopList[item.item_id].type[item.variation_id]) {
+								shopList[item.item_id].type[item.variation_id].amount += item.variation_quantity_purchased;
+							} else {
+								shopList[item.item_id].type[item.variation_id] = {
+									amount: item.variation_quantity_purchased,
+									typename: item.variation_name,
+									price: item.variation_original_price
+								}
+							}
+						} else {
+							shopList[item.item_id] = {
+								name: item.item_name,
+								type: {},
+								sku: item.item_sku
+							}
+							shopList[item.item_id].type[item.variation_id] = {
+								amount: item.variation_quantity_purchased,
+								typename: item.variation_name,
+								price: item.variation_original_price
+							}
+						}
+					}
+				}
+				if (index >= ordersns.length - 1) {
+					sortPage();
+					refreshTable(0);
+					showPageSelect();
+				} else {
+					getOrdersDetail(orderSn, page + 1);
+				}
+			}
+		});
+	}
+
+	//訂單排序
+	function sortPage() {
+		if ($("#carrier").val() != "否") {
+			for (var i in Page) {
+				if (Page[i].detail.shipping_carrier != $("#carrier").val()) {
+					Page.splice(i, 1);
+				}
+			}
+		}
+		if ($("#orderamount").val() != "否") {
+			Page.sort(function(a, b) {
+				return b.detail.total_amount - a.detail.total_amount;
+			});
+		}
 	}
 
 	$('#datetimepickertf').datetimepicker({
@@ -282,75 +361,4 @@ $(document).ready(function() {
 		$("#items").modal('show');
 	});
 
-	function sortPage() {
-		if ($("#carrier").val() != "否") {
-			for (var i in Page) {
-				if (Page[i].detail.shipping_carrier != $("#carrier").val()) {
-					Page.splice(i, 1);
-				}
-			}
-		}
-		if ($("#orderamount").val() != "否") {
-			Page.sort(function(a, b) {
-				return b.detail.total_amount - a.detail.total_amount;
-			});
-		}
-	}
-
-	function getOrdersDetail(ordersns, page) {
-		var data = ordersns.slice(page * 50, (page + 1) * 50);
-		var index = page * 50;
-		$.ajax({
-			url: '/api/orders/detail',
-			type: 'POST',
-			data: {
-				ordersn: data,
-				shopeesecret: $("#shopeesecret").val(),
-				shopeeshopid: $("#shopeeshopid").val(),
-				shopeepartnerid: $("#shopeepartnerid").val(),
-				paytwogoid: $("#paytwogoid").val(),
-				paytwogohashkey: $("#paytwogohashkey").val(),
-				paytwogohashiv: $("#paytwogohashiv").val()
-			},
-			success: function(response) {
-				for (var x in response) {
-					if (parseInt(x) + (page * 50) >= Page.length) break;
-					Page[parseInt(x) + (page * 50)].detail = response[x];
-					index++;
-					for (var y in response[x].items) {
-						var item = response[x].items[y];
-						if (shopList[item.item_id]) {
-							if (shopList[item.item_id].type[item.variation_id]) {
-								shopList[item.item_id].type[item.variation_id].amount += item.variation_quantity_purchased;
-							} else {
-								shopList[item.item_id].type[item.variation_id] = {
-									amount: item.variation_quantity_purchased,
-									typename: item.variation_name,
-									price: item.variation_original_price
-								}
-							}
-						} else {
-							shopList[item.item_id] = {
-								name: item.item_name,
-								type: {},
-								sku: item.item_sku
-							}
-							shopList[item.item_id].type[item.variation_id] = {
-								amount: item.variation_quantity_purchased,
-								typename: item.variation_name,
-								price: item.variation_original_price
-							}
-						}
-					}
-				}
-				if (index >= ordersns.length - 1) {
-					sortPage();
-					refreshTable(0);
-					showPageSelect();
-				} else {
-					getOrdersDetail(orderSn, page + 1);
-				}
-			}
-		});
-	}
 });

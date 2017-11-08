@@ -1,4 +1,5 @@
 $(document).ready(function() {
+	
 	toastr.options = {
 		"closeButton": true,
 		"positionClass": "toast-top-right",
@@ -8,6 +9,7 @@ $(document).ready(function() {
 		"extendedTimeOut": "1000"
 	}
 
+	//登入
 	$("#login").on("click", function() {
 		if ($("#username").val() == "" || $("#password").val() == "") {
 			toastr.warning("請輸入帳號與密碼");
@@ -30,6 +32,7 @@ $(document).ready(function() {
 		}
 	});
 
+	//註冊
 	$("#signup").on("click", function() {
 		if ($("#username").val() == "" || $("#password").val() == "") {
 			toastr.warning("請輸入帳號與密碼");
@@ -55,6 +58,7 @@ $(document).ready(function() {
 		}
 	});
 
+	//新增用戶
 	$("#adduser").on("click", function() {
 		if ($("#username").val() == "" || $("#password").val() == "") {
 			toastr.warning("請輸入帳號與密碼");
@@ -80,6 +84,7 @@ $(document).ready(function() {
 		}
 	});
 
+	//更新資料
 	$("#update").on("click", function() {
 		if ($("#username").val() != "" || $("#password").val() != "") {
 			var data = {}
@@ -103,6 +108,7 @@ $(document).ready(function() {
 		}
 	});
 
+	//刪除用戶
 	$(".deluser").on("click", function() {
 		var id = $(this).data("id");
 		if (confirm("確定要刪除用戶?")) {
@@ -121,6 +127,7 @@ $(document).ready(function() {
 		}
 	});
 
+	//開通用戶
 	$(".verifyuser").on("click", function() {
 		var id = $(this).data("id");
 		if (confirm("確定要開通用戶?")) {
@@ -141,6 +148,7 @@ $(document).ready(function() {
 		}
 	});
 
+	//新增用戶權限
 	$(".allowjob").on("click", function() {
 		var id = $(this).data("id");
 		if (confirm("確定要新增權限?")) {
@@ -160,6 +168,8 @@ $(document).ready(function() {
 			});
 		}
 	});
+
+	//移除用戶權限
 	$(".notallowjob").on("click", function() {
 		var id = $(this).data("id");
 		if (confirm("確定要移除權限?")) {
