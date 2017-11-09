@@ -91,13 +91,13 @@ router.get("/invlist", function(req, res) {
 });
 
 router.post("/genexcel", function(req, res) {
-  genExcel('商品計算',req.body,function(){
-		res.send("商品計算");
+  genExcel(req.body,function(){
+		res.send('ok');
 	});
 });
 
-router.get("/downloadexcel/:name", function(req, res) {
-	res.download("./file/商品計算.xlsx");
+router.get('/downloadexcel', function(req, res) {
+	res.download('./file/待出貨商品統計.xlsx');
 });
 
 module.exports = router;

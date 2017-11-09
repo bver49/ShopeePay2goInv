@@ -237,6 +237,9 @@ $(document).ready(function() {
 					count++;
 				}
 				if (count + (page * 50) >= orderSn.length - 1) {
+					shopList.tt = $("#tt").val();
+					shopList.tf = $("#tf").val();
+					shopList.carrier = $("#carrier").val();
 					sortPage();
 					refreshTable(0);
 					showPageSelect();
@@ -401,7 +404,7 @@ $(document).ready(function() {
 			data:JSON.stringify(shopList),
 			success: function(response) {
 				if(response!='err'){
-					window.open(`/api/downloadexcel/${response}`,'_blank');
+					window.open(`/api/downloadexcel`,'_blank');
 				}
 				else{
 					console.log("err");
