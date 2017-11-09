@@ -127,7 +127,6 @@ module.exports.getOrderListByStatus = function(tf, tt, page, status, key, cb) {
       console.log(data);
       cb([], false);
     } else {
-      console.log(b.more);
       cb(b.orders, b.more);
     }
   });
@@ -251,9 +250,11 @@ module.exports.genInvoice = function(shopeeData, key, cb) {
 }
 
 module.exports.genExcel = function(data, cb) {
-  var wb = new xl.Workbook(defaultFont: {
-    size: 12,
-    name: '新細明體'
+  var wb = new xl.Workbook({
+    defaultFont: {
+      size: 12,
+      name: '新細明體'
+    }
   });
 
   var x = 1;

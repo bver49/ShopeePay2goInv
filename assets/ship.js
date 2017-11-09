@@ -376,6 +376,7 @@ $(document).ready(function() {
 		var title = 0;
 		var count = 1;
 		for (var i in shopList) {
+			if(i == 'tt' || i == 'tf' || i == 'carrier') continue;
 			var typeamt = Object.keys(shopList[i].type).length;
 			result += `<tr><td rowspan="${typeamt}">${count}</td><td rowspan="${typeamt}">${shopList[i].name}</td><td rowspan="${typeamt}">${shopList[i].sku}</td>`
 			for (var j in shopList[i].type) {
@@ -404,7 +405,7 @@ $(document).ready(function() {
 			data:JSON.stringify(shopList),
 			success: function(response) {
 				if(response!='err'){
-					window.open(`/api/downloadexcel`,'_blank');
+					window.open('/downloadexcel','_blank');
 				}
 				else{
 					console.log("err");

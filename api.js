@@ -96,8 +96,4 @@ router.post("/genexcel", function(req, res) {
 	});
 });
 
-router.get('/downloadexcel', function(req, res) {
-	res.download('./file/待出貨商品統計.xlsx');
-});
-
 module.exports = router;

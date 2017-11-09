@@ -73,9 +73,12 @@ app.get("/ship", function(req, res) {
 	}
 });
 
+app.get('/downloadexcel', function(req, res) {
+	res.download('./file/待出貨商品統計.xlsx');
+});
 
 app.use(function(err, req, res, next) {
-	res.status(500).send('Something broke!')
+	res.status(500).send(err);
 });
 
 app.get('*', function(req, res, next) {
