@@ -7,6 +7,7 @@ var getOrdersDetail = helper.getOrdersDetail;
 var getOrderDetail = helper.getOrderDetail;
 var genInvoice = helper.genInvoice;
 var getOrderListByStatus = helper.getOrderListByStatus;
+var genExcel = helper.genExcel;
 
 router.post("/orders", function(req, res) {
 	var key = {
@@ -85,8 +86,18 @@ router.post("/geninv", function(req, res) {
 });
 
 router.get("/invlist", function(req, res) {
-	var list = fs.readFileSync('list.txt', 'utf8');
+	var list = fs.readFileSync('list.txt','utf8');
 	res.send(list.split(/\n/));
+});
+
+router.post("/genexcel", function(req, res) {
+  genExcel('商品計算',req.body,function(){
+		res.send("商品計算");
+	});
+});
+
+router.get("/downloadexcel/:name", function(req, res) {
+	res.download("./file/商品計算.xlsx");
 });
 
 module.exports = router;
