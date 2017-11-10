@@ -300,7 +300,7 @@ $(document).ready(function() {
 
 	$("#search").on('click', function() {
 		if ($("#tt").val() != "" && $("#tf").val() != "") {
-			if ((Math.floor(new Date($("#tt").val()).getTime() / 1000) - Math.floor(new Date($("#tf").val()).getTime() / 1000)) <= 15 * 24 * 3600) {
+			if (((Math.floor(new Date($("#tt").val()).getTime() / 1000)+(24*60*60)-1) - Math.floor(new Date($("#tf").val()).getTime() / 1000)) <= 15 * 24 * 3600) {
 				start();
 				$.ajax({
 					url: '/api/orders?status=2',
