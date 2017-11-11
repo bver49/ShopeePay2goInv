@@ -87,8 +87,7 @@ module.exports.getOrderList = function(tf, tt, page, key, cb) {
     url: url,
     json: data
   }, function(e, r, b) {
-    if (!b.orders || b.error) {
-      console.log(b.error);
+    if (!b || !b.orders || b.error) {
       console.log(data);
       cb([], false);
     } else {
@@ -122,8 +121,7 @@ module.exports.getOrderListByStatus = function(tf, tt, page, status, key, cb) {
     url: url,
     json: data
   }, function(e, r, b) {
-    if (!b.orders || b.error) {
-      console.log(b.error);
+    if (!b || !b.orders || b.error) {
       console.log(data);
       cb([], false);
     } else {
@@ -150,8 +148,7 @@ module.exports.getOrdersDetail = function(orders, key, cb) {
     url: url,
     json: data
   }, function(e, r, b) {
-    if (!b.orders || b.error) {
-      console.log(b.error);
+    if (!b || !b.orders || b.error) {
       console.log(data);
       cb([]);
     } else {
@@ -182,8 +179,7 @@ module.exports.getOrderDetail = function(ordersn, key, cb) {
     url: url,
     json: data
   }, function(e, r, b) {
-    if (!b.orders || b.error) {
-      console.log(b.error);
+    if (!b || !b.orders || b.error) {
       console.log(data);
       cb([]);
     } else {
