@@ -95,23 +95,21 @@ $(document).ready(function() {
 				if (response.more === true) {
 					getNextPage(page + 1);
 				} else {
-					if ($("#carrier").val() == "否" && $("#orderamount").val() == "否" && $("#itemscount").val() == "否") {
+					/*if ($("#carrier").val() == "否" && $("#orderamount").val() == "否" && $("#itemscount").val() == "否") {
 						Page = Object.keys(Page).map(function(key) {
 							return Page[key];
 						});
 						refreshTable(0);
 						showPageSelect();
-					} else {
+					} else {*/
 						if (Object.keys(Page).length > 0) {
 							getOrdersDetail(orderSn, 0);
 						} else {
-							Page = Object.keys(Page).map(function(key) {
-								return Page[key];
-							});
+							Page = [];
 							refreshTable(0);
 							showPageSelect();
 						}
-					}
+					//}
 				}
 			}
 		});
@@ -122,19 +120,25 @@ $(document).ready(function() {
 		$("#orderlist").empty();
 		if (Page.length < 1) {
 			var row = `<tr>
-									<td colspan="5" class="text-center">查無資料</td>
+									<td colspan="7" class="text-center">查無資料</td>
 								</tr>`
 			$("#orderlist").append(row);
 		} else {
 			for (var i = page * 50; i < (page + 1) * 50 && i < Page.length; i++) {
 				if (Page[i].order_status == 'READY_TO_SHIP') {
 					var update = new Date(Page[i].update_time * 1000);
-					var updatestring = update.getFullYear() + "/" + (update.getMonth() + 1) + "/" + update.getDate() + " " + ((update.getHours() < 10) ? ("0" + update.getHours()) : (update.getHours())) + ":" + ((update.getMinutes() < 10) ? ("0" + update.getMinutes()) : (update.getMinutes()));
+					var updatestr = update.getFullYear() + "/" + (update.getMonth() + 1) + "/" + update.getDate() + " " + ((update.getHours() < 10) ? ("0" + update.getHours()) : (update.getHours())) + ":" + ((update.getMinutes() < 10) ? ("0" + update.getMinutes()) : (update.getMinutes()));
+					var shipdate = new Date(Page[i].update_time * 1000 + (Page[i].detail.days_to_ship*24*3600000));
+					var shipdatestr = shipdate.getFullYear() + "/" + (shipdate.getMonth() + 1) + "/" + shipdate.getDate() + " " + ((shipdate.getHours() < 10) ? ("0" + shipdate.getHours()) : (shipdate.getHours())) + ":" + ((shipdate.getMinutes() < 10) ? ("0" + shipdate.getMinutes()) : (shipdate.getMinutes()));
 					var row = `<tr><td>${i+1}</td><td>${Page[i].ordersn}</td>
-						<td>${updatestring}</td>
-						<td>準備出貨</td><td>
-            <a href="https://seller.shopee.tw/portal/sale?search=${Page[i].ordersn}" target="_blank" class="btn btn-primary">出貨</a>
-            <div class="btn btn-primary detail" data-id="${Page[i].ordersn}">詳細資料</div></td></tr>`;
+						<td>${updatestr}</td>
+						<td>${shipdatestr}</td>
+						<td>準備出貨</td>
+						<td>${Page[i].detail.message_to_seller}</td>message_to_seller
+						<td>
+							<a href="https://seller.shopee.tw/portal/sale?search=${Page[i].ordersn}" target="_blank" class="btn btn-primary">出貨</a>
+            	<div class="btn btn-primary detail" data-id="${Page[i].ordersn}">詳細資料</div>
+						</td></tr>`;
 					$("#orderlist").append(row);
 				}
 			}
@@ -327,13 +331,13 @@ $(document).ready(function() {
 							if (response.more === true) {
 								getNextPage(1);
 							} else {
-								if ($("#carrier").val() == "否" && $("#orderamount").val() == "否" && $("#itemscount").val() == "否") {
+								/*if ($("#carrier").val() == "否" && $("#orderamount").val() == "否" && $("#itemscount").val() == "否") {
 									Page = Object.keys(Page).map(function(key) {
 										return Page[key];
 									});
 									refreshTable(0);
 									showPageSelect();
-								} else {
+								} else {*/
 									if (Object.keys(Page).length > 0) {
 										getOrdersDetail(orderSn, 0);
 									} else {
@@ -343,7 +347,7 @@ $(document).ready(function() {
 										refreshTable(0);
 										showPageSelect();
 									}
-								}
+								//}
 							}
 						} else {
 							stop();
