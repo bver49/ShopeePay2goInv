@@ -129,7 +129,7 @@ $(document).ready(function() {
 					var update = new Date(Page[i].update_time * 1000);
 					var updatestr = update.getFullYear() + "/" + (update.getMonth() + 1) + "/" + update.getDate() + " " + ((update.getHours() < 10) ? ("0" + update.getHours()) : (update.getHours())) + ":" + ((update.getMinutes() < 10) ? ("0" + update.getMinutes()) : (update.getMinutes()));
 					var shipdate = new Date(Page[i].update_time * 1000 + (Page[i].detail.days_to_ship*24*3600000));
-					var shipdatestr = shipdate.getFullYear() + "/" + (shipdate.getMonth() + 1) + "/" + shipdate.getDate() + " " + ((shipdate.getHours() < 10) ? ("0" + shipdate.getHours()) : (shipdate.getHours())) + ":" + ((shipdate.getMinutes() < 10) ? ("0" + shipdate.getMinutes()) : (shipdate.getMinutes()));
+					var shipdatestr = shipdate.getFullYear() + "/" + (shipdate.getMonth() + 1) + "/" + shipdate.getDate();
 					var row = `<tr><td>${i+1}</td><td>${Page[i].ordersn}</td>
 						<td>${updatestr}</td>
 						<td>${shipdatestr}</td>
