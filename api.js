@@ -69,7 +69,8 @@ router.post("/geninv", function(req, res) {
 		shopeepartnerid: req.body.shopeepartnerid,
 		paytwogoid: req.body.paytwogoid,
 		paytwogohashkey: req.body.paytwogohashkey,
-		paytwogohashiv: req.body.paytwogohashiv
+		paytwogohashiv: req.body.paytwogohashiv,
+		invurl : (req.body.invurl=="")?'https://inv.pay2go.com/api/invoice_issue':req.body.invurl
 	}
 	getOrderDetail(req.body.ordersn, key, function(order) {
 		genInvoice(order, key, function(result) {

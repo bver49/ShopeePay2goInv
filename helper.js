@@ -87,11 +87,13 @@ module.exports.getOrderList = function(tf, tt, page, key, cb) {
     url: url,
     json: data
   }, function(e, r, b) {
-    if (!b || !b.orders || b.error) {
+    try{
+      cb(b.orders, b.more);
+    }catch(err){
+      console.log(b);
+      console.log(err);
       console.log(data);
       cb([], false);
-    } else {
-      cb(b.orders, b.more);
     }
   });
 }
@@ -121,11 +123,13 @@ module.exports.getOrderListByStatus = function(tf, tt, page, status, key, cb) {
     url: url,
     json: data
   }, function(e, r, b) {
-    if (!b || !b.orders || b.error) {
+    try{
+      cb(b.orders, b.more);
+    }catch(err){
+      console.log(b);
+      console.log(err);
       console.log(data);
       cb([], false);
-    } else {
-      cb(b.orders, b.more);
     }
   });
 }
@@ -148,15 +152,13 @@ module.exports.getOrdersDetail = function(orders, key, cb) {
     url: url,
     json: data
   }, function(e, r, b) {
-    if (!b || !b.orders || b.error) {
+    try{
+      cb(b.orders);
+    }catch(err){
+      console.log(b);
+      console.log(err);
       console.log(data);
       cb([]);
-    } else {
-      if (b.orders.length > 0) {
-        cb(b.orders);
-      } else {
-        cb([]);
-      }
     }
   });
 }
@@ -179,15 +181,17 @@ module.exports.getOrderDetail = function(ordersn, key, cb) {
     url: url,
     json: data
   }, function(e, r, b) {
-    if (!b || !b.orders || b.error) {
-      console.log(data);
-      cb([]);
-    } else {
+    try{
       if (b.orders.length > 0) {
         cb(b.orders[0]);
       } else {
         cb([]);
       }
+    }catch(err){
+      console.log(b);
+      console.log(err);
+      console.log(data);
+      cb([]);
     }
   });
 }
@@ -219,7 +223,7 @@ module.exports.genInvoice = function(shopeeData, key, cb) {
     try {
       request({
         method: 'post',
-        url: 'https://inv.pay2go.com/api/invoice_issue',
+        url: key.invurl,
         formData: {
           MerchantID_: key.paytwogoid,
           PostData_: postdata(data, key.paytwogohashkey, key.paytwogohashiv)
