@@ -15,6 +15,7 @@
     "cookie-parser": "^1.4.3",
     "crypto": "^1.0.1",
     "ejs": "^2.5.7",
+    "emoji-regex": "^6.5.1",
     "excel4node": "^1.2.1",
     "express": "^4.16.2",
     "mcrypt": "^0.1.12",

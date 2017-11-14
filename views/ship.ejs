@@ -28,19 +28,19 @@
       <ul class="nav navbar-nav">
         <% if(me.role ==2 ){ %>
           <li><a href="/users">用戶管理</a></li>
-          <% } %>
-            <% if(me.inv == 1 || me.role ==2 ){ %>
-              <li><a href="/inv">開立發票</a></li>
-              <% } %>
-                <% if(me.ship == 1 || me.role ==2){ %>
-                  <li><a href="/ship">出貨管理</a></li>
-                  <% } %>
-                    <li><a href="/">個人資料</a></li>
-                    <li><a href="/users/logout">登出</a></li>
+        <% } %>
+        <% if(me.inv == 1 || me.role ==2 ){ %>
+          <li><a href="/inv">開立發票</a></li>
+        <% } %>
+        <% if(me.ship == 1 || me.role ==2){ %>
+          <li><a href="/ship">出貨管理</a></li>
+        <% } %>
+        <li><a href="/">個人資料</a></li>
+        <li><a href="/users/logout">登出</a></li>
       </ul>
     </div>
   </nav>
-  <div class="container">
+  <div class="container" style="width:95%;padding:0px;">
     <div class="col-md-10 col-md-offset-1" style="text-align:center;">
       <form class="form-inline searchform">
         起始日期
@@ -101,11 +101,14 @@
       <table class="table table-hover table-bordered ordertable">
         <thead>
           <tr>
-            <th>項次</th>
-            <th>訂單編號</th>
-            <th>更新時間</th>
-            <th>訂單狀態</th>
-            <th>操作</th>
+            <th style="width:5%;">項次</th>
+            <th style="width:12%;">訂單編號</th>
+            <th style="width:13%;">更新時間</th>
+            <th style="width:10%;">最晚出貨時間</th>
+            <th style="width:8%;">訂單狀態</th>
+            <th style="width:15%;">買家備註</th>
+            <th style="width:25%;">操作</th>
+            <th>備註</th>
           </tr>
         </thead>
         <tbody id="orderlist">

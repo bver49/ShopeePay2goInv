@@ -5,6 +5,8 @@ var MCrypt = require('mcrypt').MCrypt;
 var taxRate = 0.05;
 var rijEcb = new MCrypt('rijndael-128', 'cbc');
 var xl = require('excel4node');
+var emojiRegex = require('emoji-regex');
+var emojiReg = emojiRegex();
 var emailReg = new RegExp(/[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/i);
 
 //shopee util
@@ -278,7 +280,7 @@ module.exports.genExcel = function(data, cb) {
   for (var i in data) {
     var typeamt = Object.keys(data[i].type).length;
     ws.cell(y, 1, y + typeamt - 1, 1, true).number(index);
-    ws.cell(y, 2, y + typeamt - 1, 2, true).string(data[i].name);
+    ws.cell(y, 2, y + typeamt - 1, 2, true).string(data[i].name.replace(emojiReg," "));
     ws.cell(y, 3, y + typeamt - 1, 3, true).string(data[i].sku);
     for (var j in data[i].type) {
       ws.cell(y, 4).number(parseInt(data[i].type[j].price));
