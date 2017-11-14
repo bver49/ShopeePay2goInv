@@ -293,3 +293,21 @@ module.exports.genExcel = function(data, cb) {
   wb.write('./file/待出貨商品統計.xlsx');
   cb()
 }
+
+module.exports.inventory = function () {
+  var data = {
+
+  }
+  request({
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json',
+      'data-signature':crypto.createHash('md5').update(JSON.stringify(data)).digest("hex"),
+      'timestamp': new Date().getTime(),
+    },
+    url:'http://host:port/pospal-api2/openapi/v1/orderOpenApi/addOnLineOrder',
+    json: data
+  }, function(e, r, b) {
+
+  });
+}
