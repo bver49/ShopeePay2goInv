@@ -34,6 +34,7 @@ app.use(function(req, res, next) {
 
 app.use("/api", require("./api"));
 app.use("/users", require('./user'));
+app.use("/notes", require('./note'));
 
 app.get("/", function(req, res) {
 	if (req.user) {

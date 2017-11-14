@@ -12,6 +12,8 @@ Order.sync({force: true}).then(function () {
   process.exit();
 });*/
 
-var fs = require('fs');
-var sn = fs.readFileSync("list.txt").toString().split("\n");
-console.log(sn);
+var Note = require('./model/Note');
+Note.sync({force: true}).then(function () {
+  console.log("Table note setup");
+  process.exit();
+});
