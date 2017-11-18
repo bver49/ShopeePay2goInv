@@ -117,35 +117,37 @@ $(document).ready(function() {
   }
 
   function genInv(ordersn) {
-    $.ajax({
-      url: '/api/geninv',
-      type: 'POST',
-      data: {
-        ordersn: ordersn,
-        shopeesecret: $("#shopeesecret").val(),
-        shopeeshopid: $("#shopeeshopid").val(),
-        shopeepartnerid: $("#shopeepartnerid").val(),
-        paytwogoid: $("#paytwogoid").val(),
-        paytwogohashkey: $("#paytwogohashkey").val(),
-        paytwogohashiv: $("#paytwogohashiv").val(),
-        invurl: $("#invurl").val()
-      },
-      success: function(response) {
-        if (response == "發票開立成功" || response == "已開過發票") {
-          List.push(ordersn);
-          $(`.genInv[data-id=${ordersn}]`).remove();
-          $(`.orderCheck[data-id=${ordersn}]`).remove();
-          toastr.success(`訂單編號 ${ordersn} ${response}`)
-        } else if (response == "解密錯誤") {
-          toastr.warning("請檢查智付寶金鑰");
-        } else if (response == "取得商店申請資格失敗") {
-          toastr.warning("請確認商店已開通電子發票功能");
-        } else {
-          toastr.warning(`訂單編號 ${ordersn} ${response}`)
+    if (ordersn) {
+      $.ajax({
+        url: '/api/geninv',
+        type: 'POST',
+        data: {
+          ordersn: ordersn,
+          shopeesecret: $("#shopeesecret").val(),
+          shopeeshopid: $("#shopeeshopid").val(),
+          shopeepartnerid: $("#shopeepartnerid").val(),
+          paytwogoid: $("#paytwogoid").val(),
+          paytwogohashkey: $("#paytwogohashkey").val(),
+          paytwogohashiv: $("#paytwogohashiv").val(),
+          invurl: $("#invurl").val()
+        },
+        success: function(response) {
+          if (response == "發票開立成功" || response == "已開過發票") {
+            List.push(ordersn);
+            $(`.genInv[data-id=${ordersn}]`).remove();
+            $(`.orderCheck[data-id=${ordersn}]`).remove();
+            toastr.success(`訂單編號 ${ordersn} ${response}`)
+          } else if (response == "解密錯誤") {
+            toastr.warning("請檢查智付寶金鑰");
+          } else if (response == "取得商店申請資格失敗") {
+            toastr.warning("請確認商店已開通電子發票功能");
+          } else {
+            toastr.warning(`訂單編號 ${ordersn} ${response}`)
+          }
+          console.log(ordersn + "-" + response);
         }
-        console.log(ordersn + "-" + response);
-      }
-    });
+      });
+    }
   }
 
   function getOrder(ordersn) {
