@@ -147,6 +147,8 @@ $(document).ready(function() {
           console.log(ordersn + "-" + response);
         }
       });
+    }else{
+      toastr.warning(`訂單編號有誤`);
     }
   }
 
