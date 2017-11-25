@@ -70,7 +70,8 @@ router.post("/geninv", function(req, res) {
 		paytwogoid: req.body.paytwogoid,
 		paytwogohashkey: req.body.paytwogohashkey,
 		paytwogohashiv: req.body.paytwogohashiv,
-		invurl : (req.body.invurl=="")?'https://inv.pay2go.com/api/invoice_issue':req.body.invurl
+		invurl : (req.body.invurl=="")?'https://inv.pay2go.com/api/invoice_issue':req.body.invurl,
+		invemail : (req.body.invemail=="")?"c.p.max.tw@gmail.com":req.body.invemail
 	}
 	getOrderDetail(req.body.ordersn, key, function(order) {
 		genInvoice(order, key, function(result) {

@@ -12,6 +12,7 @@ $(document).ready(function() {
     $("#paytwogohashkey").val(localStorage.getItem("paytwogohashkey"));
     $("#paytwogohashiv").val(localStorage.getItem("paytwogohashiv"));
     $("#invurl").val(localStorage.getItem("invurl"));
+    $("#invemail").val(localStorage.getItem("invemail"));
   }
 
   toastr.options = {
@@ -129,7 +130,8 @@ $(document).ready(function() {
           paytwogoid: $("#paytwogoid").val(),
           paytwogohashkey: $("#paytwogohashkey").val(),
           paytwogohashiv: $("#paytwogohashiv").val(),
-          invurl: $("#invurl").val()
+          invurl: $("#invurl").val(),
+          invemail:$("#invemail").val()
         },
         success: function(response) {
           if (response == "發票開立成功" || response == "已開過發票") {
@@ -325,6 +327,7 @@ $(document).ready(function() {
     localStorage.setItem("paytwogohashkey", $("#paytwogohashkey").val());
     localStorage.setItem("paytwogohashiv", $("#paytwogohashiv").val());
     localStorage.setItem("invurl", $("#invurl").val());
+    localStorage.setItem("invemail", $("#invemail").val());
   });
 
 });
