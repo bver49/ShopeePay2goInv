@@ -15,6 +15,16 @@ $(document).ready(function() {
     $("#invemail").val(localStorage.getItem("invemail"));
   }
 
+  window.onerror = function(msg) {
+    console.log(msg);
+    $(".hint").hide();
+    $("#search").show();
+    $("#pageTop").empty();
+    $("#pageBot").empty();
+    $("#pageTop").hide();
+    $("#pageBot").hide();
+  };
+
   toastr.options = {
     "closeButton": true,
     "positionClass": "toast-top-right",
@@ -290,6 +300,12 @@ $(document).ready(function() {
               }
             } else {
               toastr.warning("請檢查蝦皮金鑰是否出錯");
+              $(".hint").hide();
+              $("#search").show();
+              $("#pageTop").empty();
+              $("#pageBot").empty();
+              $("#pageTop").hide();
+              $("#pageBot").hide();
             }
           }
         });

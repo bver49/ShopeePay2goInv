@@ -58,8 +58,13 @@ router.post("/order/detail", function(req, res) {
 		paytwogohashkey: req.body.paytwogohashkey,
 		paytwogohashiv: req.body.paytwogohashiv
 	}
-	getOrderDetail(req.body.ordersn, key, function(orders) {
-		res.send(orders);
+	getOrderDetail(req.body.ordersn, key, function(order) {
+		getOrderIncome(req.body.ordersn,key,function(income){
+			var detail = income.order.income_details;
+			var total_fee = parseInt(detail.escrow_amount)+parseInt(detail.commission_fee)+parseInt(detail.credit_card_transaction_fee)-parseInt(detail.actual_shipping_cost)-parseInt(detail.shipping_fee_rebate);
+			order.total_amount = ( total_fee > 0 )?total_fee:0;
+			res.send(order);
+		});
 	});
 });
 
@@ -89,16 +94,25 @@ router.post("/geninv", function(req, res) {
 		invemail : (req.body.invemail=="")?"c.p.max.tw@gmail.com":req.body.invemail
 	}
 	getOrderDetail(req.body.ordersn, key, function(order) {
-		genInvoice(order, key, function(result) {
-			if (result == "解密錯誤") {
-				res.send("解密錯誤")
-			} else {
-				if (result == "發票開立成功" || result == "已開過發票") {
-					fs.appendFileSync('list.txt', req.body.ordersn + '\n');
-				}
-				res.send(result);
+		getOrderIncome(req.body.ordersn,key,function(income){
+			var detail = income.order.income_details;
+			var total_fee = parseInt(detail.escrow_amount)+parseInt(detail.commission_fee)+parseInt(detail.credit_card_transaction_fee)-parseInt(detail.actual_shipping_cost)-parseInt(detail.shipping_fee_rebate);
+			order.total_amount = ( total_fee > 0 )?total_fee:0;
+			if(order.total_amount>0){
+				genInvoice(order, key, function(result) {
+					if (result == "解密錯誤") {
+						res.send("解密錯誤")
+					} else {
+						if (result == "發票開立成功" || result == "已開過發票") {
+							fs.appendFileSync('list.txt', req.body.ordersn + '\n');
+						}
+						res.send(result);
+					}
+				});
+			}else{
+				res.send("0元訂單");
 			}
-		})
+		});
 	});
 });
 
