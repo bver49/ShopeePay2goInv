@@ -11,7 +11,7 @@ var emailReg = new RegExp(/[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-
 
 //shopee util
 function dateToTs(date) {
-  if (date == "now") {
+  if(date == "now") {
     return Math.floor(new Date().getTime() / 1000);
   } else {
     return Math.floor((new Date(date).getTime() - (60 * 8 * 60000)) / 1000);
@@ -35,19 +35,19 @@ function countTax(amount) {
 
 function arrobjToStr(arr, title) {
   var str = "";
-  for (var i in arr) {
-    if (typeof title === "string") {
-      if (title == "item_name") {
+  for(var i in arr) {
+    if(typeof title === "string") {
+      if(title == "item_nadme") {
         arr[i][title] = arr[i][title].split(" ")[0];
       }
-      if (title == "item_sku") {
+      if(title == "item_sku") {
         arr[i][title] = "件"
       }
       str += arr[i][title];
     } else {
       str += (arr[i].variation_quantity_purchased * arr[i].variation_discounted_price);
     }
-    if (i != arr.length - 1) str += "|"
+    if(i != arr.length - 1) str += "|"
   }
   return str;
 }
@@ -89,9 +89,9 @@ module.exports.getOrderList = function(tf, tt, page, key, cb) {
     url: url,
     json: data
   }, function(e, r, b) {
-    try{
+    try {
       cb(b.orders, b.more);
-    }catch(err){
+    } catch(err) {
       console.log(b);
       console.log(err);
       console.log(data);
@@ -125,9 +125,9 @@ module.exports.getOrderListByStatus = function(tf, tt, page, status, key, cb) {
     url: url,
     json: data
   }, function(e, r, b) {
-    try{
+    try {
       cb(b.orders, b.more);
-    }catch(err){
+    } catch(err) {
       console.log(b);
       console.log(err);
       console.log(data);
@@ -154,9 +154,9 @@ module.exports.getOrdersDetail = function(orders, key, cb) {
     url: url,
     json: data
   }, function(e, r, b) {
-    try{
+    try {
       cb(b.orders);
-    }catch(err){
+    } catch(err) {
       console.log(b);
       console.log(err);
       console.log(data);
@@ -183,18 +183,39 @@ module.exports.getOrderDetail = function(ordersn, key, cb) {
     url: url,
     json: data
   }, function(e, r, b) {
-    try{
-      if (b.orders.length > 0) {
+    try {
+      if(b.orders.length > 0) {
         cb(b.orders[0]);
       } else {
         cb([]);
       }
-    }catch(err){
+    } catch(err) {
       console.log(b);
       console.log(err);
       console.log(data);
       cb([]);
     }
+  });
+}
+
+module.exports.getOrderIncome = function(ordersn, key, cb) {
+  var data = {
+    "shopid": parseInt(key.shopeeshopid),
+    "partner_id": parseInt(key.shopeepartnerid),
+    "timestamp": Math.floor(new Date().getTime() / 1000),
+    "ordersn": ordersn
+  }
+  var url = 'https://partner.shopeemobile.com/api/v1/orders/my_income';
+  request({
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': encode(url, data, key.shopeesecret)
+    },
+    url: url,
+    json: data
+  }, function(e, r, b) {
+    cb(b);
   });
 }
 
@@ -221,7 +242,7 @@ module.exports.genInvoice = function(shopeeData, key, cb) {
     ItemPrice: arrobjToStr(shopeeData.items, 'variation_discounted_price'), //單價以 | 分隔
     ItemAmt: arrobjToStr(shopeeData.items) //含稅金額以 | 分隔
   }
-  if (shopeeData.order_status == "COMPLETED") {
+  if(shopeeData.order_status == "COMPLETED") {
     try {
       request({
         method: 'post',
@@ -232,10 +253,10 @@ module.exports.genInvoice = function(shopeeData, key, cb) {
         }
       }, function(e, r, b) {
         b = JSON.parse(b);
-        if (b.Message.indexOf("重覆") !== -1 || b.Message.indexOf("重複") !== -1) {
+        if(b.Message.indexOf("重覆") !== -1 || b.Message.indexOf("重複") !== -1) {
           console.log("已開過發票");
           cb("已開過發票");
-        } else if (b.Message.indexOf("成功") !== -1) {
+        } else if(b.Message.indexOf("成功") !== -1) {
           console.log("發票開立成功");
           cb("發票開立成功");
         } else {
@@ -243,7 +264,7 @@ module.exports.genInvoice = function(shopeeData, key, cb) {
           cb(b.Message);
         }
       });
-    } catch (err) {
+    } catch(err) {
       cb("解密錯誤")
     }
   } else {
@@ -277,12 +298,12 @@ module.exports.genExcel = function(data, cb) {
   ws.cell(2, 4).string('單價');
   ws.cell(2, 5).string('尺寸/顏色');
   ws.cell(2, 6).string('數量');
-  for (var i in data) {
+  for(var i in data) {
     var typeamt = Object.keys(data[i].type).length;
     ws.cell(y, 1, y + typeamt - 1, 1, true).number(index);
-    ws.cell(y, 2, y + typeamt - 1, 2, true).string(data[i].name.replace(emojiReg," "));
+    ws.cell(y, 2, y + typeamt - 1, 2, true).string(data[i].name.replace(emojiReg, " "));
     ws.cell(y, 3, y + typeamt - 1, 3, true).string(data[i].sku);
-    for (var j in data[i].type) {
+    for(var j in data[i].type) {
       ws.cell(y, 4).number(parseInt(data[i].type[j].price));
       ws.cell(y, 5).string(data[i].type[j].typename);
       ws.cell(y, 6).number(data[i].type[j].amount);
@@ -292,22 +313,4 @@ module.exports.genExcel = function(data, cb) {
   }
   wb.write('./file/待出貨商品統計.xlsx');
   cb()
-}
-
-module.exports.inventory = function () {
-  var data = {
-
-  }
-  request({
-    method: 'post',
-    headers: {
-      'Content-Type': 'application/json',
-      'data-signature':crypto.createHash('md5').update(JSON.stringify(data)).digest("hex"),
-      'timestamp': new Date().getTime(),
-    },
-    url:'http://host:port/pospal-api2/openapi/v1/orderOpenApi/addOnLineOrder',
-    json: data
-  }, function(e, r, b) {
-
-  });
 }

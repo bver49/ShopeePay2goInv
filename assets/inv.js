@@ -4,7 +4,7 @@ $(document).ready(function() {
   var List;
   var CheckAmt = 0;
 
-  if (localStorage) {
+  if(localStorage) {
     $("#shopeesecret").val(localStorage.getItem("shopeesecret"));
     $("#shopeeshopid").val(localStorage.getItem("shopeeshopid"));
     $("#shopeepartnerid").val(localStorage.getItem("shopeepartnerid"));
@@ -40,12 +40,12 @@ $(document).ready(function() {
         paytwogohashiv: $("#paytwogohashiv").val()
       },
       success: function(response) {
-        for (var i in response.list) {
-          if (response.list[i].order_status == 'COMPLETED') {
+        for(var i in response.list) {
+          if(response.list[i].order_status == 'COMPLETED') {
             Page.push(response.list[i]);
           }
         }
-        if (response.more === true) {
+        if(response.more === true) {
           getNextPage(page + 1);
         } else {
           sortPage();
@@ -65,7 +65,7 @@ $(document).ready(function() {
     $("#pageTop").show();
     $("#pageBot").show();
     $("#search").show();
-    for (var i = 1; i <= pageAmt; i++) {
+    for(var i = 1; i <= pageAmt; i++) {
       $("#pageTop").append(`<option>${i}</option>`);
       $("#pageBot").append(`<option>${i}</option>`);
     }
@@ -73,22 +73,22 @@ $(document).ready(function() {
 
   function refreshTable(page) {
     $("#orderlist").empty();
-    if (Page.length < 1) {
+    if(Page.length < 1) {
       var row = `<tr>
 									<td colspan="5" class="text-center">查無資料</td>
 								</tr>`
       $("#orderlist").append(row);
     } else {
-      for (var i = page * 50; i < (page + 1) * 50 && i < Page.length; i++) {
-        if (Page[i].order_status == 'COMPLETED') {
+      for(var i = page * 50; i < (page + 1) * 50 && i < Page.length; i++) {
+        if(Page[i].order_status == 'COMPLETED') {
           var update = new Date(Page[i].update_time * 1000);
           var updatestring = update.getFullYear() + "/" + (update.getMonth() + 1) + "/" + update.getDate() + " " + ((update.getHours() < 10) ? ("0" + update.getHours()) : (update.getHours())) + ":" + ((update.getMinutes() < 10) ? ("0" + update.getMinutes()) : (update.getMinutes()));
           var row = `<tr>`;
-          if (List.indexOf(Page[i].ordersn) == -1) { row += `<td><input class="orderCheck" type="checkbox" data-id="${Page[i].ordersn}" value="${Page[i].ordersn}"></td>` } else { row += '<td></td>' }
+          if(List.indexOf(Page[i].ordersn) == -1) { row += `<td><input class="orderCheck" type="checkbox" data-id="${Page[i].ordersn}" value="${Page[i].ordersn}"></td>` } else { row += '<td></td>' }
           row += `<td>${Page[i].ordersn}</td>
 								<td>${updatestring}</td>
 								<td>完成</td><td>`;
-          if (List.indexOf(Page[i].ordersn) == -1) row += `<div class="btn btn-primary genInv" data-id="${Page[i].ordersn}">開立發票</div> `;
+          if(List.indexOf(Page[i].ordersn) == -1) row += `<div class="btn btn-primary genInv" data-id="${Page[i].ordersn}">開立發票</div> `;
           row += `<div class="btn btn-primary detail" data-id="${Page[i].ordersn}">詳細資料</div></td></tr>`;
           $("#orderlist").append(row);
         }
@@ -100,12 +100,12 @@ $(document).ready(function() {
         getOrder($(this).data("id"));
       });
       $(".orderCheck").change(function() {
-        if (this.checked) {
+        if(this.checked) {
           CheckAmt += 1;
         } else {
           CheckAmt -= 1;
         }
-        if (CheckAmt > 1) {
+        if(CheckAmt > 1) {
           $("#allSelectGenInv").show();
         } else {
           $("#allSelectGenInv").hide();
@@ -118,7 +118,7 @@ $(document).ready(function() {
   }
 
   function genInv(ordersn) {
-    if (ordersn) {
+    if(ordersn) {
       $.ajax({
         url: '/api/geninv',
         type: 'POST',
@@ -131,17 +131,17 @@ $(document).ready(function() {
           paytwogohashkey: $("#paytwogohashkey").val(),
           paytwogohashiv: $("#paytwogohashiv").val(),
           invurl: $("#invurl").val(),
-          invemail:$("#invemail").val()
+          invemail: $("#invemail").val()
         },
         success: function(response) {
-          if (response == "發票開立成功" || response == "已開過發票") {
+          if(response == "發票開立成功" || response == "已開過發票") {
             List.push(ordersn);
             $(`.genInv[data-id=${ordersn}]`).remove();
             $(`.orderCheck[data-id=${ordersn}]`).remove();
             toastr.success(`訂單編號 ${ordersn} ${response}`)
-          } else if (response == "解密錯誤") {
+          } else if(response == "解密錯誤") {
             toastr.warning("請檢查智付寶金鑰");
-          } else if (response == "取得商店申請資格失敗") {
+          } else if(response == "取得商店申請資格失敗") {
             toastr.warning("請確認商店已開通電子發票功能");
           } else {
             toastr.warning(`訂單編號 ${ordersn} ${response}`)
@@ -149,7 +149,7 @@ $(document).ready(function() {
           console.log(ordersn + "-" + response);
         }
       });
-    }else{
+    } else {
       toastr.warning(`訂單編號有誤`);
     }
   }
@@ -182,7 +182,7 @@ $(document).ready(function() {
 				<p>運費：${response.estimated_shipping_fee}</p>
 				<hr>
 				`;
-        for (var i in response.items) {
+        for(var i in response.items) {
           detail += `
 					<p>商品名稱：${response.items[i].item_name.split(" ")[0]}</p>
 					<p>商品單價(折扣後)：${response.items[i].variation_discounted_price}</p>
@@ -191,6 +191,23 @@ $(document).ready(function() {
         }
         $("#orderDetail .modal-body").append(detail);
         $("#orderDetail").modal('show');
+        console.log(response);
+        $.ajax({
+          url: '/api/order/income',
+          type: 'POST',
+          data: {
+            ordersn: ordersn,
+            shopeesecret: $("#shopeesecret").val(),
+            shopeeshopid: $("#shopeeshopid").val(),
+            shopeepartnerid: $("#shopeepartnerid").val(),
+            paytwogoid: $("#paytwogoid").val(),
+            paytwogohashkey: $("#paytwogohashkey").val(),
+            paytwogohashiv: $("#paytwogohashiv").val()
+          },
+          success: function(response) {
+            console.log(response);
+          }
+        })
       }
     });
   }
@@ -233,8 +250,8 @@ $(document).ready(function() {
   });
 
   $("#search").on('click', function() {
-    if ($("#tt").val() != "" && $("#tf").val() != "") {
-      if ((Math.floor(new Date($("#tt").val()).getTime() / 1000) - Math.floor(new Date($("#tf").val()).getTime() / 1000)) <= 15 * 24 * 3600) {
+    if($("#tt").val() != "" && $("#tf").val() != "") {
+      if((Math.floor(new Date($("#tt").val()).getTime() / 1000) - Math.floor(new Date($("#tf").val()).getTime() / 1000)) <= 15 * 24 * 3600) {
         $("#pageTop").hide();
         $("#pageBot").hide();
         $("#allDateGenInv").hide();
@@ -257,13 +274,13 @@ $(document).ready(function() {
           },
           success: function(response) {
             Page = [];
-            if (response.list) {
-              for (var i in response.list) {
-                if (response.list[i].order_status == 'COMPLETED') {
+            if(response.list) {
+              for(var i in response.list) {
+                if(response.list[i].order_status == 'COMPLETED') {
                   Page.push(response.list[i]);
                 }
               }
-              if (response.more === true) {
+              if(response.more === true) {
                 getNextPage(1)
               } else {
                 sortPage();
@@ -284,14 +301,14 @@ $(document).ready(function() {
 
   $("#allcheck").change(function() {
     var checks = $(".orderCheck");
-    if (this.checked) {
-      for (var i in checks) {
+    if(this.checked) {
+      for(var i in checks) {
         checks[i].checked = true;
         CheckAmt += 1;
         $("#allSelectGenInv").show();
       }
     } else {
-      for (var i in checks) {
+      for(var i in checks) {
         checks[i].checked = false;
         CheckAmt -= 1;
         $("#allSelectGenInv").hide();
@@ -302,14 +319,14 @@ $(document).ready(function() {
   $("#allSelectGenInv").on("click", function() {
     var checks = $(".orderCheck");
     var genInvList = [];
-    for (var i in checks) {
-      if (checks[i].checked) genInv(checks[i].value);
+    for(var i in checks) {
+      if(checks[i].checked) genInv(checks[i].value);
     }
   });
 
   $("#allDateGenInv").on("click", function() {
-    for (var i in Page) {
-      if (Page[i].order_status == 'COMPLETED') {
+    for(var i in Page) {
+      if(Page[i].order_status == 'COMPLETED') {
         genInv(Page[i].ordersn);
       }
     }

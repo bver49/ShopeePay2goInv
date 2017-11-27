@@ -7,6 +7,7 @@ var getOrdersDetail = helper.getOrdersDetail;
 var getOrderDetail = helper.getOrderDetail;
 var genInvoice = helper.genInvoice;
 var getOrderListByStatus = helper.getOrderListByStatus;
+var getOrderIncome = helper.getOrderIncome;
 var genExcel = helper.genExcel;
 
 router.post("/orders", function(req, res) {
@@ -58,6 +59,20 @@ router.post("/order/detail", function(req, res) {
 		paytwogohashiv: req.body.paytwogohashiv
 	}
 	getOrderDetail(req.body.ordersn, key, function(orders) {
+		res.send(orders);
+	});
+});
+
+router.post("/order/income", function(req, res) {
+	var key = {
+		shopeesecret: req.body.shopeesecret,
+		shopeeshopid: req.body.shopeeshopid,
+		shopeepartnerid: req.body.shopeepartnerid,
+		paytwogoid: req.body.paytwogoid,
+		paytwogohashkey: req.body.paytwogohashkey,
+		paytwogohashiv: req.body.paytwogohashiv
+	}
+	getOrderIncome(req.body.ordersn, key, function(orders) {
 		res.send(orders);
 	});
 });
