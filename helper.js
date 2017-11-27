@@ -37,7 +37,7 @@ function arrobjToStr(arr, title) {
   var str = "";
   for(var i in arr) {
     if(typeof title === "string") {
-      if(title == "item_nadme") {
+      if(title == "item_name") {
         arr[i][title] = arr[i][title].split(" ")[0];
       }
       if(title == "item_sku") {
