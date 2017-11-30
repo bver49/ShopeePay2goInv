@@ -329,45 +329,46 @@ $(document).ready(function() {
     if($("#tt").val() != "" && $("#tf").val() != "") {
       if(((Math.floor(new Date($("#tt").val()).getTime() / 1000) + (24 * 60 * 60) - 1) - Math.floor(new Date($("#tf").val()).getTime() / 1000)) <= 15 * 24 * 3600) {
         start();
-        getNote(Math.floor(new Date($("#tf").val()).getTime() / 1000),Math.floor(new Date($("#tt").val()).getTime() / 1000));
-        $.ajax({
-          url: '/api/orders?status=2',
-          type: 'POST',
-          data: {
-            tt: $("#tt").val(),
-            tf: $("#tf").val(),
-            page: 0,
-            shopeesecret: $("#shopeesecret").val(),
-            shopeeshopid: $("#shopeeshopid").val(),
-            shopeepartnerid: $("#shopeepartnerid").val(),
-            paytwogoid: $("#paytwogoid").val(),
-            paytwogohashkey: $("#paytwogohashkey").val(),
-            paytwogohashiv: $("#paytwogohashiv").val()
-          },
-          success: function(response) {
-            if(response.list) {
-              for(var i in response.list) {
-                if(!Page[response.list[i].ordersn]) {
-                  Page[response.list[i].ordersn] = response.list[i];
-                  orderSn.push(response.list[i].ordersn);
+        getNote(Math.floor(new Date($("#tf").val()).getTime() / 1000),Math.floor(new Date($("#tt").val()).getTime() / 1000),function(){
+          $.ajax({
+            url: '/api/orders?status=2',
+            type: 'POST',
+            data: {
+              tt: $("#tt").val(),
+              tf: $("#tf").val(),
+              page: 0,
+              shopeesecret: $("#shopeesecret").val(),
+              shopeeshopid: $("#shopeeshopid").val(),
+              shopeepartnerid: $("#shopeepartnerid").val(),
+              paytwogoid: $("#paytwogoid").val(),
+              paytwogohashkey: $("#paytwogohashkey").val(),
+              paytwogohashiv: $("#paytwogohashiv").val()
+            },
+            success: function(response) {
+              if(response.list) {
+                for(var i in response.list) {
+                  if(!Page[response.list[i].ordersn]) {
+                    Page[response.list[i].ordersn] = response.list[i];
+                    orderSn.push(response.list[i].ordersn);
+                  }
                 }
-              }
-              if(response.more === true) {
-                getNextPage(1);
-              } else {
-                if(Object.keys(Page).length > 0) {
-                  getOrdersDetail(orderSn, 0);
+                if(response.more === true) {
+                  getNextPage(1);
                 } else {
-                  Page = []
-                  refreshTable(0);
-                  showPageSelect();
+                  if(Object.keys(Page).length > 0) {
+                    getOrdersDetail(orderSn, 0);
+                  } else {
+                    Page = []
+                    refreshTable(0);
+                    showPageSelect();
+                  }
                 }
+              } else {
+                stop();
+                toastr.warning("請檢查蝦皮金鑰是否出錯");
               }
-            } else {
-              stop();
-              toastr.warning("請檢查蝦皮金鑰是否出錯");
             }
-          }
+          });          
         });
       } else {
         alert("日期間隔請設定在15天內");
@@ -484,12 +485,15 @@ $(document).ready(function() {
     });
   }
 
-  function getNote(tf,tt) {
+  function getNote(tf,tt,cb) {
+    tf = parseInt(tf)-14400;
+    tt = parseInt(tt)+14400;
     $.ajax({
       url: '/notes?tf='+tf+'&tt='+tt,
       type: 'GET',
       success: function(response) {
         noteList = response;
+        cb();
       }
     });
   }

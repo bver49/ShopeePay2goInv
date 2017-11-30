@@ -141,7 +141,8 @@ $(document).ready(function() {
           paytwogohashkey: $("#paytwogohashkey").val(),
           paytwogohashiv: $("#paytwogohashiv").val(),
           invurl: $("#invurl").val(),
-          invemail: $("#invemail").val()
+          invemail: $("#invemail").val(),
+          invitemname:$("#invitemname").val()
         },
         success: function(response) {
           if(response == "發票開立成功" || response == "已開過發票") {

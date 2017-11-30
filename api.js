@@ -98,6 +98,7 @@ router.post("/geninv", function(req, res) {
 			var detail = income.order.income_details;
 			var total_fee = parseInt(detail.escrow_amount)+parseInt(detail.commission_fee)+parseInt(detail.credit_card_transaction_fee)-parseInt(detail.actual_shipping_cost)-parseInt(detail.shipping_fee_rebate);
 			order.total_amount = ( total_fee > 0 )?total_fee:0;
+			order.invitemname = req.body.invitemname;
 			if(order.total_amount>0){
 				genInvoice(order, key, function(result) {
 					if (result == "解密錯誤") {
