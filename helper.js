@@ -236,11 +236,11 @@ module.exports.genInvoice = function(shopeeData, key, cb) {
     Amt: countOrigin(shopeeData.total_amount), //銷售額(未稅)
     TaxAmt: countTax(shopeeData.total_amount), //發票稅額
     TotalAmt: shopeeData.total_amount, //發票總金額(含稅) 商品價格+運費
-    ItemName: arrobjToStr(shopeeData.items, 'item_name',shopeeData.invitemname), //商品名稱以 | 分隔
-    ItemCount: arrobjToStr(shopeeData.items, 'variation_quantity_purchased'), //商品數量以 |分隔
-    ItemUnit: arrobjToStr(shopeeData.items, 'item_sku'), //單位以 | 分隔
-    ItemPrice: arrobjToStr(shopeeData.items, 'variation_discounted_price'), //單價以 | 分隔
-    ItemAmt: arrobjToStr(shopeeData.items) //含稅金額以 | 分隔
+    ItemName: (shopeeData.invitemname=='')?'服飾':shopeeData.invitemname, //商品名稱以 | 分隔
+    ItemCount: '1', //商品數量以 |分隔
+    ItemUnit: '件', //單位以 | 分隔
+    ItemPrice: shopeeData.total_amount.toString(), //單價以 | 分隔
+    ItemAmt: shopeeData.total_amount.toString() //含稅金額以 | 分隔
   }
   if(shopeeData.order_status == "COMPLETED") {
     try {
