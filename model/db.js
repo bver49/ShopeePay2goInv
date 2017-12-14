@@ -12,7 +12,8 @@ var db = new Sequelize(config.db.name,config.db.user,config.db.pw,{
     charset: 'utf8',
     collate: 'utf8_general_ci'
   },
-  query:{raw:true}
+  query:{raw:true},
+  logging: false
 });
 
 module.exports = db;

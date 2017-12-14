@@ -11,11 +11,7 @@ var emailReg = new RegExp(/[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-
 
 //shopee util
 function dateToTs(date) {
-  if(date == "now") {
-    return Math.floor(new Date().getTime() / 1000);
-  } else {
-    return Math.floor((new Date(date).getTime() - (60 * 8 * 60000)) / 1000);
-  }
+  return Math.floor((new Date(date).getTime() - (8 * 60 * 60 * 1000)) / 1000);
 }
 
 function encode(url, data, secret) {
@@ -90,6 +86,8 @@ module.exports.getOrderList = function(tf, tt, page, key, cb) {
     json: data
   }, function(e, r, b) {
     try {
+      b.orders = (b.orders==undefined)?[]:b.orders;
+      b.more = (b.more==undefined)?false:b.more;
       cb(b.orders, b.more);
     } catch(err) {
       console.log(b);
@@ -104,7 +102,7 @@ module.exports.getOrderList = function(tf, tt, page, key, cb) {
 module.exports.getOrderListByStatus = function(tf, tt, page, status, key, cb) {
   tt = dateToTs(tt);
   tf = dateToTs(tf);
-  tt += (24 * 3600);
+  tt += (24 * 3600)-1;
   var data = {
     "shopid": parseInt(key.shopeeshopid),
     "partner_id": parseInt(key.shopeepartnerid),
@@ -126,6 +124,8 @@ module.exports.getOrderListByStatus = function(tf, tt, page, status, key, cb) {
     json: data
   }, function(e, r, b) {
     try {
+      b.orders = (b.orders==undefined)?[]:b.orders;
+      b.more = (b.more==undefined)?false:b.more;
       cb(b.orders, b.more);
     } catch(err) {
       console.log(b);
