@@ -219,6 +219,27 @@ module.exports.getOrderIncome = function(ordersn, key, cb) {
   });
 }
 
+module.exports.getOrderLogistic = function(ordersn, key, cb) {
+  var data = {
+    "shopid": parseInt(key.shopeeshopid),
+    "partner_id": parseInt(key.shopeepartnerid),
+    "timestamp": Math.floor(new Date().getTime() / 1000),
+    "ordersn": ordersn
+  }
+  var url = 'https://partner.shopeemobile.com/api/v1/logistics/tracking';
+  request({
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': encode(url, data, key.shopeesecret)
+    },
+    url: url,
+    json: data
+  }, function(e, r, b) {
+    cb(b);
+  });
+}
+
 //開發票
 module.exports.genInvoice = function(shopeeData, key, cb) {
   var data = {

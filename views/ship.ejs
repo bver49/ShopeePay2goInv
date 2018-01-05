@@ -28,15 +28,15 @@
       <ul class="nav navbar-nav">
         <% if(me.role ==2 ){ %>
           <li><a href="/users">用戶管理</a></li>
-        <% } %>
-        <% if(me.inv == 1 || me.role ==2 ){ %>
-          <li><a href="/inv">開立發票</a></li>
-        <% } %>
-        <% if(me.ship == 1 || me.role ==2){ %>
-          <li><a href="/ship">出貨管理</a></li>
-        <% } %>
-        <li><a href="/">個人資料</a></li>
-        <li><a href="/users/logout">登出</a></li>
+          <% } %>
+            <% if(me.inv == 1 || me.role ==2 ){ %>
+              <li><a href="/inv">開立發票</a></li>
+              <% } %>
+                <% if(me.ship == 1 || me.role ==2){ %>
+                  <li><a href="/ship">出貨管理</a></li>
+                  <% } %>
+                    <li><a href="/">個人資料</a></li>
+                    <li><a href="/users/logout">登出</a></li>
       </ul>
     </div>
   </nav>
@@ -63,6 +63,11 @@
         </div>
         <br><br><br>
         <div class="form-group">
+          <label>訂單編號:</label>
+          <input type='text' class="form-control" id="ordersn" />
+        </div>  
+        <br><br><br>
+        <div class="form-group">
           <label>物流篩選:</label>
           <select class="form-control" id="carrier">
             <option>否</option>
@@ -77,6 +82,11 @@
           </select>&nbsp;&nbsp;&nbsp;
           <label>待出貨商品統計:</label>
           <select class="form-control" id="itemscount">
+            <option>否</option>
+            <option>是</option>
+          </select>&nbsp;&nbsp;&nbsp;
+          <label>到貨未取:</label>
+          <select class="form-control" id="arrive">
             <option>否</option>
             <option>是</option>
           </select>
@@ -104,11 +114,11 @@
             <th style="width:5%;">項次</th>
             <th style="width:12%;">訂單編號</th>
             <th style="width:13%;">更新時間</th>
-            <th style="width:10%;">最晚出貨時間</th>
+            <th style="width:10%;" id="limittime">最晚出貨時間</th>
             <th style="width:8%;">訂單狀態</th>
-            <th style="width:12%;">買家備註</th>
+            <th style="width:12%;" id="buyernote">買家備註</th>
             <th style="width:30%;">操作</th>
-            <th>備註</th>
+            <th id="sellernote">備註</th>
           </tr>
         </thead>
         <tbody id="orderlist">
@@ -195,24 +205,6 @@
               <label for="inputPassword3" class="col-sm-2 control-label">蝦皮Partnerid</label>
               <div class="col-sm-10">
                 <input type="text" class="form-control" id="shopeepartnerid">
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="col-sm-2 control-label">智付寶商店代號</label>
-              <div class="col-sm-10">
-                <input type="text" class="form-control" id="paytwogoid">
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="col-sm-2 control-label">智付寶HashKEY</label>
-              <div class="col-sm-10">
-                <input type="text" class="form-control" id="paytwogohashkey">
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="col-sm-2 control-label">智付寶IV</label>
-              <div class="col-sm-10">
-                <input type="text" class="form-control" id="paytwogohashiv">
               </div>
             </div>
           </form>
