@@ -187,13 +187,13 @@ module.exports.getOrderDetail = function(ordersn, key, cb) {
       if(b.orders.length > 0) {
         cb(b.orders[0]);
       } else {
-        cb([]);
+        cb(false);
       }
     } catch(err) {
       console.log(b);
       console.log(err);
       console.log(data);
-      cb([]);
+      cb(false);
     }
   });
 }
