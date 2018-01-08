@@ -47,7 +47,7 @@ router.post("/order/detail", function(req, res) {
     shopeepartnerid: req.body.shopeepartnerid
   }
   getOrderDetail(req.body.ordersn, key, function(order) {
-    if (order.length > 0) {
+    if (order > 0) {
       getOrderIncome(req.body.ordersn, key, function(income) {
         var detail = income.order.income_details;
         var total_fee = parseInt(detail.escrow_amount) + parseInt(detail.commission_fee) + parseInt(detail.credit_card_transaction_fee) - parseInt(detail.actual_shipping_cost) - parseInt(detail.shipping_fee_rebate);
