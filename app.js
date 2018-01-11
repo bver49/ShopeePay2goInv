@@ -4,7 +4,6 @@ var path = require("path");
 var bodyParser = require("body-parser");
 var cookieParser = require("cookie-parser");
 var User = require("./model/User");
-app.set("views", path.join(__dirname, "views")); //view的路徑位在資料夾views中
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
