@@ -1,4 +1,4 @@
-$(document).ready(function() {
+$(document).ready(function () {
 
   var Page = {};
   var shopList = {};
@@ -8,7 +8,7 @@ $(document).ready(function() {
   var nowPage = 0;
   var searchArrive = 0;
 
-  window.onerror = function(msg) {
+  window.onerror = function (msg) {
     console.log(msg);
     stop();
     $("#pageTop").hide();
@@ -86,7 +86,7 @@ $(document).ready(function() {
         shopeeshopid: $("#shopeeshopid").val(),
         shopeepartnerid: $("#shopeepartnerid").val()
       },
-      success: function(response) {
+      success: function (response) {
         for (var i in response.list) {
           if (!Page[response.list[i].ordersn]) {
             Page[response.list[i].ordersn] = response.list[i];
@@ -155,21 +155,33 @@ $(document).ready(function() {
       						<td style="text-align:center;">${shipstatus}</td>
                   <td>
                     <a href="https://seller.shopee.tw/portal/sale?search=${Page[i].ordersn}" target="_blank" class="btn btn-primary">通知買家</a>
-          					<div class="btn btn-primary detail" data-id="${Page[i].ordersn}">詳細資料</div>
-          				</td></tr>`;
+          					<div class="btn btn-primary detail" data-id="${Page[i].ordersn}">詳細資料</div>`;
+          if (noteList[Page[i].ordersn]) {
+            row += `
+                <div class="btn btn-primary updateNote" data-id="${Page[i].ordersn}">修改備註</div>
+                <div class="btn btn-primary delNote" data-id="${Page[i].ordersn}">刪除備註</div>
+              </td>
+              <td>
+                ${noteList[Page[i].ordersn]}
+              </td></tr>`
+          } else {
+            row += `
+              <div class="btn btn-primary addNote" data-id="${Page[i].ordersn}" data-ts="${Page[i].update_time}">新增備註</div>
+            </td><td></td></tr>`
+          }
         }
         $("#orderlist").append(row);
       }
-      $(".detail").on("click", function() {
+      $(".detail").on("click", function () {
         getOrder($(this).data("id"));
       });
-      $(".addNote").on("click", function() {
+      $(".addNote").on("click", function () {
         addNote($(this).data("id"), $(this).data("ts"));
       });
-      $(".delNote").on("click", function() {
+      $(".delNote").on("click", function () {
         delNote($(this).data("id"));
       });
-      $(".updateNote").on("click", function() {
+      $(".updateNote").on("click", function () {
         updateNote($(this).data("id"));
       });
       console.timeEnd("count");
@@ -179,7 +191,7 @@ $(document).ready(function() {
   function showShip(orderSn) {
     var chunkPage = chunk(orderSn, 50);
     var getAllDetail = Promise.all(chunkPage.map(getOrdersDetail));
-    getAllDetail.then(function(result) {
+    getAllDetail.then(function (result) {
       shopList.tt = $("#tt").val();
       shopList.tf = $("#tf").val();
       shopList.carrier = $("#carrier").val();
@@ -190,18 +202,18 @@ $(document).ready(function() {
   }
 
   function showArrive(orderSn) {
-    var shipOrder = orderSn.filter(function(sn) {
+    var shipOrder = orderSn.filter(function (sn) {
       return Page[sn].order_status == 'SHIPPED';
     });
     var getAllLogistic = Promise.all(shipOrder.map(getOrderLogistic));
-    getAllLogistic.then(function(result) {
+    getAllLogistic.then(function (result) {
       var tmpPage = {}
       for (var i in result) {
         if (result[i].ordersn) {
           tmpPage[result[i].ordersn] = Page[result[i].ordersn];
         }
       }
-      Page = Object.keys(tmpPage).map(function(key) {
+      Page = Object.keys(tmpPage).map(function (key) {
         return Page[key];
       });;
       window.re = result;
@@ -224,7 +236,7 @@ $(document).ready(function() {
         shopeeshopid: $("#shopeeshopid").val(),
         shopeepartnerid: $("#shopeepartnerid").val()
       },
-      success: function(response) {
+      success: function (response) {
         console.log(response);
         $("#orderDetail .modal-body").empty();
         if (response != 'notFound') {
@@ -260,7 +272,7 @@ $(document).ready(function() {
 
   //查找多筆訂單詳細資料
   function getOrdersDetail(ordersns) {
-    return new Promise(function(resolve, reject) {
+    return new Promise(function (resolve, reject) {
       $.ajax({
         url: '/api/orders/detail',
         type: 'POST',
@@ -270,7 +282,7 @@ $(document).ready(function() {
           shopeeshopid: $("#shopeeshopid").val(),
           shopeepartnerid: $("#shopeepartnerid").val()
         },
-        success: function(response) {
+        success: function (response) {
           for (var x in response) {
             Page[response[x].ordersn].detail = response[x];
             for (var y in response[x].items) {
@@ -306,7 +318,7 @@ $(document).ready(function() {
   }
 
   function getOrderLogistic(ordersn) {
-    return new Promise(function(resolve, reject) {
+    return new Promise(function (resolve, reject) {
       $.ajax({
         url: '/api/order/logistic',
         type: 'POST',
@@ -316,7 +328,7 @@ $(document).ready(function() {
           shopeeshopid: $("#shopeeshopid").val(),
           shopeepartnerid: $("#shopeepartnerid").val()
         },
-        success: function(response) {
+        success: function (response) {
           if (response.tracking_info && response.tracking_info.length > 0 && response.tracking_info[0].description == '包裹配達取件門市') {
             resolve(response);
           } else {
@@ -329,12 +341,12 @@ $(document).ready(function() {
 
   //訂單排序
   function sortPage() {
-    Page = Object.keys(Page).map(function(key) {
+    Page = Object.keys(Page).map(function (key) {
       return Page[key];
     });
     if ($("#carrier").val() != "否") {
       console.time("filter");
-      Page = Page.filter(function(ele) {
+      Page = Page.filter(function (ele) {
         if (ele.detail) {
           return ele.detail.shipping_carrier == $("#carrier").val();
         } else {
@@ -345,7 +357,7 @@ $(document).ready(function() {
     }
     if ($("#orderamount").val() != "否") {
       console.time("sort");
-      Page.sort(function(a, b) {
+      Page.sort(function (a, b) {
         return b.detail.total_amount - a.detail.total_amount;
       });
       console.timeEnd("sort");
@@ -361,40 +373,38 @@ $(document).ready(function() {
     useCurrent: false
   });
 
-  $("#datetimepickertf").on("dp.change", function(e) {
+  $("#datetimepickertf").on("dp.change", function (e) {
     $('#datetimepickertt').data("DateTimePicker").minDate(e.date);
   });
 
-  $("#datetimepickertt").on("dp.change", function(e) {
+  $("#datetimepickertt").on("dp.change", function (e) {
     $('#datetimepickertf').data("DateTimePicker").maxDate(e.date);
   });
 
-  $("#pageTop,#pageBot").on("change", function() {
+  $("#pageTop,#pageBot").on("change", function () {
     var page = $(this).val() - 1;
     nowPage = page;
     $("#pageTop,#pageBot").val($(this).val());
     refreshTable(page);
   });
 
-  $("#search").on('click', function() {
+  $("#search").on('click', function () {
     if ($('#ordersn').val() == '') {
       if ($('#arrive').val() == '是') {
         var status = 2;
         searchArrive = 1;
         $('#limittime').text('最晚取貨時間');
         $('#buyernote').hide();
-        $('#sellernote').hide();
       } else {
         var status = 1;
         searchArrive = 0;
         $('#limittime').text('最晚出貨時間');
         $('#buyernote').show();
-        $('#sellernote').show();
       }
       if ($("#tt").val() != "" && $("#tf").val() != "") {
         if (((Math.floor(new Date($("#tt").val()).getTime() / 1000) + (24 * 60 * 60) - 1) - Math.floor(new Date($("#tf").val()).getTime() / 1000)) <= 15 * 24 * 3600) {
           start();
-          getNote(Math.floor(new Date($("#tf").val()).getTime() / 1000), Math.floor(new Date($("#tt").val()).getTime() / 1000), function() {
+          getNote(Math.floor(new Date($("#tf").val()).getTime() / 1000), Math.floor(new Date($("#tt").val()).getTime() / 1000), function () {
             $.ajax({
               url: `/api/orders?status=${status}`,
               type: 'POST',
@@ -406,7 +416,7 @@ $(document).ready(function() {
                 shopeeshopid: $("#shopeeshopid").val(),
                 shopeepartnerid: $("#shopeepartnerid").val()
               },
-              success: function(response) {
+              success: function (response) {
                 if (response.list) {
                   for (var i in response.list) {
                     if (!Page[response.list[i].ordersn]) {
@@ -439,17 +449,17 @@ $(document).ready(function() {
     }
   });
 
-  $("#setting").on("click", function() {
+  $("#setting").on("click", function () {
     $("#settingForm").modal("show");
   });
 
-  $("#save").on("click", function() {
+  $("#save").on("click", function () {
     localStorage.setItem("shopeesecret", $("#shopeesecret").val());
     localStorage.setItem("shopeeshopid", $("#shopeeshopid").val());
     localStorage.setItem("shopeepartnerid", $("#shopeepartnerid").val());
   });
 
-  $("#itemsdetail").on("click", function() {
+  $("#itemsdetail").on("click", function () {
     $("#itemlist").empty();
     var result = "";
     var title = 0;
@@ -474,7 +484,7 @@ $(document).ready(function() {
     $("#items").modal('show');
   });
 
-  $("#exportitemsdetail").on('click', function() {
+  $("#exportitemsdetail").on('click', function () {
     $.ajax({
       headers: {
         "Content-Type": "application/json"
@@ -482,7 +492,7 @@ $(document).ready(function() {
       url: '/api/genexcel',
       type: 'POST',
       data: JSON.stringify(shopList),
-      success: function(response) {
+      success: function (response) {
         if (response != 'err') {
           window.open('/downloadexcel', '_blank');
         } else {
@@ -503,7 +513,7 @@ $(document).ready(function() {
           content: content,
           order_time: ts
         },
-        success: function(response) {
+        success: function (response) {
           if (response == "ok") {
             noteList[sn] = content;
             refreshTable(nowPage);
@@ -522,7 +532,7 @@ $(document).ready(function() {
         data: {
           content: content
         },
-        success: function(response) {
+        success: function (response) {
           if (response == "ok") {
             noteList[sn] = content;
             refreshTable(nowPage);
@@ -536,7 +546,7 @@ $(document).ready(function() {
     $.ajax({
       url: '/notes/' + sn,
       type: 'DELETE',
-      success: function(response) {
+      success: function (response) {
         if (response == "ok") {
           delete noteList[sn];
           refreshTable(nowPage);
@@ -551,7 +561,7 @@ $(document).ready(function() {
     $.ajax({
       url: '/notes?tf=' + tf + '&tt=' + tt,
       type: 'GET',
-      success: function(response) {
+      success: function (response) {
         noteList = response;
         cb();
       }
@@ -559,7 +569,9 @@ $(document).ready(function() {
   }
 
   function chunk(arr, size) {
-    return Array.from({ length: Math.ceil(arr.length / size) }, function(v, i) {
+    return Array.from({
+      length: Math.ceil(arr.length / size)
+    }, function (v, i) {
       return arr.slice(i * size, i * size + size);
     });
   }
