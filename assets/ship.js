@@ -556,8 +556,8 @@ $(document).ready(function () {
   }
 
   function getNote(tf, tt, cb) {
-    tf = parseInt(tf) - 14400;
-    tt = parseInt(tt) + 14400;
+    tf = parseInt(tf);
+    tt = parseInt(tt) + 86400;
     $.ajax({
       url: '/notes?tf=' + tf + '&tt=' + tt,
       type: 'GET',
