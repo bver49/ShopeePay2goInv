@@ -1,6 +1,6 @@
 var express = require("express");
 var router = express.Router();
-var Note = require("./model/Note");
+var Note = require("../model/Note");
 const Op = require("sequelize").Op;
 
 router.get("/", function(req, res) {

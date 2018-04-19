@@ -1,7 +1,7 @@
 var express = require("express");
 var router = express.Router();
 var bcrypt = require('bcrypt');
-var User = require("./model/User");
+var User = require("../model/User");
 const Op = require("sequelize").Op;
 
 router.get("/", function(req, res) {

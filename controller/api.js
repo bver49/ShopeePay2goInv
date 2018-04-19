@@ -1,15 +1,16 @@
 var express = require('express');
 var fs = require('fs');
 var router = express.Router();
-var helper = require('./helper');
-var getOrderList = helper.getOrderList;
-var getOrdersDetail = helper.getOrdersDetail;
-var getOrderDetail = helper.getOrderDetail;
-var genInvoice = helper.genInvoice;
-var getOrderListByStatus = helper.getOrderListByStatus;
-var getOrderIncome = helper.getOrderIncome;
-var getOrderLogistic = helper.getOrderLogistic;
-var genExcel = helper.genExcel;
+var shopee = require('../helper/shopee');
+var pay2go = require('../helper/pay2go');
+var getOrderList = shopee.getOrderList;
+var getOrdersDetail = shopee.getOrdersDetail;
+var getOrderDetail = shopee.getOrderDetail;
+var getOrderListByStatus = shopee.getOrderListByStatus;
+var getOrderIncome = shopee.getOrderIncome;
+var getOrderLogistic = shopee.getOrderLogistic;
+var genExcel = shopee.genExcel;
+var genInvoice = pay2go.genInvoice;
 
 router.post("/orders", function(req, res) {
   var key = {
@@ -105,7 +106,7 @@ router.post("/geninv", function(req, res) {
             res.send("解密錯誤")
           } else {
             if (result == "發票開立成功" || result == "已開過發票") {
-              fs.appendFileSync('list.txt', req.body.ordersn + '\n');
+                fs.appendFileSync('../list.txt', req.body.ordersn + '\n');
             }
             res.send(result);
           }
@@ -118,7 +119,7 @@ router.post("/geninv", function(req, res) {
 });
 
 router.get("/invlist", function(req, res) {
-  var list = fs.readFileSync('list.txt', 'utf8');
+  var list = fs.readFileSync('../list.txt', 'utf8');
   res.send(list.split(/\n/));
 });
 

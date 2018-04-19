@@ -1,16 +1,8 @@
 var request = require('request');
 var crypto = require('crypto');
-var shopee = require('./helper/shopee');
-var getAllItems = shopee.getAllItems;
-
-var key = {
-    shopeeshopid:"",
-    shopeepartnerid:"",
-    shopeesecret:""
-}
-
 var yahooAPIkey = "";
 var yahooAPISecret = "";
+
 var ts = Math.floor(new Date().getTime() / 1000);
 var QueryString = "&Format=json";
 var RequestContent = "ApiKey=" + yahooAPIkey + "&TimeStamp=" + ts + QueryString;
