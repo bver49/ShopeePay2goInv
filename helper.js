@@ -335,3 +335,121 @@ module.exports.genExcel = function(data, cb) {
   wb.write('./file/待出貨商品統計.xlsx');
   cb()
 }
+
+//取得商品分類
+function getCategory(key, cb) {
+    return new Promise(function (resolve, reject) {
+        var data = {
+            "pagination_offset":0,
+            "pagination_entries_per_page":100,
+            "shopid": parseInt(key.shopeeshopid),
+            "partner_id": parseInt(key.shopeepartnerid),
+            "timestamp": Math.floor(new Date().getTime() / 1000)
+        }
+        var url = 'https://partner.shopeemobile.com/api/v1/shop_categorys/get';
+        request({
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': encode(url, data, key.shopeesecret)
+            },
+            url: url,
+            json: data
+        }, function (e, r, b) {
+            resolve(b);
+        });
+    });
+}
+
+//取得單一分類中的商品
+function getItemInCategory(category, key) {
+    return new Promise(function (resolve, reject) {
+        var data = {
+            "shop_category_id": category.shop_category_id,
+            "shopid": parseInt(key.shopeeshopid),
+            "partner_id": parseInt(key.shopeepartnerid),
+            "timestamp": Math.floor(new Date().getTime() / 1000)
+        }
+        var url = 'https://partner.shopeemobile.com/api/v1/shop_category/get/items';
+        request({
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': encode(url, data, key.shopeesecret)
+            },
+            url: url,
+            json: data
+        }, function (e, r, b) {
+            b.shop_category_name = category.name;
+            resolve(b);
+        });
+    });
+}
+
+//取得單一商品的資料
+function getItemDetail(itemId, key) {
+    return new Promise(function (resolve, reject) {
+        var data = {
+            "item_id": itemId,
+            "shopid": parseInt(key.shopeeshopid),
+            "partner_id": parseInt(key.shopeepartnerid),
+            "timestamp": Math.floor(new Date().getTime() / 1000)
+        }
+        var url = 'https://partner.shopeemobile.com/api/v1/item/get';
+        request({
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': encode(url, data, key.shopeesecret)
+            },
+            url: url,
+            json: data
+        }, function (e, r, b) {
+            resolve(b);
+        });
+    });
+}
+
+module.exports.getShopeeItems = function(key) {
+    return new Promise(function(resolve,reject){
+        getCategory(key).then(function (data) {
+            var categoryList = data.shop_categorys.filter(function (ele) {
+                return ele.status == 1;
+            });
+
+            var getCategoryDetail = Promise.all(categoryList.map(function(category){
+                return getItemInCategory(category, key);
+            }));
+
+            getCategoryDetail.then(function(categorys){
+                //過濾掉未有商品的分類
+                categorys = categorys.filter(function(category){
+                    return category.items.length > 0;
+                });
+                //Making itemId array
+                var categorysItems = [];
+                for (var i in categorys) {
+                    categorysItems = categorysItems.concat(categorys[i].items);
+                }
+
+                //取得商品詳細資料
+                var getAllItemsDetail = Promise.all(categorysItems.map(function(itemId){
+                    return getItemDetail(itemId, key);
+                }));
+
+                getAllItemsDetail.then(function(items){
+                    var itemsObject = {};
+                    for (var i in items){
+                        itemsObject[items[i].item.item_id] = items[i].item;
+                    }
+                    for (var i in categorys){
+                        for (var j in categorys[i].items){
+                            categorys[i].items[j] = itemsObject[categorys[i].items[j]];
+                        }
+                    }
+                    resolve(categorys);
+                });
+            });
+        });
+    });
+}
