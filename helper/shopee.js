@@ -13,6 +13,22 @@ function encode(url, data, secret) {
     return crypto.createHmac('sha256', secret).update(basestring).digest('hex');
 }
 
+function callAPI(key, url, data) {
+    return new Promise(function(resolve, reject){
+        request({
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': encode(url, data, key.shopeesecret)
+            },
+            url: url,
+            json: data
+        }, function (e, r, b) {
+            resolve(b);
+        });
+    });
+}
+
 //依照訂單更新時間查找
 module.exports.getOrderList = function (tf, tt, page, key, cb) {
     tt = dateToTs(tt);
@@ -28,21 +44,13 @@ module.exports.getOrderList = function (tf, tt, page, key, cb) {
         "pagination_offset": parseInt(page) * 100 //第幾頁
     }
     var url = 'https://partner.shopeemobile.com/api/v1/orders/basics';
-    request({
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': encode(url, data, key.shopeesecret)
-        },
-        url: url,
-        json: data
-    }, function (e, r, b) {
+    callAPI(key, url, data).then(function(body){
         try {
-            b.orders = (b.orders == undefined) ? [] : b.orders;
-            b.more = (b.more == undefined) ? false : b.more;
-            cb(b.orders, b.more);
+            body.orders = (body.orders == undefined) ? [] : body.orders;
+            body.more = (body.more == undefined) ? false : body.more;
+            cb(body.orders, body.more);
         } catch (err) {
-            console.log(b);
+            console.log(body);
             console.log(err);
             console.log(data);
             cb([], false);
@@ -66,21 +74,13 @@ module.exports.getOrderListByStatus = function (tf, tt, page, status, key, cb) {
         "order_status": status
     }
     var url = 'https://partner.shopeemobile.com/api/v1/orders/get';
-    request({
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': encode(url, data, key.shopeesecret)
-        },
-        url: url,
-        json: data
-    }, function (e, r, b) {
+    callAPI(key, url, data).then(function (body) {
         try {
-            b.orders = (b.orders == undefined) ? [] : b.orders;
-            b.more = (b.more == undefined) ? false : b.more;
-            cb(b.orders, b.more);
+            body.orders = (body.orders == undefined) ? [] : body.orders;
+            body.more = (body.more == undefined) ? false : body.more;
+            cb(body.orders, body.more);
         } catch (err) {
-            console.log(b);
+            console.log(body);
             console.log(err);
             console.log(data);
             cb([], false);
@@ -97,19 +97,11 @@ module.exports.getOrdersDetail = function (orders, key, cb) {
         "ordersn_list": orders
     }
     var url = 'https://partner.shopeemobile.com/api/v1/orders/detail';
-    request({
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': encode(url, data, key.shopeesecret)
-        },
-        url: url,
-        json: data
-    }, function (e, r, b) {
+    callAPI(key, url, data).then(function (body) {
         try {
-            cb(b.orders);
+            cb(body.orders);
         } catch (err) {
-            console.log(b);
+            console.log(body);
             console.log(err);
             console.log(data);
             cb([]);
@@ -126,23 +118,15 @@ module.exports.getOrderDetail = function (ordersn, key, cb) {
         "ordersn_list": [ordersn]
     }
     var url = 'https://partner.shopeemobile.com/api/v1/orders/detail';
-    request({
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': encode(url, data, key.shopeesecret)
-        },
-        url: url,
-        json: data
-    }, function (e, r, b) {
+    callAPI(key, url, data).then(function (body) {
         try {
-            if (b.orders.length > 0) {
-                cb(b.orders[0]);
+            if (body.orders.length > 0) {
+                cb(body.orders[0]);
             } else {
                 cb(false);
             }
         } catch (err) {
-            console.log(b);
+            console.log(body);
             console.log(err);
             console.log(data);
             cb(false);
@@ -158,16 +142,8 @@ module.exports.getOrderIncome = function (ordersn, key, cb) {
         "ordersn": ordersn
     }
     var url = 'https://partner.shopeemobile.com/api/v1/orders/my_income';
-    request({
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': encode(url, data, key.shopeesecret)
-        },
-        url: url,
-        json: data
-    }, function (e, r, b) {
-        cb(b);
+    callAPI(key, url, data).then(function (body) {
+        cb(body);
     });
 }
 
@@ -179,16 +155,8 @@ module.exports.getOrderLogistic = function (ordersn, key, cb) {
         "ordersn": ordersn
     }
     var url = 'https://partner.shopeemobile.com/api/v1/logistics/tracking';
-    request({
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': encode(url, data, key.shopeesecret)
-        },
-        url: url,
-        json: data
-    }, function (e, r, b) {
-        cb(b);
+    callAPI(key, url, data).then(function (body) {
+        cb(body);
     });
 }
 
@@ -246,16 +214,8 @@ function getCategory(key, cb) {
             "timestamp": Math.floor(new Date().getTime() / 1000)
         }
         var url = 'https://partner.shopeemobile.com/api/v1/shop_categorys/get';
-        request({
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': encode(url, data, key.shopeesecret)
-            },
-            url: url,
-            json: data
-        }, function (e, r, b) {
-            resolve(b);
+        callAPI(key, url, data).then(function (body) {
+            resolve(body);
         });
     });
 }
@@ -270,17 +230,9 @@ function getItemInCategory(category, key) {
             "timestamp": Math.floor(new Date().getTime() / 1000)
         }
         var url = 'https://partner.shopeemobile.com/api/v1/shop_category/get/items';
-        request({
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': encode(url, data, key.shopeesecret)
-            },
-            url: url,
-            json: data
-        }, function (e, r, b) {
-            b.shop_category_name = category.name;
-            resolve(b);
+        callAPI(key, url, data).then(function (body) {
+            body.shop_category_name = category.name;
+            resolve(body);
         });
     });
 }
@@ -295,16 +247,8 @@ function getItemDetail(itemId, key) {
             "timestamp": Math.floor(new Date().getTime() / 1000)
         }
         var url = 'https://partner.shopeemobile.com/api/v1/item/get';
-        request({
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': encode(url, data, key.shopeesecret)
-            },
-            url: url,
-            json: data
-        }, function (e, r, b) {
-            resolve(b);
+        callAPI(key, url, data).then(function (body) {
+            resolve(body);
         });
     });
 }
