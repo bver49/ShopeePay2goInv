@@ -10,6 +10,7 @@ COPY . .
 
 RUN npm install
 RUN npm rebuild bcrypt --build-from-source
+RUN npm install -g pm2
 
 RUN touch list.txt
 RUN mkdir file
@@ -17,5 +18,5 @@ RUN mkdir file
 # Open 3000 Port
 EXPOSE 3000
 
-# Run npm start when container start
-CMD [ "npm", "start" ]
+# Run pm2 when container start
+CMD [ "pm2", "start","app.js","--no-daemon" ]
