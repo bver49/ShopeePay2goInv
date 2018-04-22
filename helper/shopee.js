@@ -30,7 +30,7 @@ function callAPI(key, url, data) {
 }
 
 //依照訂單更新時間查找
-module.exports.getOrderList = function (tf, tt, page, key, cb) {
+function getOrderList(tf, tt, page, key, cb) {
     tt = dateToTs(tt);
     tf = dateToTs(tf);
     tt += (24 * 3600);
@@ -59,7 +59,7 @@ module.exports.getOrderList = function (tf, tt, page, key, cb) {
 }
 
 //依照訂單狀態查找
-module.exports.getOrderListByStatus = function (tf, tt, page, status, key, cb) {
+function getOrderListByStatus(tf, tt, page, status, key, cb) {
     tt = dateToTs(tt);
     tf = dateToTs(tf);
     tt += (24 * 3600) - 1;
@@ -89,7 +89,7 @@ module.exports.getOrderListByStatus = function (tf, tt, page, status, key, cb) {
 }
 
 //多筆訂單查找詳細資料
-module.exports.getOrdersDetail = function (orders, key, cb) {
+function getOrdersDetail(orders, key, cb) {
     var data = {
         "shopid": parseInt(key.shopeeshopid),
         "partner_id": parseInt(key.shopeepartnerid),
@@ -110,7 +110,7 @@ module.exports.getOrdersDetail = function (orders, key, cb) {
 }
 
 //單筆訂單查找詳細資料
-module.exports.getOrderDetail = function (ordersn, key, cb) {
+function getOrderDetail(ordersn, key, cb) {
     var data = {
         "shopid": parseInt(key.shopeeshopid),
         "partner_id": parseInt(key.shopeepartnerid),
@@ -134,7 +134,7 @@ module.exports.getOrderDetail = function (ordersn, key, cb) {
     });
 }
 
-module.exports.getOrderIncome = function (ordersn, key, cb) {
+function getOrderIncome(ordersn, key, cb) {
     var data = {
         "shopid": parseInt(key.shopeeshopid),
         "partner_id": parseInt(key.shopeepartnerid),
@@ -147,7 +147,7 @@ module.exports.getOrderIncome = function (ordersn, key, cb) {
     });
 }
 
-module.exports.getOrderLogistic = function (ordersn, key, cb) {
+function getOrderLogistic(ordersn, key, cb) {
     var data = {
         "shopid": parseInt(key.shopeeshopid),
         "partner_id": parseInt(key.shopeepartnerid),
@@ -160,7 +160,7 @@ module.exports.getOrderLogistic = function (ordersn, key, cb) {
     });
 }
 
-module.exports.genExcel = function (data, cb) {
+function genExcel(data, cb) {
     var wb = new xl.Workbook({
         defaultFont: {
             size: 12,
@@ -253,7 +253,7 @@ function getItemDetail(itemId, key) {
     });
 }
 
-module.exports.getAllItems = function (key) {
+function getAllItems(key) {
     return new Promise(function (resolve, reject) {
         getCategory(key).then(function (data) {
             var categoryList = data.shop_categorys.filter(function (ele) {
@@ -295,4 +295,16 @@ module.exports.getAllItems = function (key) {
             });
         });
     });
+}
+
+module.exports = {
+    "getOrderList": getOrderList,
+    "getOrderListByStatus": getOrderListByStatus,
+    "getOrdersDetail": getOrdersDetail,
+    "getOrderDetail": getOrderDetail,
+    "getOrderIncome": getOrderIncome,
+    "getOrderLogistic": getOrderLogistic,
+    "genExcel": genExcel,
+    "getCategory": getCategory,
+    "getAllItems": getAllItems
 }

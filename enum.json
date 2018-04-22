@@ -1,0 +1,12 @@
+{
+    "paytype":{
+        "atm":1,
+        "familymart":12
+    },
+    "shiptype":{
+        "mail":1
+    },
+    "category":{
+        "mancloth":794023443
+    }
+}
