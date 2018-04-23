@@ -26,16 +26,17 @@ var data = {
     "ProductName":"測試",
     "SalePrice":200,
     "MallCategoryId": [
-        enums.category.mancloth,
-        "12312"
+        enums.category.mancloth
     ],
-    "ShortDescription":"asdjlasjldj",
+    "ShortDescription":"ShortDescription",
+    "LongDescription":"LongDescription",
     "PayTypeId": enums.paytype.atm,
     "ShippingId": enums.shiptype.mail,
-    "Stock":10,
-    "SaftyStock":1,
-    "SpecTypeDimension":"0"
+    "SpecTypeDimension":"1",
+    "SpecDimension1":"顏色尺寸",
+    "SpecDimension1Description":"黑L"
 }
+
 addItem(data).then(function(res){
     console.log(res);
 }).catch(function(err){
