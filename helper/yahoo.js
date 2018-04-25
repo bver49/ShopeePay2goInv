@@ -118,6 +118,7 @@ function uploadImage(data) {
 function addItem(data) {
     var shopeeData = data;
     var itemId = shopeeData.item_id;
+    var productId = "";
     return new Promise(function (resolve, reject) {
         var data = {
             "SaleType": "Normal",
@@ -127,7 +128,7 @@ function addItem(data) {
                 enums.category.mancloth
             ],
             "ShortDescription": cutShort(shopeeData.name,50),
-            "LongDescription": cutShort(shopeeData.description,500),
+            "LongDescription": cutShort(shopeeData.description,5000),
             "PayTypeId": enums.paytype.atm,
             "ShippingId": enums.shiptype.mail
         }
@@ -141,7 +142,7 @@ function addItem(data) {
         submitVerifyMain(data).then(function(res) {
             return submitMain(data);
         }).then(function (res) {
-            var productId = res.ProductId;
+            productId = res.ProductId;
             var image = {
                 "ImageFile": shopeeData.images,
                 "ProductId": productId,
@@ -152,10 +153,12 @@ function addItem(data) {
         }).then(function (res) {
             resolve({
                 '@Status': 'Success',
-                shopeeItemId: itemId
+                'shopeeItemId' : itemId,
+                'productId': productId
             });
         }).catch(function (err) {
             err["shopeeItemId"] = itemId;
+            err["productId"] = productId;
             if (err.ErrorList) {
                 err.ErrorList = err.ErrorList.Error.map(function(ele){
                     return ele.Parameter + " -> " + ele.Message;
