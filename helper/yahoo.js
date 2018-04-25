@@ -1,10 +1,28 @@
 var request = require('request');
 var crypto = require('crypto');
+var emojiRegex = require('emoji-regex');
+var emojiReg = emojiRegex();
 var config = require('../config');
 var enums = require('../enum');
 var imageField = "ImageFile";
 var yahooAPIkey = config.yahoo.apikey;
 var yahooAPISecret = config.yahoo.apisecret;
+
+function cutShort(str, limit){
+    limit = Math.floor(limit/3);
+    str = str.replace(emojiReg, "");
+    var len = str.length;
+    if (len > limit) {
+        str = str.split(" ");
+        for (var i = 0 ; len > limit ; i++){
+            str.splice(str.length - 1, 1);
+            len = str.join(" ").length;
+        }
+        return str.join(" ");
+    } else {
+        return str;
+    }
+}
 
 function callAPI(url, data){
     return new Promise(function(resolve, reject){
@@ -35,7 +53,14 @@ function callAPI(url, data){
         var ts = Math.floor(new Date().getTime() / 1000);
         var RequestContent = `ApiKey=${yahooAPIkey}&TimeStamp=${ts}&Format=json${QueryString}`;
         var Signature = crypto.createHmac('sha1', yahooAPISecret).update(RequestContent).digest('hex');
-        url = encodeURI(url + "?" + RequestContent + "&Signature=" + Signature);
+        RequestContent = encodeURI(RequestContent)
+                        .replace(/\#/g, "%23")
+                        .replace(/\\/g, "%5C")
+                        .replace(/\?/g, "%3F")
+                        .replace(/\+/g, "%2B")
+                        .replace(/\:/g, "%3A")
+                        .replace(/\n/g, "%0A");
+        url = url + "?" + RequestContent + "&Signature=" + Signature;
         request({
             method: 'POST',
             headers: {
@@ -60,6 +85,7 @@ function submitVerifyMain(data){
         callAPI(url, data).then(function (res) {
             resolve(res);
         }).catch(function(err){
+            err["FailAt"] = "submitVerifyMain";
             reject(err);
         });
     });
@@ -71,6 +97,7 @@ function submitMain(data) {
         callAPI(url, data).then(function (res) {
             resolve(res);
         }).catch(function (err) {
+            err["FailAt"] = "submitMain";
             reject(err);
         });
     });
@@ -82,6 +109,7 @@ function uploadImage(data) {
         callAPI(url, data).then(function (res) {
             resolve(res);
         }).catch(function (err) {
+            err["FailAt"] = "uploadImage";
             reject(err);
         });
     });
@@ -89,17 +117,17 @@ function uploadImage(data) {
 
 function addItem(data) {
     var shopeeData = data;
-
+    var itemId = shopeeData.item_id;
     return new Promise(function (resolve, reject) {
         var data = {
             "SaleType": "Normal",
-            "ProductName": shopeeData.name,
+            "ProductName": cutShort(shopeeData.name,130),
             "SalePrice": shopeeData.price,
             "MallCategoryId": [
                 enums.category.mancloth
             ],
-            "ShortDescription": shopeeData.name,
-            "LongDescription": shopeeData.description,
+            "ShortDescription": cutShort(shopeeData.name,50),
+            "LongDescription": cutShort(shopeeData.description,500),
             "PayTypeId": enums.paytype.atm,
             "ShippingId": enums.shiptype.mail
         }
@@ -115,14 +143,24 @@ function addItem(data) {
         }).then(function (res) {
             var productId = res.ProductId;
             var image = {
-                "ImageFilen": shopeeData.images,
+                "ImageFile": shopeeData.images,
                 "ProductId": productId,
+                "MainImage": "ImageFile1",
                 "Purge": true
             }
             return uploadImage(image);
         }).then(function (res) {
-            resolve(res);
+            resolve({
+                '@Status': 'Success',
+                shopeeItemId: itemId
+            });
         }).catch(function (err) {
+            err["shopeeItemId"] = itemId;
+            if (err.ErrorList) {
+                err.ErrorList = err.ErrorList.Error.map(function(ele){
+                    return ele.Parameter + " -> " + ele.Message;
+                });
+            }
             reject(err);
         });
     });

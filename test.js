@@ -17,28 +17,6 @@ getAllItems(key).then(function (category) {
     addItem(category[0].items[0]).then(function (res) {
         console.log(res);
     }).catch(function (err) {
-        console.log(err.ErrorList);
+        console.log(err);
     });
 });
-
-var data = {
-    "SaleType":"Normal",
-    "ProductName":"測試",
-    "SalePrice":200,
-    "MallCategoryId": [
-        enums.category.mancloth
-    ],
-    "ShortDescription":"ShortDescription",
-    "LongDescription":"LongDescription",
-    "PayTypeId": enums.paytype.atm,
-    "ShippingId": enums.shiptype.mail,
-    "SpecTypeDimension":"1",
-    "SpecDimension1":"顏色尺寸",
-    "SpecDimension1Description":"黑L"
-}
-
-// addItem(data).then(function(res){
-//     console.log(res);
-// }).catch(function(err){
-//     console.log(err);
-// });
