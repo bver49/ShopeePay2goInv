@@ -1,6 +1,7 @@
 var request = require('request');
 var crypto = require('crypto');
 var config = require('../config');
+var enums = require('../enum');
 var imageField = "ImageFile";
 var yahooAPIkey = config.yahoo.apikey;
 var yahooAPISecret = config.yahoo.apisecret;
@@ -44,10 +45,10 @@ function callAPI(url, data){
             url: url
         }, function (e, r, b) {
             var res = JSON.parse(b).Response;
-            if (!res.ErrorList) {
+            if (res['@Status'] != 'fail') {
                 resolve(res);
             } else {
-                reject(res.ErrorList.Error);
+                reject(res);
             }
         });
     });
@@ -87,10 +88,38 @@ function uploadImage(data) {
 }
 
 function addItem(data) {
+    var shopeeData = data;
+
     return new Promise(function (resolve, reject) {
+        var data = {
+            "SaleType": "Normal",
+            "ProductName": shopeeData.name,
+            "SalePrice": shopeeData.price,
+            "MallCategoryId": [
+                enums.category.mancloth
+            ],
+            "ShortDescription": shopeeData.name,
+            "LongDescription": shopeeData.description,
+            "PayTypeId": enums.paytype.atm,
+            "ShippingId": enums.shiptype.mail
+        }
+        if (shopeeData.has_variation == true) {
+            data["SpecTypeDimension"] = "1";
+            for (var i in shopeeData.variations) {
+                data["SpecDimension1"] = "尺寸";
+                data["SpecDimension1Description"] = "商品尺寸";
+            }
+        }
         submitVerifyMain(data).then(function(res) {
-            resolve(res);
             return submitMain(data);
+        }).then(function (res) {
+            var productId = res.ProductId;
+            var image = {
+                "ImageFilen": shopeeData.images,
+                "ProductId": productId,
+                "Purge": true
+            }
+            return uploadImage(image);
         }).then(function (res) {
             resolve(res);
         }).catch(function (err) {
@@ -101,6 +130,5 @@ function addItem(data) {
 
 module.exports = {
     "callAPI": callAPI,
-    "addItem": addItem,
-    "uploadImage": uploadImage
+    "addItem": addItem
 }

@@ -13,12 +13,12 @@ var key = {
     shopeesecret: config.shopee.apisecret
 }
 
-getAllItems(key).then(function(items){
-    for(var i in items) {
-        for (var j in items[i]){
-            console.log(items[i][j]);
-        }
-    }
+getAllItems(key).then(function (category) {
+    addItem(category[0].items[0]).then(function (res) {
+        console.log(res);
+    }).catch(function (err) {
+        console.log(err.ErrorList);
+    });
 });
 
 var data = {
@@ -37,8 +37,8 @@ var data = {
     "SpecDimension1Description":"黑L"
 }
 
-addItem(data).then(function(res){
-    console.log(res);
-}).catch(function(err){
-    console.log(err);
-});
+// addItem(data).then(function(res){
+//     console.log(res);
+// }).catch(function(err){
+//     console.log(err);
+// });
