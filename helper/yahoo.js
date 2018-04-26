@@ -208,6 +208,7 @@ function addItem(data) {
             "SaleType": "Normal",
             "ProductName": cutShort(shopeeData.name,130),
             "SalePrice": shopeeData.price,
+            "CostPrice": shopeeData.price,
             "CustomizedMainProductId": shopeeData.item_sku,
             "MallCategoryId": [
                 enums.category.mancloth
