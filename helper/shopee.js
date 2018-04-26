@@ -1,3 +1,4 @@
+var Promise = require("bluebird");
 var crypto = require('crypto');
 var request = require('request');
 var xl = require('excel4node');
@@ -284,6 +285,7 @@ function getAllItems(key) {
                     try {
                         var itemsObject = {};
                         for (var i in items) {
+                            if (items[i].error) continue;
                             itemsObject[items[i].item.item_id] = items[i].item;
                         }
                         for (var i in categorys) {
@@ -302,6 +304,7 @@ function getAllItems(key) {
 }
 
 module.exports = {
+    "callAPI": callAPI,
     "getOrderList": getOrderList,
     "getOrderListByStatus": getOrderListByStatus,
     "getOrdersDetail": getOrdersDetail,

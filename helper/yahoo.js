@@ -1,3 +1,4 @@
+var Promise = require("bluebird");
 var request = require('request');
 var crypto = require('crypto');
 var emojiRegex = require('emoji-regex');
@@ -7,22 +8,6 @@ var enums = require('../enum');
 var imageField = "ImageFile";
 var yahooAPIkey = config.yahoo.apikey;
 var yahooAPISecret = config.yahoo.apisecret;
-
-function cutShort(str, limit){
-    limit = Math.floor(limit/3);
-    str = str.replace(emojiReg, "");
-    var len = str.length;
-    if (len > limit) {
-        str = str.split(" ");
-        for (var i = 0 ; len > limit ; i++){
-            str.splice(str.length - 1, 1);
-            len = str.join(" ").length;
-        }
-        return str.join(" ");
-    } else {
-        return str;
-    }
-}
 
 function callAPI(url, data){
     return new Promise(function(resolve, reject){
@@ -69,14 +54,45 @@ function callAPI(url, data){
             formData: formData,
             url: url
         }, function (e, r, b) {
-            var res = JSON.parse(b).Response;
-            if (res['@Status'] != 'fail') {
-                resolve(res);
-            } else {
-                reject(res);
+            try {
+                var res = JSON.parse(b).Response;
+                if (res['@Status'] != 'fail') {
+                    resolve(res);
+                } else {
+                    reject(res);
+                }
+            } catch (err) {
+                reject(err);
             }
         });
     });
+}
+
+function getCategory(name) {
+    var categoryId = enums.category.mancloth;
+    for (var i in enums.keyword) {
+        if (enums.keyword[i].indexOf(name) != -1) {
+            categoryId = enums.category[i];
+            break;
+        }
+    }
+    return categoryId;
+}
+
+function cutShort(str, limit) {
+    limit = Math.floor(limit / 3);
+    str = str.replace(emojiReg, "");
+    var len = str.length;
+    if (len > limit) {
+        str = str.split(" ");
+        for (var i = 0; len > limit; i++) {
+            str.splice(str.length - 1, 1);
+            len = str.join(" ").length;
+        }
+        return str.join(" ");
+    } else {
+        return str;
+    }
 }
 
 function submitVerifyMain(data){
@@ -115,13 +131,14 @@ function uploadImage(data) {
     });
 }
 
-function updateStock(data){
+function updateStock(data, action){
     return new Promise(function (resolve, reject) {
+        data["Spec.1.Action"] = action;
         var url = "https://tw.ews.mall.yahooapis.com/stauth/v1/Product/UpdateStock";
         callAPI(url, data).then(function (res) {
             resolve(res);
         }).catch(function (err) {
-            err["FailAt"] = "updateStock";
+            err["FailAt"] = "updateStock-"+action;
             reject(err);
         });
     });
@@ -210,9 +227,7 @@ function addItem(data) {
             "SalePrice": shopeeData.price,
             "CostPrice": shopeeData.price,
             "CustomizedMainProductId": shopeeData.item_sku,
-            "MallCategoryId": [
-                enums.category.mancloth
-            ],
+            "MallCategoryId": getCategory(shopeeData.name),
             "ShortDescription": cutShort(shopeeData.name,50),
             "LongDescription": cutShort(shopeeData.description,5000),
             "PayTypeId": enums.paytype.atm,
@@ -236,6 +251,11 @@ function addItem(data) {
             data["Stock"] = shopeeData.stock;
             data["SaftyStock"] = 10;
         }
+        console.log("Upload Item" + data["ProductName"]);
+        console.log("Shopee data");
+        console.log(JSON.stringify(shopeeData, null, 4));
+        console.log("Yahoo data");
+        console.log(JSON.stringify(data, null, 4));
         submitVerifyMain(data).then(function(res) {
             return submitMain(data);
         }).then(function (res) {
@@ -255,14 +275,14 @@ function addItem(data) {
                     var data = {
                         "ProductId": productId,
                         "Spec.1.Id": index,
-                        "Spec.1.Action": "add",
                         "Spec.1.Stock": ele.stock
                     }
                     index++;
-                    return updateStock(data);
+                    return updateStock(data,"add");
                 }));
                 return updateItemStock;
             } else {
+                console.log("Upload Item Done");
                 resolve({
                     '@Status': 'Success',
                     'Action': 'addItem',
@@ -271,6 +291,7 @@ function addItem(data) {
                 });
             }
         }).then(function (res) {
+            console.log("Upload Item Done");
             resolve({
                 '@Status': 'Success',
                 'Action': 'addItem',
@@ -278,6 +299,7 @@ function addItem(data) {
                 'productId': productId
             });
         }).catch(function (err) {
+            console.log("Upload Item Fail");
             err["shopeeItemId"] = itemId;
             err["productId"] = productId;
             err["submitData"] = data;
@@ -295,5 +317,6 @@ module.exports = {
     "addItem": addItem,
     "delItem": delItem,
     "productOnline": productOnline,
-    "productOffline": productOffline
+    "productOffline": productOffline,
+    "updateStock": updateStock
 }

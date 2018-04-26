@@ -7,6 +7,25 @@
         "mail":1
     },
     "category":{
-        "mancloth":794023443
+        "mancloth": 794023443,
+        "girlcloth": 152981803,
+        "shoe": 152982559,
+        "internetCard": 152983561,
+        "tshirt": 152982023,
+        "suit": 152982080,
+        "jeans": 152982036,
+        "jacket": 152982051,
+        "vest": 152982035
+    },
+    "keyword":{
+        "jeans": ["牛仔褲"],
+        "internetCard": ["上網卡","預付卡","上網"],
+        "shoe":["布鞋"],
+        "suit":["西裝"],
+        "vest":["背心"],
+        "jacket":["外套","夾克"],
+        "tshirt":["t-shirt","t恤","短袖","潮T","棉T","綿T"],
+        "girlcloth":["女裝"],
+        "mancloth":["男裝"]
     }
 }
