@@ -115,6 +115,90 @@ function uploadImage(data) {
     });
 }
 
+function updateStock(data){
+    return new Promise(function (resolve, reject) {
+        var url = "https://tw.ews.mall.yahooapis.com/stauth/v1/Product/UpdateStock";
+        callAPI(url, data).then(function (res) {
+            resolve(res);
+        }).catch(function (err) {
+            err["FailAt"] = "updateStock";
+            reject(err);
+        });
+    });
+}
+
+function productOnline(data){
+    return new Promise(function (resolve, reject) {
+        var product = {
+            "ProductId": data.productId
+        }
+        var url = "http://tw.ews.mall.yahooapis.com/stauth/v1/Product/Online";
+        callAPI(url, product).then(function (res) {
+            resolve({
+                '@Status': 'Success',
+                'Action': 'productOnline',
+                'shopeeItemId': data.shopeeItemId,
+                'productId': data.productId
+            });
+        }).catch(function (err) {
+            resolve({
+                '@Status': 'Fail',
+                'FailAt': 'productOnline',
+                'shopeeItemId': data.shopeeItemId,
+                'productId': data.productId
+            });
+        });
+    });
+}
+
+function productOffline(data) {
+    return new Promise(function (resolve, reject) {
+        var product = {
+            "ProductId": data.productId
+        }
+        var url = "http://tw.ews.mall.yahooapis.com/stauth/v1/Product/Offline";
+        callAPI(url, product).then(function (res) {
+            resolve({
+                '@Status': 'Success',
+                'Action': 'productOffline',
+                'shopeeItemId': data.shopeeItemId,
+                'productId': data.productId
+            });
+        }).catch(function (err) {
+            resolve({
+                '@Status': 'Fail',
+                'FailAt': 'productOffline',
+                'shopeeItemId': data.shopeeItemId,
+                'productId': data.productId
+            });
+        });
+    });
+}
+
+function delItem(data) {
+    return new Promise(function (resolve, reject) {
+        var product = {
+            "ProductId": data.productId
+        }
+        var url = "http://tw.ews.mall.yahooapis.com/stauth/v1/Product/Delete";
+        callAPI(url, product).then(function (res) {
+            resolve({
+                '@Status': 'Success',
+                'Action': 'delItem',
+                'shopeeItemId': data.shopeeItemId,
+                'productId': data.productId
+            });
+        }).catch(function (err) {
+            resolve({
+                '@Status': 'Fail',
+                'FailAt': 'delItem',
+                'shopeeItemId': data.shopeeItemId,
+                'productId': data.productId
+            });
+        });
+    });
+}
+
 function addItem(data) {
     var shopeeData = data;
     var itemId = shopeeData.item_id;
@@ -124,6 +208,7 @@ function addItem(data) {
             "SaleType": "Normal",
             "ProductName": cutShort(shopeeData.name,130),
             "SalePrice": shopeeData.price,
+            "CustomizedMainProductId": shopeeData.item_sku,
             "MallCategoryId": [
                 enums.category.mancloth
             ],
@@ -132,12 +217,23 @@ function addItem(data) {
             "PayTypeId": enums.paytype.atm,
             "ShippingId": enums.shiptype.mail
         }
-        if (shopeeData.has_variation == true) {
-            data["SpecTypeDimension"] = "1";
-            for (var i in shopeeData.variations) {
-                data["SpecDimension1"] = "尺寸";
-                data["SpecDimension1Description"] = "商品尺寸";
+        if (shopeeData.attributes.length > 0) {
+            var index = 1;
+            for (var i in shopeeData.attributes) {
+                data[`Attribute${index}Name`] = shopeeData.attributes[i].attribute_name.replace(/\(/g, "").replace(/\)/g, "");
+                data[`Attribute${index}Value`] = shopeeData.attributes[i].attribute_value.replace(/\(/g, "").replace(/\)/g, "").replace(/\./g, "");
             }
+        }
+        if (shopeeData.has_variation == true) {
+            data["SpecTypeDimension"] = 1;
+            data[`SpecDimension1`] = "尺寸";
+            data[`SpecDimension1Description`] = shopeeData.variations.map(function(ele){
+                return ele.name;
+            });
+        } else {
+            data["SpecTypeDimension"] = 0;
+            data["Stock"] = shopeeData.stock;
+            data["SaftyStock"] = 10;
         }
         submitVerifyMain(data).then(function(res) {
             return submitMain(data);
@@ -149,27 +245,54 @@ function addItem(data) {
                 "MainImage": "ImageFile1",
                 "Purge": true
             }
+            data["ImageFile"] = shopeeData.images;
             return uploadImage(image);
+        }).then(function (res) {
+            if (shopeeData.has_variation == true) {
+                var index = 1;
+                var updateItemStock = Promise.all(shopeeData.variations.map(function(ele){
+                    var data = {
+                        "ProductId": productId,
+                        "Spec.1.Id": index,
+                        "Spec.1.Action": "add",
+                        "Spec.1.Stock": ele.stock
+                    }
+                    index++;
+                    return updateStock(data);
+                }));
+                return updateItemStock;
+            } else {
+                resolve({
+                    '@Status': 'Success',
+                    'Action': 'addItem',
+                    'shopeeItemId' : itemId,
+                    'productId': productId
+                });
+            }
         }).then(function (res) {
             resolve({
                 '@Status': 'Success',
-                'shopeeItemId' : itemId,
+                'Action': 'addItem',
+                'shopeeItemId': itemId,
                 'productId': productId
             });
         }).catch(function (err) {
             err["shopeeItemId"] = itemId;
             err["productId"] = productId;
+            err["submitData"] = data;
             if (err.ErrorList) {
                 err.ErrorList = err.ErrorList.Error.map(function(ele){
                     return ele.Parameter + " -> " + ele.Message;
                 });
             }
-            reject(err);
+            resolve(err);
         });
     });
 }
 
 module.exports = {
-    "callAPI": callAPI,
-    "addItem": addItem
+    "addItem": addItem,
+    "delItem": delItem,
+    "productOnline": productOnline,
+    "productOffline": productOffline
 }

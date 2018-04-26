@@ -281,14 +281,18 @@ function getAllItems(key) {
                 }));
 
                 getAllItemsDetail.then(function (items) {
-                    var itemsObject = {};
-                    for (var i in items) {
-                        itemsObject[items[i].item.item_id] = items[i].item;
-                    }
-                    for (var i in categorys) {
-                        for (var j in categorys[i].items) {
-                            categorys[i].items[j] = itemsObject[categorys[i].items[j]];
+                    try {
+                        var itemsObject = {};
+                        for (var i in items) {
+                            itemsObject[items[i].item.item_id] = items[i].item;
                         }
+                        for (var i in categorys) {
+                            for (var j in categorys[i].items) {
+                                categorys[i].items[j] = itemsObject[categorys[i].items[j]];
+                            }
+                        }
+                    } catch (err){
+                        reject(err);
                     }
                     resolve(categorys);
                 });

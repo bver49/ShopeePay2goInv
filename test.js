@@ -14,9 +14,12 @@ var key = {
 }
 
 getAllItems(key).then(function (category) {
-    addItem(category[0].items[0]).then(function (res) {
-        console.log(res);
-    }).catch(function (err) {
-        console.log(err);
-    });
+    var uploadAllItems = Promise.all(category[0].items.map(function(item){
+        return addItem(item);
+    }));
+    return uploadAllItems;
+}).then(function (res) {
+    console.log(res);
+}).catch(function (err) {
+    console.log(err);
 });
