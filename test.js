@@ -16,8 +16,10 @@ var key = {
 
 getAllItems(key).then(function (categories) {
     var allItems = [];
-    for (var j in categories[0].items) {
-        allItems.push(categories[0].items[j]);
+    for (var i in categories) {
+        for (var j in categories[i].items) {
+            allItems.push(categories[i].items[j]);
+        }
     }
     var uploadAllItems = Promise.all(allItems.map(function(item){
         return addItem(item);
@@ -25,6 +27,7 @@ getAllItems(key).then(function (categories) {
     return uploadAllItems;
 }).then(function (res) {
     console.log(res);
+    console.log("All Done");
 }).catch(function (err) {
     console.log(err);
 });
