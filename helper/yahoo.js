@@ -75,8 +75,11 @@ function callAPI(url, data){
 function getCategory(name) {
     var categoryIds = [];
     for (var i in enums.keyword) {
-        if (enums.keyword[i].indexOf(name) != -1) {
-            categoryIds.push(enums.category[i]);
+        for (var j in enums.keyword[i]) {
+            if (name.indexOf(enums.keyword[i][j]) != -1) {
+                categoryIds.push(enums.category[i]);
+                break;
+            }
         }
     }
     if (categoryIds.length == 0) categoryIds.push(enums.category.otherManCloth);
