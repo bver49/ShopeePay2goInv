@@ -103,6 +103,41 @@ function cutShort(str, limit) {
     }
 }
 
+function shopeeDataToYahooData(shopeeData){
+    var data = {
+        "SaleType": "Normal",
+        "ProductName": cutShort(shopeeData.name,130),
+        "SalePrice": shopeeData.price,
+        "CostPrice": shopeeData.price,
+        "CustomizedMainProductId": shopeeData.item_sku,
+        "MallCategoryId": getCategory(shopeeData.name),
+        "ShortDescription": cutShort(shopeeData.name,50),
+        "LongDescription": cutShort(shopeeData.description,3000),
+        "PayTypeId": enums.paytype.atm,
+        "ShippingId": enums.shiptype.mail
+    }
+    if (shopeeData.attributes.length > 0) {
+        var index = 1;
+        for (var i in shopeeData.attributes) {
+            data[`Attribute${index}Name`] = shopeeData.attributes[i].attribute_name.replace(/\(/g, "").replace(/\)/g, "");
+            data[`Attribute${index}Value`] = shopeeData.attributes[i].attribute_value.replace(/\(/g, "").replace(/\)/g, "").replace(/\./g, "");
+        }
+    }
+    if (shopeeData.has_variation == true) {
+        data["SpecTypeDimension"] = 1;
+        data[`SpecDimension1`] = "尺寸";
+        data[`SpecDimension1Description`] = shopeeData.variations.map(function(ele){
+            return ele.name;
+        });
+    } else {
+        data["SpecTypeDimension"] = 0;
+        data["Stock"] = shopeeData.stock;
+        data["SaftyStock"] = 10;
+    }
+
+    return data;
+}
+
 function submitVerifyMain(data){
     return new Promise(function(resolve,reject){
         var url = "https://tw.ews.mall.yahooapis.com/stauth/v2/Product/SubmitVerifyMain";
@@ -127,8 +162,14 @@ function submitMain(data) {
     });
 }
 
-function uploadImage(data) {
+function uploadImage(productId, images) {
     return new Promise(function (resolve, reject) {
+        var data = {
+            "ImageFile": images,
+            "ProductId": productId,
+            "MainImage": "ImageFile1",
+            "Purge": true
+        }
         var url = "https://tw.ews.mall.yahooapis.com/stauth/v1/Product/UploadImage";
         callAPI(url, data).then(function (res) {
             resolve(res);
@@ -140,9 +181,14 @@ function uploadImage(data) {
     });
 }
 
-function updateStock(data, action){
+function updateStock(productId, variastionIndex, stock, action){
     return new Promise(function (resolve, reject) {
-        data["Spec.1.Action"] = action;
+        var data = {
+            "ProductId": productId,
+            "Spec.1.Id": variastionIndex,
+            "Spec.1.Stock": stock,
+            "Spec.1.Action": action
+        }
         var url = "https://tw.ews.mall.yahooapis.com/stauth/v1/Product/UpdateStock";
         callAPI(url, data).then(function (res) {
             resolve(res);
@@ -225,62 +271,48 @@ function delItem(data) {
     });
 }
 
+function addItemTest(data) {
+    var shopeeData = data;
+    var itemId = shopeeData.item_id;
+    return new Promise(function (resolve, reject) {
+        var data = shopeeDataToYahooData(shopeeData);
+        submitVerifyMain(data).then(function (res) {
+            console.log("Upload Item Test Done");
+            console.log("Item: " + data["ProductName"] + "\n");
+            resolve({
+                '@Status': 'Success',
+                'Action': 'addItemTest',
+                'shopeeItemId': itemId
+            });
+        }).catch(function (err) {
+            console.log("Upload Item Test Fail");
+            console.log("Item: " + data["ProductName"] + "\n");
+            err["@Status"] = "Fail";
+            err["shopeeItemId"] = itemId;
+            err["submitData"] = shopeeData;
+            if (err.ErrorList) {
+                err.ErrorList = err.ErrorList.Error.map(function(ele){
+                    return ele.Parameter + " -> " + ele.Message;
+                });
+            }
+            resolve(err);
+        });
+    });
+}
+
 function addItem(data) {
     var shopeeData = data;
     var itemId = shopeeData.item_id;
     var productId = "";
     return new Promise(function (resolve, reject) {
-        var data = {
-            "SaleType": "Normal",
-            "ProductName": cutShort(shopeeData.name,130),
-            "SalePrice": shopeeData.price,
-            "CostPrice": shopeeData.price,
-            "CustomizedMainProductId": shopeeData.item_sku,
-            "MallCategoryId": getCategory(shopeeData.name),
-            "ShortDescription": cutShort(shopeeData.name,50),
-            "LongDescription": cutShort(shopeeData.description,3000),
-            "PayTypeId": enums.paytype.atm,
-            "ShippingId": enums.shiptype.mail
-        }
-        if (shopeeData.attributes.length > 0) {
-            var index = 1;
-            for (var i in shopeeData.attributes) {
-                data[`Attribute${index}Name`] = shopeeData.attributes[i].attribute_name.replace(/\(/g, "").replace(/\)/g, "");
-                data[`Attribute${index}Value`] = shopeeData.attributes[i].attribute_value.replace(/\(/g, "").replace(/\)/g, "").replace(/\./g, "");
-            }
-        }
-        if (shopeeData.has_variation == true) {
-            data["SpecTypeDimension"] = 1;
-            data[`SpecDimension1`] = "尺寸";
-            data[`SpecDimension1Description`] = shopeeData.variations.map(function(ele){
-                return ele.name;
-            });
-        } else {
-            data["SpecTypeDimension"] = 0;
-            data["Stock"] = shopeeData.stock;
-            data["SaftyStock"] = 10;
-        }
+        var data = shopeeDataToYahooData(shopeeData);
         submitMain(data).then(function (res) {
             productId = res.ProductId;
-            var image = {
-                "ImageFile": shopeeData.images,
-                "ProductId": productId,
-                "MainImage": "ImageFile1",
-                "Purge": true
-            }
-            data["ImageFile"] = shopeeData.images;
-            return uploadImage(image);
+            return uploadImage(productId, shopeeData.images);
         }).then(function (res) {
             if (shopeeData.has_variation == true) {
-                var index = 1;
-                var updateItemStock = Promise.all(shopeeData.variations.map(function(ele){
-                    var data = {
-                        "ProductId": productId,
-                        "Spec.1.Id": index,
-                        "Spec.1.Stock": ele.stock
-                    }
-                    index++;
-                    return updateStock(data,"add");
+                var updateItemStock = Promise.all(shopeeData.variations.map(function(ele, index){
+                    return updateStock(productId, index+1, ele, "add");
                 }));
                 return updateItemStock;
             } else {
@@ -324,6 +356,7 @@ function addItem(data) {
 }
 
 module.exports = {
+    "addItemTest": addItemTest,
     "addItem": addItem,
     "delItem": delItem,
     "productOnline": productOnline,

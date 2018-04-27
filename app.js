@@ -18,7 +18,7 @@ app.use(function(req, res, next) {
 		if (req.cookies.isLogin) {
 			User.findOne({
 				where: { id: req.cookies.id },
-				attributes: ["id", "username", "role", "ship","inv"]
+				attributes: ["id", "username", "role", "ship", "inv"]
 			}).then(function(user) {
 				req.user = user;
 				next();

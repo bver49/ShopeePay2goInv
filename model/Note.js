@@ -7,13 +7,13 @@ var noteSchema = {
 		autoIncrement: true,
 		primaryKey: true
 	},
-  sn:{
-    type: Sequelize.STRING,
-    unique:true
-  },
-  content:{
-    type: Sequelize.STRING
-  },
+    sn:{
+        type: Sequelize.STRING,
+        unique:true
+    },
+    content:{
+        type: Sequelize.STRING
+    },
 	order_time:{
 		type: Sequelize.INTEGER
 	}

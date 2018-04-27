@@ -3,18 +3,18 @@ var Sequelize = require("sequelize");
 
 var orderSchema = {
 	id: {
-		type: Sequelize.INTEGER,
+	    type: Sequelize.INTEGER,
 		autoIncrement: true,
 		primaryKey: true
 	},
-  sn:{
-    type: Sequelize.STRING,
-    unique:true
-  }
+    sn:{
+        type: Sequelize.STRING,
+        unique: true
+    }
 }
 
 var Order = db.define('order', orderSchema,{
-  timestamps: false
+    timestamps: false
 });
 
 module.exports = Order;
