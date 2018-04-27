@@ -1,53 +1,133 @@
 {
-    "paytype":{
-        "atm":1,
-        "familymart":12
+    "paytype": {
+        "atm": 1,
+        "familymart": 12
     },
-    "shiptype":{
-        "mail":1
+    "shiptype": {
+        "mail": 1
     },
-    "category":{
+    "category": {
         "koreaMancloth": 794023443,
-        "girlcloth": 152981803,
-        "shoe": 152982559,
+        "girlcloth": 152981806,
+        "shoe": 152982565,
         "internetCard": 152983561,
-        "tshirt": 152982023,
-        "suit": 152982080,
-        "jeans": 152982036,
-        "jacket": 152982051,
+        "tshirt": 152982024,
+        "suit": 152982052,
+        "jeans": 152982037,
+        "jacket": 152982063,
         "vest": 152982035,
         "seaPants": 152982048,
         "manShorts": 152982044,
-        "girlShorts": 152981890,
+        "girlShorts": 152981892,
         "manPants": 152982042,
-        "girlPants": 152981896,
-        "skirt":152981879,
+        "girlPants": 152981904,
+        "skirt": 152981884,
         "otherManCloth": 152982066,
-        "ring":152982716,
-        "necklace":152982686,
-        "earRing":152982729,
-        "protector":152983647
+        "ring": 152982723,
+        "necklace": 152982700,
+        "earRing": 152982738,
+        "protector": 152983655,
+        "polo": 152982029,
+        "slipper": 152989323,
+        "underwear": 979365191,
+        "watch": 2144443102
     },
-    "keyword":{
-        "jeans": ["牛仔褲"],
-        "internetCard": ["上網卡","預付卡","上網","流量","預付卡"],
-        "shoe":["布鞋","鞋","靴"],
-        "suit":["西裝"],
-        "vest":["背心"],
-        "jacket":["外套","夾克"],
-        "tshirt":["t-shirt","t恤","短袖","潮T","棉T","綿T","長T","印花T"],
-        "girlcloth":["女裝"],
-        "koreaMancloth":["韓男裝"],
-        "otherManCloth": ["男裝"],
-        "seaPants":["海灘褲"],
-        "manPants":["男長褲"],
-        "girlPants":["女長褲","褲裙"],
-        "manShorts": ["男短褲","男褲"],
-        "girlShorts": ["女短褲","女褲"],
-        "skirt": ["裙"],
-        "ring": ["戒指","對戒"],
-        "necklace": ["項鍊"],
-        "earRing": ["耳環"],
-        "protector":["保護貼","玻璃貼"]
+    "keyword": {
+        "jeans": [
+            "牛仔褲"
+        ],
+        "internetCard": [
+            "上網卡",
+            "預付卡",
+            "上網",
+            "流量",
+            "預付卡"
+        ],
+        "shoe": [
+            "布鞋",
+            "休閒鞋",
+            "靴"
+        ],
+        "slipper": [
+            "拖鞋"
+        ],
+        "suit": [
+            "西裝外套"
+        ],
+        "vest": [
+            "背心"
+        ],
+        "jacket": [
+            "外套",
+            "夾克"
+        ],
+        "tshirt": [
+            "t-shirt",
+            "t恤",
+            "短袖",
+            "潮T",
+            "棉T",
+            "綿T",
+            "長T",
+            "印花T"
+        ],
+        "girlcloth": [
+            "女裝"
+        ],
+        "koreaMancloth": [
+            "韓男裝",
+            "韓版"
+        ],
+        "otherManCloth": [
+            "男裝"
+        ],
+        "seaPants": [
+            "海灘褲"
+        ],
+        "manPants": [
+            "男長褲"
+        ],
+        "girlPants": [
+            "女長褲",
+            "褲裙"
+        ],
+        "manShorts": [
+            "男短褲",
+            "男褲",
+            "休閒短褲"
+        ],
+        "girlShorts": [
+            "女短褲",
+            "女褲",
+            "休閒短褲"
+        ],
+        "skirt": [
+            "裙"
+        ],
+        "ring": [
+            "戒指",
+            "對戒"
+        ],
+        "necklace": [
+            "項鍊"
+        ],
+        "earRing": [
+            "耳環"
+        ],
+        "protector": [
+            "保護貼",
+            "玻璃貼"
+        ],
+        "polo": [
+            "polo",
+            "POLO"
+        ],
+        "underwear": [
+            "四角褲",
+            "男內褲"
+        ],
+        "watch":[
+            "錶帶"
+        ]
     }
 }

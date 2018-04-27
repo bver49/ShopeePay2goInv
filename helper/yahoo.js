@@ -32,6 +32,7 @@ function callAPI(url, data){
         if (hasImg) {
             for (var i in data[imageField]) {
                 var index = parseInt(i)+1;
+                if (index > 9) break;
                 formData[imageField + index] = request.get(data[imageField][i]);
             }
         }
