@@ -41,10 +41,14 @@ function callAPI(url, data){
         RequestContent = encodeURI(RequestContent)
                         .replace(/\#/g, "%23")
                         .replace(/\\/g, "%5C")
+                        .replace(/\//g, "%2F")
                         .replace(/\?/g, "%3F")
                         .replace(/\+/g, "%2B")
                         .replace(/\:/g, "%3A")
-                        .replace(/\n/g, "%0A");
+                        .replace(/\@/g, "%40")
+                        .replace(/\$/g, "%24")
+                        .replace(/\;/g, "%3B")
+                        .replace(/\,/g, "%2C");
         url = url + "?" + RequestContent + "&Signature=" + Signature;
         request({
             method: 'POST',
@@ -69,14 +73,14 @@ function callAPI(url, data){
 }
 
 function getCategory(name) {
-    var categoryId = enums.category.mancloth;
+    var categoryIds = [];
     for (var i in enums.keyword) {
         if (enums.keyword[i].indexOf(name) != -1) {
-            categoryId = enums.category[i];
-            break;
+            categoryIds.push(enums.category[i]);
         }
     }
-    return categoryId;
+    if (categoryIds.length == 0) categoryIds.push(enums.category.otherManCloth);
+    return categoryIds;
 }
 
 function cutShort(str, limit) {
@@ -101,7 +105,7 @@ function submitVerifyMain(data){
         callAPI(url, data).then(function (res) {
             resolve(res);
         }).catch(function(err){
-            err["FailAt"] = "submitVerifyMain";
+            err["Action"] = "submitVerifyMain";
             reject(err);
         });
     });
@@ -113,7 +117,7 @@ function submitMain(data) {
         callAPI(url, data).then(function (res) {
             resolve(res);
         }).catch(function (err) {
-            err["FailAt"] = "submitMain";
+            err["Action"] = "submitMain";
             reject(err);
         });
     });
@@ -125,7 +129,8 @@ function uploadImage(data) {
         callAPI(url, data).then(function (res) {
             resolve(res);
         }).catch(function (err) {
-            err["FailAt"] = "uploadImage";
+            err["Action"] = "uploadImage";
+            err["ImageData"] = data;
             reject(err);
         });
     });
@@ -138,7 +143,7 @@ function updateStock(data, action){
         callAPI(url, data).then(function (res) {
             resolve(res);
         }).catch(function (err) {
-            err["FailAt"] = "updateStock-"+action;
+            err["Action"] = "updateStock-"+action;
             reject(err);
         });
     });
@@ -160,7 +165,7 @@ function productOnline(data){
         }).catch(function (err) {
             resolve({
                 '@Status': 'Fail',
-                'FailAt': 'productOnline',
+                'Action': 'productOnline',
                 'shopeeItemId': data.shopeeItemId,
                 'productId': data.productId
             });
@@ -184,7 +189,7 @@ function productOffline(data) {
         }).catch(function (err) {
             resolve({
                 '@Status': 'Fail',
-                'FailAt': 'productOffline',
+                'Action': 'productOffline',
                 'shopeeItemId': data.shopeeItemId,
                 'productId': data.productId
             });
@@ -208,7 +213,7 @@ function delItem(data) {
         }).catch(function (err) {
             resolve({
                 '@Status': 'Fail',
-                'FailAt': 'delItem',
+                'Action': 'delItem',
                 'shopeeItemId': data.shopeeItemId,
                 'productId': data.productId
             });
@@ -251,14 +256,7 @@ function addItem(data) {
             data["Stock"] = shopeeData.stock;
             data["SaftyStock"] = 10;
         }
-        console.log("Upload Item" + data["ProductName"]);
-        console.log("Shopee data");
-        console.log(JSON.stringify(shopeeData, null, 4));
-        console.log("Yahoo data");
-        console.log(JSON.stringify(data, null, 4));
-        submitVerifyMain(data).then(function(res) {
-            return submitMain(data);
-        }).then(function (res) {
+        submitMain(data).then(function (res) {
             productId = res.ProductId;
             var image = {
                 "ImageFile": shopeeData.images,
@@ -283,6 +281,7 @@ function addItem(data) {
                 return updateItemStock;
             } else {
                 console.log("Upload Item Done");
+                console.log("Item: " + data["ProductName"] + "\n");
                 resolve({
                     '@Status': 'Success',
                     'Action': 'addItem',
@@ -292,6 +291,7 @@ function addItem(data) {
             }
         }).then(function (res) {
             console.log("Upload Item Done");
+            console.log("Item: " + data["ProductName"] + "\n");
             resolve({
                 '@Status': 'Success',
                 'Action': 'addItem',
@@ -299,10 +299,16 @@ function addItem(data) {
                 'productId': productId
             });
         }).catch(function (err) {
-            console.log("Upload Item Fail");
+            if (err["Action"] == "uploadImage") {
+                console.log("Upload Image Fail");
+            } else {
+                console.log("Upload Item Fail");
+            }
+            console.log("Item: " + data["ProductName"] + "\n");
+            err["@Status"] = "Fail";
             err["shopeeItemId"] = itemId;
             err["productId"] = productId;
-            err["submitData"] = data;
+            err["submitData"] = shopeeData;
             if (err.ErrorList) {
                 err.ErrorList = err.ErrorList.Error.map(function(ele){
                     return ele.Parameter + " -> " + ele.Message;
