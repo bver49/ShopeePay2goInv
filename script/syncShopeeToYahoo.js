@@ -8,6 +8,7 @@ var yahoo = require('../helper/yahoo');
 var addItem = yahoo.addItem;
 var addItemTest = yahoo.addItemTest;
 var getAllItems = shopee.getAllItems;
+var report = [];
 
 var key = {
     shopeeshopid: config.shopee.shopid,
@@ -54,6 +55,7 @@ function syncShopeeToYahoo() {
                 }
             }).then(function (res) {
                 if (res!==0) {
+                    report = res;
                     var success = 0;
                     var fail = 0;
                     var failUploadImg = 0;
@@ -86,7 +88,7 @@ function syncShopeeToYahoo() {
                 }
             }).then(function(res){
                 console.log("All Done!");
-                resolve("Done");
+                resolve(report);
             }).catch(function (err) {
                 console.log(err);
                 reject(err);
@@ -134,6 +136,7 @@ function syncShopeeToYahooTest() {
                 }
             }).then(function (res) {
                 if (res!==0) {
+                    report = res;
                     var success = 0;
                     var fail = 0;
                     var failUploadImg = 0;
@@ -166,7 +169,7 @@ function syncShopeeToYahooTest() {
                 }
             }).then(function(res){
                 console.log("All Done!");
-                resolve("Done");
+                resolve(report);
             }).catch(function (err) {
                 console.log(err);
                 reject(err);
