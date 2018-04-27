@@ -30,7 +30,8 @@
         "polo": 152982029,
         "slipper": 152989323,
         "underwear": 979365191,
-        "watch": 2144443102
+        "watch": 2144443102,
+        "HTCProtector": 152983649
     },
     "keyword": {
         "jeans": [
@@ -117,6 +118,9 @@
         "protector": [
             "保護貼",
             "玻璃貼"
+        ],
+        "HTCProtector":[
+            "HTC"
         ],
         "polo": [
             "polo",
