@@ -234,7 +234,7 @@ function addItem(data) {
             "CustomizedMainProductId": shopeeData.item_sku,
             "MallCategoryId": getCategory(shopeeData.name),
             "ShortDescription": cutShort(shopeeData.name,50),
-            "LongDescription": cutShort(shopeeData.description,5000),
+            "LongDescription": cutShort(shopeeData.description,3000),
             "PayTypeId": enums.paytype.atm,
             "ShippingId": enums.shiptype.mail
         }
