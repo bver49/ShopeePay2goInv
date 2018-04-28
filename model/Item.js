@@ -11,6 +11,12 @@ var itemSchema = {
 		type: Sequelize.STRING,
         defaultValue:0
     },
+    sku: {
+        type: Sequelize.STRING
+    },
+    product_name: {
+        type: Sequelize.STRING,
+    },
     on_yahoo: {
 		type: Sequelize.INTEGER,
         defaultValue:0

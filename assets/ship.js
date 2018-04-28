@@ -76,7 +76,7 @@ $(document).ready(function () {
   function getNextPage(page) {
     var status = (searchArrive) ? 2 : 1;
     $.ajax({
-      url: `/api/orders?status=${status}`,
+      url: '/orders?status=' + status,
       type: 'POST',
       data: {
         tt: $("#tt").val(),
@@ -228,10 +228,9 @@ $(document).ready(function () {
   //查找單筆訂單詳細資料
   function getOrder(ordersn) {
     $.ajax({
-      url: '/api/order/detail',
+      url: '/orders/' + ordersn +'/detail',
       type: 'POST',
       data: {
-        ordersn: ordersn,
         shopeesecret: $("#shopeesecret").val(),
         shopeeshopid: $("#shopeeshopid").val(),
         shopeepartnerid: $("#shopeepartnerid").val()
@@ -274,7 +273,7 @@ $(document).ready(function () {
   function getOrdersDetail(ordersns) {
     return new Promise(function (resolve, reject) {
       $.ajax({
-        url: '/api/orders/detail',
+        url: '/orders/detail',
         type: 'POST',
         data: {
           ordersn: ordersns,
@@ -320,10 +319,9 @@ $(document).ready(function () {
   function getOrderLogistic(ordersn) {
     return new Promise(function (resolve, reject) {
       $.ajax({
-        url: '/api/order/logistic',
+        url: '/orders/' + ordersn +'/logistic',
         type: 'POST',
         data: {
-          ordersn: ordersn,
           shopeesecret: $("#shopeesecret").val(),
           shopeeshopid: $("#shopeeshopid").val(),
           shopeepartnerid: $("#shopeepartnerid").val()
@@ -406,7 +404,7 @@ $(document).ready(function () {
           start();
           getNote(Math.floor(new Date($("#tf").val()).getTime() / 1000), Math.floor(new Date($("#tt").val()).getTime() / 1000), function () {
             $.ajax({
-              url: `/api/orders?status=${status}`,
+              url: '/orders?status='+ status,
               type: 'POST',
               data: {
                 tt: $("#tt").val(),
@@ -489,12 +487,12 @@ $(document).ready(function () {
       headers: {
         "Content-Type": "application/json"
       },
-      url: '/api/genexcel',
+      url: '/orders/genexcel',
       type: 'POST',
       data: JSON.stringify(shopList),
       success: function (response) {
         if (response != 'err') {
-          window.open('/downloadexcel', '_blank');
+          window.open('/orders/downloadexcel', '_blank');
         } else {
           console.log("err");
         }

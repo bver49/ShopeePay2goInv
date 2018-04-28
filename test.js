@@ -1,7 +1,7 @@
 var Promise = require("bluebird");
 var request = require('request');
 var config = require('./config');
-var sync = require('./script/syncShopeeToYahoo');
+var sync = require('./script/sync');
 var syncShopeeToYahoo = sync.syncShopeeToYahoo;
 var syncShopeeToYahooTest = sync.syncShopeeToYahooTest;
 

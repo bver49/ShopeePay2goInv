@@ -1,5 +1,5 @@
-var Note = require('../model/Note');
-Note.sync({force: true}).then(function () {
-  console.log("Table note setup");
+var Item = require('../model/Item');
+Item.sync({force: true}).then(function () {
+  console.log("Table item setup");
   process.exit();
 });

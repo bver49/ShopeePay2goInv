@@ -282,7 +282,9 @@ function addItemTest(data) {
             resolve({
                 '@Status': 'Success',
                 'Action': 'addItemTest',
-                'shopeeItemId': itemId
+                'shopeeItemId': itemId,
+                'productName': data["ProductName"],
+                'sku': data["CustomizedMainProductId"]
             });
         }).catch(function (err) {
             console.log("Upload Item Test Fail");
@@ -322,7 +324,9 @@ function addItem(data) {
                     '@Status': 'Success',
                     'Action': 'addItem',
                     'shopeeItemId' : itemId,
-                    'productId': productId
+                    'productId': productId,
+                    'productName': data["ProductName"],
+                    'sku': data["CustomizedMainProductId"]
                 });
             }
         }).then(function (res) {
@@ -332,7 +336,9 @@ function addItem(data) {
                 '@Status': 'Success',
                 'Action': 'addItem',
                 'shopeeItemId': itemId,
-                'productId': productId
+                'productId': productId,
+                'productName': data["ProductName"],
+                'sku': data["CustomizedMainProductId"]
             });
         }).catch(function (err) {
             if (err["Action"] == "uploadImage") {

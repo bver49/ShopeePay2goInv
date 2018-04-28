@@ -36,7 +36,7 @@ $(document).ready(function() {
 
   function getNextPage(page, cb) {
     $.ajax({
-      url: '/api/orders',
+      url: '/orders',
       type: 'POST',
       data: {
         tt: $("#tt").val(),
@@ -130,10 +130,9 @@ $(document).ready(function() {
   function genInv(ordersn) {
     if(ordersn) {
       $.ajax({
-        url: '/api/geninv',
+        url: '/orders/' + ordersn + '/geninv',
         type: 'POST',
         data: {
-          ordersn: ordersn,
           shopeesecret: $("#shopeesecret").val(),
           shopeeshopid: $("#shopeeshopid").val(),
           shopeepartnerid: $("#shopeepartnerid").val(),
@@ -167,10 +166,9 @@ $(document).ready(function() {
 
   function getOrder(ordersn) {
     $.ajax({
-      url: '/api/order/detail',
+      url: '/orders/' + ordersn + '/detail',
       type: 'POST',
       data: {
-        ordersn: ordersn,
         shopeesecret: $("#shopeesecret").val(),
         shopeeshopid: $("#shopeeshopid").val(),
         shopeepartnerid: $("#shopeepartnerid").val(),
@@ -204,10 +202,9 @@ $(document).ready(function() {
         $("#orderDetail").modal('show');
         console.log(response);
         $.ajax({
-          url: '/api/order/income',
+          url: '/orders/' + ordersn + '/income',
           type: 'POST',
           data: {
-            ordersn: ordersn,
             shopeesecret: $("#shopeesecret").val(),
             shopeeshopid: $("#shopeeshopid").val(),
             shopeepartnerid: $("#shopeepartnerid").val(),
@@ -230,7 +227,7 @@ $(document).ready(function() {
   }
 
   $.ajax({
-    url: '/api/invlist',
+    url: '/orders/invlist',
     type: 'get',
     success: function(response) {
       List = response;
@@ -270,7 +267,7 @@ $(document).ready(function() {
         $("#orderlist").empty();
         $(".hint").show();
         $.ajax({
-          url: '/api/orders',
+          url: '/orders',
           type: 'POST',
           data: {
             tt: $("#tt").val(),

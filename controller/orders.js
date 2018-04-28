@@ -12,7 +12,7 @@ var getOrderLogistic = shopee.getOrderLogistic;
 var genExcel = shopee.genExcel;
 var genInvoice = pay2go.genInvoice;
 
-router.post("/orders", function(req, res) {
+router.post("/", function(req, res) {
   var key = {
     shopeesecret: req.body.shopeesecret,
     shopeeshopid: req.body.shopeeshopid,
@@ -30,7 +30,7 @@ router.post("/orders", function(req, res) {
   }
 });
 
-router.post("/orders/detail", function(req, res) {
+router.post("/detail", function(req, res) {
   var key = {
     shopeesecret: req.body.shopeesecret,
     shopeeshopid: req.body.shopeeshopid,
@@ -41,15 +41,15 @@ router.post("/orders/detail", function(req, res) {
   });
 });
 
-router.post("/order/detail", function(req, res) {
+router.post("/:ordersn/detail", function(req, res) {
   var key = {
     shopeesecret: req.body.shopeesecret,
     shopeeshopid: req.body.shopeeshopid,
     shopeepartnerid: req.body.shopeepartnerid
   }
-  getOrderDetail(req.body.ordersn, key, function(order) {
+  getOrderDetail(req.params.ordersn, key, function(order) {
     if (order) {
-      getOrderIncome(req.body.ordersn, key, function(income) {
+        getOrderIncome(req.params.ordersn, key, function(income) {
         var detail = income.order.income_details;
         var total_fee = parseInt(detail.escrow_amount) + parseInt(detail.commission_fee) + parseInt(detail.credit_card_transaction_fee) - parseInt(detail.actual_shipping_cost) - parseInt(detail.shipping_fee_rebate);
         order.total_amount = (total_fee > 0) ? total_fee : 0;
@@ -61,72 +61,76 @@ router.post("/order/detail", function(req, res) {
   });
 });
 
-router.post("/order/income", function(req, res) {
+router.post("/:ordersn/income", function(req, res) {
   var key = {
     shopeesecret: req.body.shopeesecret,
     shopeeshopid: req.body.shopeeshopid,
     shopeepartnerid: req.body.shopeepartnerid
   }
-  getOrderIncome(req.body.ordersn, key, function(orders) {
+  getOrderIncome(req.params.ordersn, key, function(orders) {
     res.send(orders);
   });
 });
 
-router.post("/order/logistic", function(req, res) {
+router.post("/:ordersn/logistic", function(req, res) {
   var key = {
     shopeesecret: req.body.shopeesecret,
     shopeeshopid: req.body.shopeeshopid,
     shopeepartnerid: req.body.shopeepartnerid
   }
-  getOrderLogistic(req.body.ordersn, key, function(orders) {
+  getOrderLogistic(req.params.ordersn, key, function(orders) {
     res.send(orders);
   });
 });
 
-router.post("/geninv", function(req, res) {
-  var key = {
-    shopeesecret: req.body.shopeesecret,
-    shopeeshopid: req.body.shopeeshopid,
-    shopeepartnerid: req.body.shopeepartnerid,
-    paytwogoid: req.body.paytwogoid,
-    paytwogohashkey: req.body.paytwogohashkey,
-    paytwogohashiv: req.body.paytwogohashiv,
-    invurl: (req.body.invurl == "") ? 'https://inv.pay2go.com/api/invoice_issue' : req.body.invurl,
-    invemail: (req.body.invemail == "") ? "c.p.max.tw@gmail.com" : req.body.invemail
-  }
-  getOrderDetail(req.body.ordersn, key, function(order) {
-    getOrderIncome(req.body.ordersn, key, function(income) {
-      var detail = income.order.income_details;
-      var total_fee = parseInt(detail.escrow_amount) + parseInt(detail.commission_fee) + parseInt(detail.credit_card_transaction_fee) - parseInt(detail.actual_shipping_cost) - parseInt(detail.shipping_fee_rebate);
-      order.total_amount = (total_fee > 0) ? total_fee : 0;
-      order.invitemname = req.body.invitemname;
-      if (order.total_amount > 0) {
-        genInvoice(order, key, function(result) {
-          if (result == "解密錯誤") {
-            res.send("解密錯誤")
-          } else {
-            if (result == "發票開立成功" || result == "已開過發票") {
-                fs.appendFileSync('../list.txt', req.body.ordersn + '\n');
+router.post("/:ordersn/geninv", function(req, res) {
+    var key = {
+        shopeesecret: req.body.shopeesecret,
+        shopeeshopid: req.body.shopeeshopid,
+        shopeepartnerid: req.body.shopeepartnerid,
+        paytwogoid: req.body.paytwogoid,
+        paytwogohashkey: req.body.paytwogohashkey,
+        paytwogohashiv: req.body.paytwogohashiv,
+        invurl: (req.body.invurl == "") ? 'https://inv.pay2go.com/api/invoice_issue' : req.body.invurl,
+        invemail: (req.body.invemail == "") ? "c.p.max.tw@gmail.com" : req.body.invemail
+    }
+    getOrderDetail(req.params.ordersn, key, function(order) {
+        getOrderIncome(req.params.ordersn, key, function(income) {
+            var detail = income.order.income_details;
+            var total_fee = parseInt(detail.escrow_amount) + parseInt(detail.commission_fee) + parseInt(detail.credit_card_transaction_fee) - parseInt(detail.actual_shipping_cost) - parseInt(detail.shipping_fee_rebate);
+            order.total_amount = (total_fee > 0) ? total_fee : 0;
+            order.invitemname = req.body.invitemname;
+            if (order.total_amount > 0) {
+                genInvoice(order, key, function(result) {
+                    if (result == "解密錯誤") {
+                        res.send("解密錯誤")
+                    } else {
+                        if (result == "發票開立成功" || result == "已開過發票") {
+                            fs.appendFileSync('./list.txt', req.params.ordersn + '\n');
+                        }
+                        res.send(result);
+                    }
+                });
+            } else {
+                res.send("0元訂單");
             }
-            res.send(result);
-          }
         });
-      } else {
-        res.send("0元訂單");
-      }
     });
-  });
 });
 
 router.get("/invlist", function(req, res) {
-  var list = fs.readFileSync('../list.txt', 'utf8');
-  res.send(list.split(/\n/));
+    var list = fs.readFileSync('./list.txt', 'utf8');
+    res.send(list.split(/\n/));
 });
 
 router.post("/genexcel", function(req, res) {
   genExcel(req.body, function() {
     res.send('ok');
   });
+});
+
+router.get('/downloadexcel', function (req, res) {
+    res.download('./file/待出貨商品統計.xlsx');
 });
 
 module.exports = router;

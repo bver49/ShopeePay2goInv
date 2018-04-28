@@ -18,6 +18,7 @@ var key = {
 
 function syncShopeeToYahoo() {
     return new Promise(function(resolve, reject){
+        var needDelItems;
         Item.findAll({
             where: {
                 on_yahoo: {
@@ -39,11 +40,16 @@ function syncShopeeToYahoo() {
                 console.log("Total " + allItems.length + " shopee items");
                 var needUploadItems = [];
                 for (var k in allItems) {
-                    if (items.indexOf(allItems[k].item_id.toString()) == -1) {
+                    var itemIndex = items.indexOf(allItems[k].item_id.toString());
+                    if (itemIndex == -1) {
                         needUploadItems.push(allItems[k]);
+                    } else {
+                        items.splice(itemIndex, 1);
                     }
                 }
+                needDelItems = items;
                 console.log("Total " + needUploadItems.length + " need to upload");
+                console.log("Total " + needDelItems.length + " need to delete");
                 if (needUploadItems.length > 0) {
                     var uploadAllItems = [];
                     for (var l in needUploadItems){
@@ -159,7 +165,9 @@ function syncShopeeToYahooTest() {
                             updateToDB.push(Item.create({
                                 "shopee_id": res[j].shopeeItemId,
                                 "on_yahoo": 1,
-                                "yahoo_id": (res[j].productId) ? res[j].productId : "fortest"
+                                "yahoo_id": (res[j].productId) ? res[j].productId : "fortest",
+                                "sku": res[j].sku,
+                                "product_name": res[j].productName
                             }));
                         }
                     }
