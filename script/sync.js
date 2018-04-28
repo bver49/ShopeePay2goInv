@@ -19,6 +19,12 @@ var key = {
 function syncShopeeToYahoo() {
     return new Promise(function(resolve, reject){
         var needDelItems;
+        var report = [];
+        var success = 0;
+        var fail = 0;
+        var failUploadImg = 0;
+        var shopeeItemsAmt = 0;
+        var needUploadItemsAmt = 0;
         Item.findAll({
             where: {
                 on_yahoo: {
@@ -38,6 +44,8 @@ function syncShopeeToYahoo() {
                     }
                 }
                 console.log("Total " + allItems.length + " shopee items");
+                shopeeItemsAmt = allItems.length;
+
                 var needUploadItems = [];
                 for (var k in allItems) {
                     var itemIndex = items.indexOf(allItems[k].item_id.toString());
@@ -47,6 +55,7 @@ function syncShopeeToYahoo() {
                         items.splice(itemIndex, 1);
                     }
                 }
+                needUploadItemsAmt = needUploadItems.length;
                 needDelItems = items;
                 console.log("Total " + needUploadItems.length + " need to upload");
                 console.log("Total " + needDelItems.length + " need to delete");
@@ -62,9 +71,9 @@ function syncShopeeToYahoo() {
             }).then(function (res) {
                 if (res!==0) {
                     report = res;
-                    var success = 0;
-                    var fail = 0;
-                    var failUploadImg = 0;
+                    success = 0;
+                    fail = 0;
+                    failUploadImg = 0;
                     for (var i in res) {
                         if (res[i]["@Status"] == "Success" || res[i]["Action"] == "uploadImage") {
                             success++;
@@ -94,7 +103,14 @@ function syncShopeeToYahoo() {
                 }
             }).then(function(res){
                 console.log("All Done!");
-                resolve(report);
+                resolve({
+                    report:report,
+                    success: success,
+                    fail:fail,
+                    failUploadImg: failUploadImg,
+                    shopeeItemsAmt: shopeeItemsAmt,
+                    needUploadItemsAmt: needUploadItemsAmt
+                });
             }).catch(function (err) {
                 console.log(err);
                 reject(err);
@@ -105,6 +121,12 @@ function syncShopeeToYahoo() {
 
 function syncShopeeToYahooTest() {
     return new Promise(function(resolve, reject){
+        var report = [];
+        var success = 0;
+        var fail = 0;
+        var failUploadImg = 0;
+        var shopeeItemsAmt = 0;
+        var needUploadItemsAmt = 0;
         Item.findAll({
             where: {
                 on_yahoo: {
@@ -124,6 +146,7 @@ function syncShopeeToYahooTest() {
                     }
                 }
                 console.log("Total " + allItems.length + " shopee items");
+                shopeeItemsAmt = allItems.length;
                 var needUploadItems = [];
                 for (var k in allItems) {
                     if (items.indexOf(allItems[k].item_id.toString()) == -1) {
@@ -131,6 +154,7 @@ function syncShopeeToYahooTest() {
                     }
                 }
                 console.log("Total " + needUploadItems.length + " need to upload");
+                needUploadItemsAmt = needUploadItems.length;
                 if (needUploadItems.length > 0) {
                     var uploadAllItems = [];
                     for (var l in needUploadItems){
@@ -143,9 +167,9 @@ function syncShopeeToYahooTest() {
             }).then(function (res) {
                 if (res!==0) {
                     report = res;
-                    var success = 0;
-                    var fail = 0;
-                    var failUploadImg = 0;
+                    success = 0;
+                    fail = 0;
+                    failUploadImg = 0;
                     for (var i in res) {
                         if (res[i]["@Status"] == "Success" || res[i]["Action"] == "uploadImage") {
                             success++;
@@ -177,7 +201,14 @@ function syncShopeeToYahooTest() {
                 }
             }).then(function(res){
                 console.log("All Done!");
-                resolve(report);
+                resolve({
+                    report: report,
+                    success: success,
+                    fail: fail,
+                    failUploadImg: failUploadImg,
+                    shopeeItemsAmt: shopeeItemsAmt,
+                    needUploadItemsAmt: needUploadItemsAmt
+                });
             }).catch(function (err) {
                 console.log(err);
                 reject(err);

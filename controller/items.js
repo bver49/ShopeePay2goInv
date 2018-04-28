@@ -22,10 +22,12 @@ router.get("/", function (req, res) {
 });
 
 router.post("/syncshopeetoyahoo", function (req, res) {
-    syncShopeeToYahooTest().then(function (res) {
-        res.send(res);
+    syncShopeeToYahooTest().then(function (result) {
+        res.send(result);
     }).catch(function (err) {
-        res.send(err);
+        res.send({
+            err:err
+        });
     });
 });
 
