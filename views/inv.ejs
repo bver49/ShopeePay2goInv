@@ -1,9 +1,9 @@
 <% layout('./layout') %>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script>
-<script src="/assets/inv.js"></script>
 <script type="text/javascript" src="/assets/moment.min.js"></script>
 <script type="text/javascript" src="/assets/bootstrap-datetimepicker.min.js"></script>
 <link rel="stylesheet" href="/assets/bootstrap-datetimepicker.min.css" />
+<script src="/assets/inv.js"></script>
 <% include ./menu %>
 <div class="container">
     <div class="col-md-10 col-md-offset-1" style="text-align:center;">
@@ -26,50 +26,77 @@
                     </span>
                 </div>
             </div>
-            <br>
-            <br>
-            <br>
-            <div class="form-group">
-                <label>開立發票商品名稱:</label>
-                <input type='text' class="form-control" id="invitemname" />
-            </div>
-            <div class="col-md-10 col-md-offset-1" style="margin-top:30px;text-align:center;">
-                <div id="search" class="btn btn-primary">查詢</div>
-                <div id="setting" class="btn btn-primary">修改金鑰</div>
-            </div>
         </form>
     </div>
-    <div class="col-md-12" style="padding-top:10px;">
-        <div class="text-center hint" style="display:none;">資料讀取中</div>
-        <div class="col-md-1 col-md-offset-5" style="text-align:center;">
-            <div class="form-group">
-                <select class="form-control" id="pageTop" style="display:none;"></select>
+    <div id="geninv">
+        <div class="col-md-10 col-md-offset-1" style="text-align:center;">
+            <form class="form-inline searchform">
+                <div class="form-group">
+                    <label>開立發票商品名稱:</label>
+                    <input type='text' class="form-control" id="invitemname" />
+                </div>
+                <div class="col-md-10 col-md-offset-1" style="margin-top:30px;text-align:center;">
+                    <div v-if="loading == 0" v-on:click="search" class="btn btn-primary">查詢</div>
+                    <div v-on:click="setting" class="btn btn-primary">修改金鑰</div>
+                </div>
+            </form>
+        </div>
+        <div class="col-md-12" style="padding-top:10px;">
+            <div class="col-md-1 col-md-offset-5" style="text-align:center;">
+                <div class="form-group">
+                    <select v-if="loading == 0 && pageAmt > 0" v-model="page" class="form-control">
+                        <option v-for="n in pageAmt">{{n}}</option>
+                    </select>
+                </div>
             </div>
-        </div>
-        <div class="col-md-6 col-md-offset-3" style="text-align:center;">
-            <div id="allSelectGenInv" class="btn btn-primary" style="display:none;margin-bottom:10px;">已選訂單全部開立</div>
-            <div id="allDateGenInv" class="btn btn-primary" style="display:none;margin-bottom:10px;">已選日期區間全部開立</div>
-        </div>
-        <table class="table table-hover table-bordered ordertable">
-            <thead>
-                <tr>
-                    <th>
-                        <input id="allcheck" type="checkbox" value="all">
-                    </th>
-                    <th>訂單編號</th>
-                    <th>更新時間</th>
-                    <th>訂單狀態</th>
-                    <th>操作</th>
-                </tr>
-            </thead>
-            <tbody id="orderlist">
-            </tbody>
-        </table>
-        <div class="text-center  hint" style="display:none;">資料讀取中</div>
-        <div class="col-md-1 col-md-offset-5" style="margin-bottom:50px;">
-            <div class="form-group">
-                <select class="form-control" id="pageBot" style="display:none;">
-                </select>
+            <div class="col-md-6 col-md-offset-3" style="text-align:center;">
+                <div v-if="loading == 0 && checkAmt > 0" v-on:click="allSelectGenInv" class="btn btn-primary" style="margin-bottom:10px;">已選訂單全部開立</div>
+                <div v-if="loading == 0 && orderlist.length > 0" v-on:click="allDateGenInv" class="btn btn-primary" style="margin-bottom:10px;">已選日期區間全部開立</div>
+            </div>
+            <table class="table table-hover table-bordered ordertable">
+                <thead>
+                    <tr>
+                        <th>
+                            <input v-on:click="selectAll" type="checkbox" v-model="hasSelectAll">
+                        </th>
+                        <th>訂單編號</th>
+                        <th>更新時間</th>
+                        <th>訂單狀態</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <template v-if="loading == 1">
+                        <tr>
+                            <td class="text-center" colspan="5">資料讀取中</td>
+                        </tr>
+                    </template>
+                    <template v-else>
+                        <template v-if="orderlist.length > 0" v-for="order in orderlist">
+                            <tr v-if="order.order_status == 'COMPLETED'">
+                                <td><input v-if="invlist.indexOf(order.ordersn) == -1" type="checkbox" v-bind:value="order.ordersn" v-model="ordersCheck"></td>
+                                <td>{{ order.ordersn }}</td>
+                                <td>{{ order.update_time | time }}</td>
+                                <td>完成</td>
+                                <td>
+                                    <div v-if="invlist.indexOf(order.ordersn) == -1" class="btn btn-primary" v-on:click="genInv(order.ordersn)">開立發票</div>
+                                    <div class="btn btn-primary" v-on:click="detail(order.ordersn)">詳細資料</div>
+                                </td>
+                            </tr>
+                        </template>
+                        <tr v-else>
+                            <td colspan="5" class="text-center">查無資料</td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+            <div v-if="loading == 1" class="text-center" style="display:none;">資料讀取中</div>
+            <div class="col-md-1 col-md-offset-5" style="margin-bottom:50px;">
+                <div class="form-group">
+                    <select v-if="loading == 0 && pageAmt > 0" v-model="page" class="form-control">
+                        <option v-for="n in pageAmt">{{n}}</option>
+                    </select>
+                </div>
             </div>
         </div>
     </div>
@@ -83,7 +110,21 @@
                 </button>
                 <h4 class="modal-title" id="myModalLabel">訂單資料</h4>
             </div>
-            <div class="modal-body">
+            <div v-if="show" class="modal-body">
+                <p>成立時間 : {{ order.create_time | time }}</p><br>
+                <p>訂購人 : {{ order.recipient_address.name }}</p><br>
+                <p>手機 : {{ order.recipient_address.phone }}</p><br>
+                <p>訂單編號 : {{ order.ordersn }}</p><br>
+                <p>銷售額(未稅) : {{Math.round(order.total_amount / 1.05)}}</p><br>
+                <p>發票稅額 : {{ Math.round(order.total_amount - (order.total_amount / 1.05)) }}</p><br>
+                <p>發票總金額(商品價格+運費) : {{ order.total_amount }}</p><br>
+                <p>運費：{{ order.estimated_shipping_fee }}</p>
+                <hr>
+                <template v-for="item in order.items">
+                    <p>商品名稱：{{ item.item_name.split(" ")[0] }}</p>
+                    <p>商品單價(折扣後)：{{ item.variation_discounted_price }}</p>
+                    <p>商品銷售數量：{{ item.variation_quantity_purchased }}</p><br>
+                </template>
             </div>
             <div class="modal-footer">
                 <div class="btn btn-default" data-dismiss="modal">關閉</div>
