@@ -5,6 +5,7 @@ var bodyParser = require("body-parser");
 var cookieParser = require("cookie-parser");
 var User = require("./model/User");
 
+app.engine('ejs', require('ejs-locals'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser("secretString"));

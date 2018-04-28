@@ -1,109 +1,72 @@
-<!DOCTYPE html>
-<html>
-
-<head>
-  <meta charset="utf-8">
-  <title>C.P.MAX蝦皮系統</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-  <link rel="stylesheet" href="/assets/toastr.min.css" />
-  <link rel="stylesheet" href="/assets/style.css">
-  <script type="text/javascript" src="/assets/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-  <script type="text/javascript" src="/assets/toastr.min.js"></script>
-  <script type="text/javascript" src="/assets/user.js"></script>
-</head>
-
-<body>
-  <nav class="navbar navbar-default">
-    <div class="container-fluid">
-      <div class="navbar-header">
-        <a class="navbar-brand" href="/">C.P.MAX</a>
-      </div>
-      <ul class="nav navbar-nav">
-        <% if(me.role ==2 ){ %>
-          <li><a href="/users">用戶管理</a></li>
-        <% } %>
-        <% if(me.inv == 1 || me.role ==2 ){ %>
-          <li><a href="/inv">開立發票</a></li>
-        <% } %>
-        <% if(me.ship == 1 || me.role ==2){ %>
-          <li><a href="/ship">出貨管理</a></li>
-        <% } %>
-        <li><a href="/">個人資料</a></li>
-        <li><a href="/users/logout">登出</a></li>
-      </ul>
-    </div>
-  </nav>
-  <div class="container">
+<% layout('./layout') %>
+<script type="text/javascript" src="/assets/user.js"></script>
+<% include ./menu %>
+<div class="container">
     <div class="col-md-8 col-md-offset-2" style="margin-top:50px;">
-      <h1 class="h2 text-center">用戶管理</h1><br><br>
-      <table class="table table-hover table-bordered ordertable">
-        <thead>
-          <tr>
-            <th>用戶名稱</th>
-            <th>驗證</th>
-            <th>權限</th>
-            <th>操作</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% for(var i in users){ %>
-            <tr id="user<%= users[i].id %>">
-              <td>
-                <%= users[i].username %>
-              </td>
-              <% if(users[i].role == 0){ %>
-                <td>未驗證</td>
-              <% }else{ %>
-                <td>已驗證</td>
-              <% } %>
-              <td>
-                <% if(users[i].ship == 1){ %>
-                  出貨管理
+        <h1 class="h2 text-center">用戶管理</h1><br><br>
+        <table class="table table-hover table-bordered ordertable">
+            <thead>
+                <tr>
+                <th>用戶名稱</th>
+                <th>驗證</th>
+                <th>權限</th>
+                <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% for(var i in users){ %>
+                <tr id="user<%= users[i].id %>">
+                    <td>
+                    <%= users[i].username %>
+                    </td>
+                    <% if(users[i].role == 0){ %>
+                    <td>未驗證</td>
+                    <% }else{ %>
+                    <td>已驗證</td>
+                    <% } %>
+                    <td>
+                    <% if(users[i].ship == 1){ %>
+                        出貨管理
+                    <% } %>
+                    <% if(users[i].inv == 1){ %>
+                        開立發票
+                    <% } %>
+                    </td>
+                    <td>
+                    <div class="deluser btn btn-danger" data-id="<%= users[i].id %>">刪除</div>
+                    <% if(users[i].role == 0){ %>
+                        <div class="verifyuser btn btn-success" data-id="<%= users[i].id %>">驗證</div>
+                    <% }else{ %>
+                        <% if(users[i].inv == 0){ %>
+                        <div class="allowjob btn btn-success" data-job="inv" data-id="<%= users[i].id %>">新增開發票權限</div>
+                        <% }else{ %>
+                        <div class="notallowjob btn btn-danger" data-job="inv" data-id="<%= users[i].id %>">移除開發票權限</div>
+                        <% } %>
+                        <% if(users[i].ship == 0){ %>
+                        <div class="allowjob btn btn-success" data-job="ship" data-id="<%= users[i].id %>">新增出貨權限</div>
+                        <% }else{ %>
+                        <div class="notallowjob btn btn-danger" data-job="ship" data-id="<%= users[i].id %>">移除出貨權限</div>
+                        <% } %>
+                    <% } %>
+                    </td>
+                </tr>
                 <% } %>
-                <% if(users[i].inv == 1){ %>
-                  開立發票
-                <% } %>
-              </td>
-              <td>
-                <div class="deluser btn btn-danger" data-id="<%= users[i].id %>">刪除</div>
-                <% if(users[i].role == 0){ %>
-                  <div class="verifyuser btn btn-success" data-id="<%= users[i].id %>">驗證</div>
-                <% }else{ %>
-                  <% if(users[i].inv == 0){ %>
-                    <div class="allowjob btn btn-success" data-job="inv" data-id="<%= users[i].id %>">新增開發票權限</div>
-                  <% }else{ %>
-                    <div class="notallowjob btn btn-danger" data-job="inv" data-id="<%= users[i].id %>">移除開發票權限</div>
-                  <% } %>
-                  <% if(users[i].ship == 0){ %>
-                    <div class="allowjob btn btn-success" data-job="ship" data-id="<%= users[i].id %>">新增出貨權限</div>
-                  <% }else{ %>
-                    <div class="notallowjob btn btn-danger" data-job="ship" data-id="<%= users[i].id %>">移除出貨權限</div>
-                  <% } %>
-                <% } %>
-              </td>
-            </tr>
-            <% } %>
-        </tbody>
-      </table>
+            </tbody>
+        </table>
     </div>
     <div class="col-md-4 col-md-offset-4" style="margin-top:50px;margin-bottom:50px;">
-      <h1 class="h2 text-center">新增用戶</h1><br><br>
-      <form>
-        <div class="form-group">
-          <label style="margin-bottom:10px;">Username</label>
-          <input type="text" class="form-control" id="username" placeholder="username">
-        </div>
-        <div class="form-group">
-          <label style="margin-bottom:10px;">Password</label>
-          <input type="password" class="form-control" id="password" placeholder="password">
-        </div>
-        <div id="adduser" class="btn btn-default">新增</div>
-      </form>
+        <h1 class="h2 text-center">新增用戶</h1><br><br>
+        <form>
+            <div class="form-group">
+                <label style="margin-bottom:10px;">Username</label>
+                <input type="text" class="form-control" id="username" placeholder="username">
+            </div>
+            <div class="form-group">
+                <label style="margin-bottom:10px;">Password</label>
+                <input type="password" class="form-control" id="password" placeholder="password">
+            </div>
+            <div id="adduser" class="btn btn-default">新增</div>
+        </form>
     </div>
-  </div>
-</body>
+</div>
 
-</html>

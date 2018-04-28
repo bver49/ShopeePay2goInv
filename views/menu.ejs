@@ -1,0 +1,22 @@
+<nav id="menu" class="navbar navbar-default">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="/">C.P.MAX</a>
+        </div>
+        <ul class="nav navbar-nav">
+            <li v-if="me.role=2"><a href="/users">用戶管理</a></li>
+            <li v-if="me.inv == 1 || me.role == 2"><a href="/inv">開立發票</a></li>
+            <li v-if="me.ship == 1 || me.role ==2"><a href="/ship">出貨管理</a></li>
+            <li><a href="/">個人資料</a></li>
+            <li><a href="/users/logout">登出</a></li>
+        </ul>
+    </div>
+</nav>
+<script>
+    var menu = new Vue({
+        el:"#menu",
+        data:{
+            me:<%- JSON.stringify(me) %>
+        }
+    });
+</script>
