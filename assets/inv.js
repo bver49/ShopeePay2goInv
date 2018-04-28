@@ -2,6 +2,15 @@ $(document).ready(function () {
 
     var Page = [];
 
+    toastr.options = {
+        "closeButton": true,
+        "positionClass": "toast-top-right",
+        "showDuration": "0",
+        "hideDuration": "1000",
+        "timeOut": "2000",
+        "extendedTimeOut": "1000"
+    }
+
     var genInv = new Vue({
         el: "#geninv",
         data: {
@@ -158,15 +167,6 @@ $(document).ready(function () {
         $("#paytwogohashiv").val(localStorage.getItem("paytwogohashiv"));
         $("#invurl").val(localStorage.getItem("invurl"));
         $("#invemail").val(localStorage.getItem("invemail"));
-    }
-
-    toastr.options = {
-        "closeButton": true,
-        "positionClass": "toast-top-right",
-        "showDuration": "0",
-        "hideDuration": "1000",
-        "timeOut": "2000",
-        "extendedTimeOut": "1000"
     }
 
     function getNextPage(page, cb) {
