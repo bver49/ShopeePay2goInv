@@ -7,6 +7,7 @@
             <li v-if="me.role=2"><a href="/users">用戶管理</a></li>
             <li v-if="me.inv == 1 || me.role == 2"><a href="/inv">開立發票</a></li>
             <li v-if="me.ship == 1 || me.role ==2"><a href="/ship">出貨管理</a></li>
+            <li v-if="me.syncitems == 1 || me.role ==2"><a href="/items/syncitems">同步商品</a></li>
             <li><a href="/">個人資料</a></li>
             <li><a href="/users/logout">登出</a></li>
         </ul>

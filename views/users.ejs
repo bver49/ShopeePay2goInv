@@ -1,56 +1,48 @@
 <% layout('./layout') %>
 <script type="text/javascript" src="/assets/user.js"></script>
 <% include ./menu %>
-<div class="container">
+<div class="container" id="manage-users">
     <div class="col-md-8 col-md-offset-2" style="margin-top:50px;">
         <h1 class="h2 text-center">用戶管理</h1><br><br>
         <table class="table table-hover table-bordered ordertable">
             <thead>
                 <tr>
-                <th>用戶名稱</th>
-                <th>驗證</th>
-                <th>權限</th>
-                <th>操作</th>
+                    <th>用戶名稱</th>
+                    <th>驗證</th>
+                    <th>權限</th>
+                    <th>操作</th>
                 </tr>
             </thead>
             <tbody>
-                <% for(var i in users){ %>
-                <tr id="user<%= users[i].id %>">
-                    <td>
-                    <%= users[i].username %>
-                    </td>
-                    <% if(users[i].role == 0){ %>
-                    <td>未驗證</td>
-                    <% }else{ %>
-                    <td>已驗證</td>
-                    <% } %>
-                    <td>
-                    <% if(users[i].ship == 1){ %>
-                        出貨管理
-                    <% } %>
-                    <% if(users[i].inv == 1){ %>
-                        開立發票
-                    <% } %>
-                    </td>
-                    <td>
-                    <div class="deluser btn btn-danger" data-id="<%= users[i].id %>">刪除</div>
-                    <% if(users[i].role == 0){ %>
-                        <div class="verifyuser btn btn-success" data-id="<%= users[i].id %>">驗證</div>
-                    <% }else{ %>
-                        <% if(users[i].inv == 0){ %>
-                        <div class="allowjob btn btn-success" data-job="inv" data-id="<%= users[i].id %>">新增開發票權限</div>
-                        <% }else{ %>
-                        <div class="notallowjob btn btn-danger" data-job="inv" data-id="<%= users[i].id %>">移除開發票權限</div>
-                        <% } %>
-                        <% if(users[i].ship == 0){ %>
-                        <div class="allowjob btn btn-success" data-job="ship" data-id="<%= users[i].id %>">新增出貨權限</div>
-                        <% }else{ %>
-                        <div class="notallowjob btn btn-danger" data-job="ship" data-id="<%= users[i].id %>">移除出貨權限</div>
-                        <% } %>
-                    <% } %>
-                    </td>
-                </tr>
-                <% } %>
+                <template v-for="(user, index) in users">
+                    <tr v-bind:id="'user'+user.id">
+                        <td>
+                            {{ user.username }}
+                        </td>
+                        <td v-if="user.role == 0">未驗證</td>
+                        <td v-else>已驗證</td>
+                        <td>
+                            <span v-if="user.ship == 1">
+                                出貨管理
+                            </span>
+                            <span v-if="user.inv == 1">
+                                開立發票
+                            </span>
+                        </td>
+                        <td>
+                            <div class="btn btn-danger" v-on:click="delUser(index,user.id)">刪除</div>
+                            <template v-if="user.role == 0">
+                                <div class="btn btn-success" v-on:click="verifyUser(index,user.id)">驗證</div>
+                            </template>
+                            <template v-else>
+                                <div v-if="user.inv == 0" class="btn btn-success" v-on:click="allowJob(index,user.id,'inv')">新增開發票權限</div>
+                                <div v-else class="btn btn-danger" v-on:click="notAllowJob(index,user.id,'inv')">移除開發票權限</div>
+                                <div v-if="user.ship == 0" class="btn btn-success" v-on:click="allowJob(index,user.id,'ship')">新增出貨權限</div>
+                                <div v-else class="btn btn-danger" v-on:click="notAllowJob(index,user.id,'ship')">移除出貨權限</div>
+                            </template>
+                        </td>
+                    </tr>
+                </template>
             </tbody>
         </table>
     </div>
@@ -69,4 +61,79 @@
         </form>
     </div>
 </div>
+<script>
+    var manageUsers = new Vue({
+        el:"#manage-users",
+        data:{
+            me:<%- JSON.stringify(me) %>,
+            users:<%- JSON.stringify(users) %>
+        },
+        methods:{
+            verifyUser: function(index,id){
+                if (confirm("確定要開通用戶?")) {
+                    $.ajax({
+                        url: '/users/verify/' + id,
+                        type: 'PUT',
+                        success: function(response) {
+                            if (response == "ok") {
+                                toastr.success("開通成功");
+                                manageUsers.users[index].role = 1;
+                            } else {
+                                toastr.warning(response);
+                            }
+                        }
+                    });
+                }
+            },
+            delUser: function(index,id){
+                if (confirm("確定要刪除用戶?")) {
+                    $.ajax({
+                        url: '/users/' + id,
+                        type: 'DELETE',
+                        success: function(response) {
+                            if (response == "ok") {
+                                toastr.success("刪除成功");
+                                manageUsers.users.splice(index,1);
+                            } else {
+                                toastr.warning(response);
+                            }
+                        }
+                    });
+                }
+            },
+            allowJob: function(index,id,job){
+                if (confirm("確定要新增權限?")) {
+                    $.ajax({
+                        url: '/users/allow/' + job + '/' + id,
+                        type: 'PUT',
+                        success: function(response) {
+                            if (response == "ok") {
+                                toastr.success("新增成功");
+                                manageUsers.users[index][job] = 1;
+                            } else {
+                                toastr.warning(response);
+                            }
+                        }
+                    });
+		        }
+            },
+            notAllowJob: function(index,id,job){
+                if (confirm("確定要移除權限?")) {
+                    $.ajax({
+                        url: '/users/notallow/' + job + '/' + id,
+                        type: 'PUT',
+                        success: function(response) {
+                            if (response == "ok") {
+                                toastr.success("移除成功");
+                                manageUsers.users[index][job] = 0;
+                            } else {
+                                toastr.warning(response);
+                            }
+                        }
+                    });
+		        }
+            }
+        }
+    });
+</script>
 

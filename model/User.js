@@ -27,7 +27,7 @@ var userSchema = {
         }
     },
 	role: {
-		type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
         defaultValue:0
 	},
 	ship: {
@@ -37,7 +37,11 @@ var userSchema = {
 	inv: {
 		type: Sequelize.INTEGER,
         defaultValue:0
-	},
+    },
+    syncitems: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0
+    },
 	created_at: {
 		type: 'TIMESTAMP',
 		defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
