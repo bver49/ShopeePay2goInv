@@ -200,7 +200,7 @@ function genExcel(data, cb) {
         }
         index++;
     }
-    wb.write('../file/待出貨商品統計.xlsx');
+    wb.write('./file/待出貨商品統計.xlsx');
     cb()
 }
 
@@ -257,9 +257,7 @@ function getItemDetail(itemId, key) {
 function getAllItems(key) {
     return new Promise(function (resolve, reject) {
         getCategory(key).then(function (data) {
-            var categoryList = data.shop_categorys.filter(function (ele) {
-                return ele.status == 1;
-            });
+            var categoryList = data.shop_categorys;
 
             var getCategoryDetail = Promise.all(categoryList.map(function (category) {
                 return getItemInCategory(category, key);
