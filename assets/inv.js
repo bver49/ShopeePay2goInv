@@ -1,6 +1,6 @@
 $(document).ready(function () {
 
-    var Page = [];
+    window.Page = [];
 
     toastr.options = {
         "closeButton": true,
@@ -31,6 +31,7 @@ $(document).ready(function () {
         },
         watch: {
             page: function (page) {
+                //換頁
                 page = page - 1;
                 genInv.orderlist = [];
                 for (var i = page * 50; i < (page + 1) * 50 && i < Page.length; i++) {
@@ -41,6 +42,7 @@ $(document).ready(function () {
                 genInv.hasSelectAll = false;
             },
             ordersCheck: function (value) {
+                //打勾
                 genInv.checkAmt = value.length;
             }
         },
@@ -57,6 +59,7 @@ $(document).ready(function () {
             search: function () {
                 if ($("#tt").val() != "" && $("#tf").val() != "") {
                     if ((Math.floor(new Date($("#tt").val()).getTime() / 1000) - Math.floor(new Date($("#tf").val()).getTime() / 1000)) <= 15 * 24 * 3600) {
+                        //開始查詢
                         genInv.orderlist = [];
                         genInv.loading = 1;
                         $.ajax({
@@ -85,8 +88,9 @@ $(document).ready(function () {
                                         getNextPage(1)
                                     } else {
                                         sortPage();
-                                        for (var i = 0; i < 50 && i < Page.length; i++) {
-                                            genInv.orderlist.push(Page[i]);
+                                        //查詢結束
+                                        for (var j = 0; j < 50 && j < Page.length; j++) {
+                                            genInv.orderlist.push(Page[j]);
                                         }
                                         genInv.page = 1;
                                         genInv.loading = 0;
@@ -106,10 +110,10 @@ $(document).ready(function () {
                     }
                 }
             },
-            genInv: function (ordersn) {
+            genInvoice: function (ordersn) {
                 genInvoice(ordersn);
             },
-            detail: function (ordersn) {
+            showDetail: function (ordersn) {
                 getOrder(ordersn);
             },
             selectAll: function () {
@@ -125,16 +129,17 @@ $(document).ready(function () {
                     genInv.hasSelectAll = false;
                 }
             },
-            allDateGenInv: function () {
+            allDateGenInvoice: function () {
                 for (var i in Page) {
                     if (Page[i].order_status == 'COMPLETED' && genInv.invlist.indexOf(Page[i].ordersn) == -1) {
                         genInvoice(Page[i].ordersn);
                     }
                 }
             },
-            allSelectGenInv: function () {
-                for (var i in genInv.ordersCheck) {
-                    genInvoice(genInv.ordersCheck[i]);
+            allSelectGenInvoice: function () {
+                var tempArr = genInv.ordersCheck;
+                for (var i in tempArr) {
+                    genInvoice(tempArr[i]);
                 }
                 genInv.hasSelectAll = false;
             },
@@ -168,6 +173,17 @@ $(document).ready(function () {
         $("#invurl").val(localStorage.getItem("invurl"));
         $("#invemail").val(localStorage.getItem("invemail"));
     }
+
+    $("#save").on("click", function () {
+        localStorage.setItem("shopeesecret", $("#shopeesecret").val());
+        localStorage.setItem("shopeeshopid", $("#shopeeshopid").val());
+        localStorage.setItem("shopeepartnerid", $("#shopeepartnerid").val());
+        localStorage.setItem("paytwogoid", $("#paytwogoid").val());
+        localStorage.setItem("paytwogohashkey", $("#paytwogohashkey").val());
+        localStorage.setItem("paytwogohashiv", $("#paytwogohashiv").val());
+        localStorage.setItem("invurl", $("#invurl").val());
+        localStorage.setItem("invemail", $("#invemail").val());
+    });
 
     function getNextPage(page, cb) {
         $.ajax({
@@ -288,16 +304,5 @@ $(document).ready(function () {
 
     $("#datetimepickertt").on("dp.change", function (e) {
         $('#datetimepickertf').data("DateTimePicker").maxDate(e.date);
-    });
-
-    $("#save").on("click", function () {
-        localStorage.setItem("shopeesecret", $("#shopeesecret").val());
-        localStorage.setItem("shopeeshopid", $("#shopeeshopid").val());
-        localStorage.setItem("shopeepartnerid", $("#shopeepartnerid").val());
-        localStorage.setItem("paytwogoid", $("#paytwogoid").val());
-        localStorage.setItem("paytwogohashkey", $("#paytwogohashkey").val());
-        localStorage.setItem("paytwogohashiv", $("#paytwogohashiv").val());
-        localStorage.setItem("invurl", $("#invurl").val());
-        localStorage.setItem("invemail", $("#invemail").val());
     });
 });
