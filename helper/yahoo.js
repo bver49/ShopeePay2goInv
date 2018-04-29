@@ -316,7 +316,7 @@ function addItem(data) {
         }).then(function (res) {
             if (shopeeData.has_variation == true) {
                 var updateItemStock = Promise.all(shopeeData.variations.map(function(ele, index){
-                    return updateStock(productId, index+1, ele, "add");
+                    return updateStock(productId, index + 1, ele.stock, "add");
                 }));
                 return updateItemStock;
             } else {

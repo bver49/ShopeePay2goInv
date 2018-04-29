@@ -22,7 +22,7 @@ router.get("/", checkLogin(1),function (req, res) {
 });
 
 router.post("/syncshopeetoyahoo", checkLogin(1),function (req, res) {
-    syncShopeeToYahooTest().then(function (result) {
+    syncShopeeToYahoo().then(function (result) {
         res.send(result);
     }).catch(function (err) {
         console.log(err);
