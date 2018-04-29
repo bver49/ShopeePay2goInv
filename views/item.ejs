@@ -2,64 +2,75 @@
 <script src="/assets/item.js"></script>
 <% include ./menu %>
 <div id="syncitem" class="container">
-    <div class="col-md-10 col-md-offset-1" style="text-align:center;">
+    <div class="col-md-10 col-md-offset-1 text-center">
         <div v-if="syncing == false" v-on:click="sync" class="btn btn-primary">同步商品</div>
-        <div v-else class="text-center">同步商品中</div>
+        <br><br>
+        <div v-if="syncing == false">上次同步時間:
+            <span v-if="items.length >0">{{ items[0].created_at | time }}</span>
+            <span v-else>從未同步過</span>
+        </div>
+        <div v-else class="text-center">同步商品中，請稍候</div>
     </div>
     <br><br>
     <template v-if="showreport">
-        <h2 class="h2 text-center">此次同步報告</h2><br>
-        <p class="text-center">蝦皮商城共有 {{ shopeeItemsAmt }} 個商品</p><br>
-        <p class="text-center">共有 {{ needUploadItemsAmt }} 需要同步</p><br>
-        <p class="text-center">同步成功 {{ success }} 個</p><br>
-        <p class="text-center">同步失敗 {{ fail }} 個</p><br>
-        <p class="text-center">圖片上傳失敗 {{ failUploadImg }} 個</p>
-        <template v-if="needUploadItemsAmt > 0 && report.length > 0">
-            <h2 class="h2 text-center">此次同步商品</h2>
-            <table class="table table-hover table-bordered ordertable">
-                <thead>
-                    <tr>
-                        <th>蝦皮ID</th>
-                        <th>商品名稱</th>
-                        <th>商品貨號</th>
-                        <th>結果</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <template v-for="detail in report">
+        <div class="col-md-12 text-center">
+            <h2 class="h2 text-center">本次同步報告</h2><br>
+            <p class="text-center">蝦皮商城共有 {{ shopeeItemsAmt }} 個商品</p><br>
+            <p class="text-center">共有 {{ needUploadItemsAmt }} 個需要同步</p><br>
+            <p class="text-center">同步成功 {{ success }} 個</p><br>
+            <p class="text-center">同步失敗 {{ fail }} 個</p><br>
+            <p class="text-center">圖片上傳失敗 {{ failUploadImg }} 個</p>
+            <template v-if="needUploadItemsAmt > 0 && report.length > 0">
+                <h2 class="h2 text-center">本次同步商品</h2>
+                <table class="table table-hover table-bordered ordertable">
+                    <thead>
                         <tr>
-                            <td>{{ detail.shopeeItemId }}</td>
-                            <td>{{ detail.productName }}</td>
-                            <td>{{ detail.sku }}</td>
-                            <td>{{ detail["@Status"] | status }}</td>
+                            <th>蝦皮ID</th>
+                            <th>商品名稱</th>
+                            <th>商品貨號</th>
+                            <th>結果</th>
                         </tr>
-                    </template>
-                </tbody>
-            </table>
-        </template>
+                    </thead>
+                    <tbody>
+                        <template v-for="detail in report">
+                            <tr>
+                                <td>{{ detail.shopeeItemId }}</td>
+                                <td>{{ detail.productName }}</td>
+                                <td>{{ detail.sku }}</td>
+                                <td>{{ detail["@Status"] | status(detail["Action"]) }}</td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </template>
+        </div>
     </template>
     <br><br>
-    <h2 class="h2 text-center">目前同步情形</h2>
-    <table class="table table-hover table-bordered ordertable">
-        <thead>
-            <tr>
-                <th>蝦皮ID</th>
-                <th>商品名稱</th>
-                <th>商品貨號</th>
-                <th>上次同步時間</th>
-                <th>同步於</th>
-            </tr>
-        </thead>
-        <tbody>
-            <template v-for="item in items">
+    <div class="col-md-12 text-center">
+        <h2 class="h2 text-center">目前同步情形</h2>
+        <table class="table table-hover table-bordered ordertable">
+            <thead>
                 <tr>
-                    <td>{{ item.shopee_id }}</td>
-                    <td>{{ item.product_name }}</td>
-                    <td>{{ item.sku }}</td>
-                    <td>{{ item.created_at | time }}</td>
-                    <td>Yahoo</td>
+                    <th>編號</th>
+                    <th>蝦皮ID</th>
+                    <th>商品名稱</th>
+                    <th>商品貨號</th>
+                    <th>上次同步時間</th>
+                    <th>同步平台</th>
                 </tr>
-            </template>
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                <template v-for="(item,index) in items">
+                    <tr>
+                        <td>{{ index+1 }}</td>
+                        <td>{{ item.shopee_id }}</td>
+                        <td>{{ item.product_name }}</td>
+                        <td>{{ item.sku }}</td>
+                        <td>{{ item.created_at | time }}</td>
+                        <td>Yahoo</td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
+    </div>
 </div>

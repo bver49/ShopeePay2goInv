@@ -89,11 +89,13 @@ function syncShopeeToYahoo() {
                     console.log("Update DB");
                     var updateToDB = [];
                     for (var j in res) {
-                        if (res[i]["@Status"] == "Success") {
+                        if (res[j]["@Status"] == "Success" || res[j]["Action"] == "uploadImage") {
                             updateToDB.push(Item.create({
                                 "shopee_id": res[j].shopeeItemId,
                                 "on_yahoo": 1,
-                                "yahoo_id": (res[j].productId) ? res[j].productId : "fortest"
+                                "yahoo_id": res[j].productId,
+                                "sku": res[j].sku,
+                                "product_name": res[j].productName
                             }));
                         }
                     }
@@ -185,7 +187,7 @@ function syncShopeeToYahooTest() {
                     console.log("Update DB");
                     var updateToDB = [];
                     for (var j in res) {
-                        if (res[i]["@Status"] == "Success") {
+                        if (res[i]["@Status"] == "Success" || res[i]["Action"] == "uploadImage") {
                             updateToDB.push(Item.create({
                                 "shopee_id": res[j].shopeeItemId,
                                 "on_yahoo": 1,

@@ -24,15 +24,18 @@ $(document).ready(function () {
         },
         filters: {
             time: function (value) {
-                var time = new Date(value);
+                var time = new Date(new Date(value).getTime() + (8 * 60 * 60 * 1000));
                 return time.getFullYear() + "/" + (time.getMonth() + 1) + "/" + time.getDate() + " " + ((time.getHours() < 10) ? ("0" + time.getHours()) : (time.getHours())) + ":" + ((time.getMinutes() < 10) ? ("0" + time.getMinutes()) : (time.getMinutes()));
             },
-            status:function(value){
-                switch(value){
-                    case "Success":
-                        return "同步成功"
-                    case "Fail":
-                        return "同步失敗"
+            status:function(status, action){
+                if(status == "Success") {
+                    return "同步成功";
+                } else {
+                    if (action == "uploadImage") {
+                        return "圖片上傳失敗";
+                    } else {
+                        return "同步失敗";
+                    }
                 }
             }
         },
@@ -72,7 +75,7 @@ $(document).ready(function () {
                                     }
                                 });
                             } else {
-                                toastr.warning("發生錯誤!");
+                                toastr.warning("發生錯誤，請重新整理後再試一次!");
                             }
                         }
                     });

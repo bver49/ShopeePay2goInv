@@ -292,6 +292,8 @@ function addItemTest(data) {
             err["@Status"] = "Fail";
             err["shopeeItemId"] = itemId;
             err["submitData"] = shopeeData;
+            err["productName"] = data["ProductName"];
+            err["sku"] = data["CustomizedMainProductId"];
             if (err.ErrorList) {
                 err.ErrorList = err.ErrorList.Error.map(function(ele){
                     return ele.Parameter + " -> " + ele.Message;
@@ -351,6 +353,8 @@ function addItem(data) {
             err["shopeeItemId"] = itemId;
             err["productId"] = productId;
             err["submitData"] = shopeeData;
+            err["productName"] = data["ProductName"];
+            err["sku"] = data["CustomizedMainProductId"];
             if (err.ErrorList) {
                 err.ErrorList = err.ErrorList.Error.map(function(ele){
                     return ele.Parameter + " -> " + ele.Message;

@@ -29,7 +29,7 @@ app.use(function(req, res, next) {
 });
 
 app.use("/orders", checkLogin(1), require("./controller/orders"));
-app.use("/items", checkLogin(1), require('./controller/items'));
+app.use("/items", require('./controller/items'));
 app.use("/users", require('./controller/users'));
 app.use("/notes", checkLogin(1), require('./controller/notes'));
 
