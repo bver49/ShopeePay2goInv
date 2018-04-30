@@ -16,8 +16,9 @@ var key = {
     shopeesecret: config.shopee.apisecret
 }
 
-function syncShopeeToYahoo() {
+function syncShopeeToYahoo(priceRate) {
     return new Promise(function(resolve, reject){
+        var priceRate = (priceRate) ? priceRate : 1;
         var needDelItems;
         var report = [];
         var success = 0;
@@ -50,6 +51,7 @@ function syncShopeeToYahoo() {
                 for (var k in allItems) {
                     var itemIndex = items.indexOf(allItems[k].item_id.toString());
                     if (itemIndex == -1) {
+                        allItems[k]["priceRate"] = priceRate;
                         needUploadItems.push(allItems[k]);
                     } else {
                         items.splice(itemIndex, 1);
@@ -121,8 +123,9 @@ function syncShopeeToYahoo() {
     });
 }
 
-function syncShopeeToYahooTest() {
+function syncShopeeToYahooTest(priceRate) {
     return new Promise(function(resolve, reject){
+        var priceRate = (priceRate) ? priceRate : 1;
         var report = [];
         var success = 0;
         var fail = 0;
@@ -152,6 +155,7 @@ function syncShopeeToYahooTest() {
                 var needUploadItems = [];
                 for (var k in allItems) {
                     if (items.indexOf(allItems[k].item_id.toString()) == -1) {
+                        allItems[k]["priceRate"] = priceRate;
                         needUploadItems.push(allItems[k]);
                     }
                 }

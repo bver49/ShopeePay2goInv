@@ -107,8 +107,8 @@ function shopeeDataToYahooData(shopeeData){
     var data = {
         "SaleType": "Normal",
         "ProductName": cutShort(shopeeData.name,130),
-        "SalePrice": shopeeData.price,
-        "CostPrice": shopeeData.price,
+        "SalePrice": shopeeData.price * shopeeData.priceRate,
+        "CostPrice": shopeeData.price * shopeeData.priceRate,
         "CustomizedMainProductId": shopeeData.item_sku,
         "MallCategoryId": getCategory(shopeeData.name),
         "ShortDescription": cutShort(shopeeData.name,50),
@@ -131,7 +131,7 @@ function shopeeDataToYahooData(shopeeData){
         });
     } else {
         data["SpecTypeDimension"] = 0;
-        data["Stock"] = shopeeData.stock;
+        data["Stock"] = parseInt(shopeeData.stock);
         data["SaftyStock"] = 10;
     }
 
@@ -186,7 +186,7 @@ function updateStock(productId, variastionIndex, stock, action){
         var data = {
             "ProductId": productId,
             "Spec.1.Id": variastionIndex,
-            "Spec.1.Stock": stock,
+            "Spec.1.Stock": parseInt(stock),
             "Spec.1.Action": action
         }
         var url = "https://tw.ews.mall.yahooapis.com/stauth/v1/Product/UpdateStock";
