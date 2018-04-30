@@ -205,7 +205,7 @@ function genExcel(data, cb) {
 }
 
 //取得商品分類
-function getCategory(key, cb) {
+function getCategory(key) {
     return new Promise(function (resolve, reject) {
         var data = {
             "pagination_offset": 0,
@@ -311,5 +311,6 @@ module.exports = {
     "getOrderLogistic": getOrderLogistic,
     "genExcel": genExcel,
     "getCategory": getCategory,
+    "getItemInCategory":getItemInCategory,
     "getAllItems": getAllItems
 }
