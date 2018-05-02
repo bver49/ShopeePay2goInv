@@ -1,5 +1,7 @@
 $(document).ready(function () {
 
+    var needUploadItemsAmt = 0;
+
     toastr.options = {
         "closeButton": true,
         "positionClass": "toast-top-right",
@@ -41,7 +43,7 @@ $(document).ready(function () {
         },
         mounted:function(){
             $.ajax({
-                url: '/items',
+                url: '/items/logs',
                 type: 'get',
                 success: function (response) {
                     syncItem.items = response;
@@ -53,30 +55,27 @@ $(document).ready(function () {
                 if (confirm("確定要同步商品?")) {
                     syncItem.syncing = true;
                     syncItem.showreport = false;
+                    syncItem.report = [];
+                    syncItem.shopeeItemsAmt = 0;
+                    syncItem.success = 0;
+                    syncItem.fail = 0;
+                    syncItem.failUploadImg = 0;
+                    syncItem.needUploadItemsAmt = 0;
                     $.ajax({
-                        url: '/items/syncshopeetoyahoo',
-                        type: 'post',
+                        url: '/items/fromshopee',
+                        type: 'POST',
                         success: function (response) {
-                            syncItem.syncing = false;
-                            if(response.report) {
-                                console.log(response.report);
-                                syncItem.report = response.report;
-                                syncItem.showreport = true;
-                                syncItem.success = response.success;
-                                syncItem.fail = response.fail;
-                                syncItem.failUploadImg = response.failUploadImg;
-                                syncItem.shopeeItemsAmt = response.shopeeItemsAmt;
-                                syncItem.needUploadItemsAmt = response.needUploadItemsAmt;
-                                $.ajax({
-                                    url: '/items',
-                                    type: 'get',
-                                    success: function (items) {
-                                        syncItem.items = items;
-                                    }
-                                });
-                            } else {
-                                toastr.warning("發生錯誤，請重新整理後再試一次!");
+                            var needUploadItems = response.needUploadItems;
+                            needUploadItemsAmt = needUploadItems.length;
+                            syncItem.showreport = true;
+                            syncItem.needUploadItemsAmt = needUploadItems.length;
+                            syncItem.shopeeItemsAmt = response.shopeeItemAmt;
+                            for (var i in needUploadItems){
+                                upload(needUploadItems[i]);
                             }
+                        },
+                        error: function(err){
+                            alert("撈取蝦皮資料錯誤請重新整理畫面");
                         }
                     });
                 }
@@ -84,4 +83,33 @@ $(document).ready(function () {
         }
     });
 
+    function upload(orderData){
+        $.ajax({
+            url: '/items/upload/yahoo',
+            type: 'post',
+            dataType:'json',
+            data:{
+                orderData: JSON.stringify(orderData),
+                priceRate: parseFloat($('#priceRate').val())
+            },
+            success: function (response) {
+                syncItem.report.push(response);
+                console.log(syncItem.report);
+                needUploadItemsAmt--;
+                if(needUploadItemsAmt <= 0){
+                    syncItem.syncing = false;
+                    $.ajax({
+                        url: '/items/logs',
+                        type: 'get',
+                        success: function (response) {
+                            syncItem.items = response;
+                        }
+                    });
+                }
+            },
+            error: function(err){
+                console.log(err);
+            }
+        });
+    }
 });

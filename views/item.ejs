@@ -3,7 +3,8 @@
 <% include ./menu %>
 <div id="syncitem" class="container">
     <div class="col-md-10 col-md-offset-1 text-center">
-        <div v-if="syncing == false" v-on:click="sync" class="btn btn-primary">同步商品</div>
+        <div v-if="syncing == false" v-on:click="sync" class="btn btn-primary">同步商品</div><br><br>
+        <div>上架價格倍率：<input class="text-center" type="number" value="1"> 倍</div>
         <br><br>
         <div v-if="syncing == false">上次同步時間:
             <span v-if="items.length >0">{{ items[0].created_at | time }}</span>

@@ -30,7 +30,7 @@ router.get("/logs", checkLogin(1),function (req, res) {
     });
 });
 
-router.post("/getfromshopee", checkLogin(1),function (req, res) {
+router.post("/fromshopee", checkLogin(1),function (req, res) {
     Item.findAll({
         "where": {
             "on_yahoo": {
@@ -67,6 +67,8 @@ router.post("/getfromshopee", checkLogin(1),function (req, res) {
                 "needDelItems":needDelItems,
                 "shopeeItemAmt":allItems.length
             });
+        }).catch(function(err){
+            res.send(err);
         });
     });
 });
@@ -74,7 +76,7 @@ router.post("/getfromshopee", checkLogin(1),function (req, res) {
 router.post("/upload/yahoo", checkLogin(1),function (req, res) {
     var orderData = JSON.parse(req.body.orderData);
     orderData["priceRate"] = req.body.priceRate;
-    addItem(orderData).then(function(result){
+    addItemTest(orderData).then(function(result){
         if (result["@Status"] == "Success" || result["Action"] == "uploadImage") {
             Item.create({
                 "shopee_id": result.shopeeItemId,
