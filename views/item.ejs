@@ -4,13 +4,21 @@
 <div id="syncitem" class="container">
     <div class="col-md-10 col-md-offset-1 text-center">
         <div v-if="syncing == false" v-on:click="sync" class="btn btn-primary">同步商品</div><br><br>
-        <div>上架價格倍率：<input class="text-center" type="number" value="1"> 倍</div>
+        <div>上架價格倍率：<input id="priceRate" class="text-center" type="number" value="1"> 倍</div>
         <br><br>
         <div v-if="syncing == false">上次同步時間:
             <span v-if="items.length >0">{{ items[0].created_at | time }}</span>
             <span v-else>從未同步過</span>
         </div>
-        <div v-else class="text-center">同步商品中，請稍候</div>
+        <div v-else class="text-center">
+            <template v-if="needUploadItemsAmt <= 0">
+                <p>從蝦皮撈取商品資料中</p>
+            </template>
+            <template v-else>
+                <p>同步商品中，請稍候</p>
+                <p>目前已處理 {{ done }}/{{ needUploadItemsAmt }} 個商品</p>
+            </template>
+        </div>
     </div>
     <br><br>
     <template v-if="showreport">

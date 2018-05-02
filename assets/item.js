@@ -1,7 +1,5 @@
 $(document).ready(function () {
 
-    var needUploadItemsAmt = 0;
-
     toastr.options = {
         "closeButton": true,
         "positionClass": "toast-top-right",
@@ -16,11 +14,12 @@ $(document).ready(function () {
         data: {
             syncing: false,
             showreport:false,
+            shopeeItemsAmt: 0,
+            needUploadItemsAmt:0,
             success:0,
             fail:0,
             failUploadImg:0,
-            shopeeItemsAmt:0,
-            needUploadItemsAmt:0,
+            done:0,
             items:[],
             report:[]
         },
@@ -57,21 +56,26 @@ $(document).ready(function () {
                     syncItem.showreport = false;
                     syncItem.report = [];
                     syncItem.shopeeItemsAmt = 0;
+                    syncItem.needUploadItemsAmt = 0;
+                    syncItem.done = 0;
                     syncItem.success = 0;
                     syncItem.fail = 0;
                     syncItem.failUploadImg = 0;
-                    syncItem.needUploadItemsAmt = 0;
+
                     $.ajax({
                         url: '/items/fromshopee',
                         type: 'POST',
                         success: function (response) {
                             var needUploadItems = response.needUploadItems;
-                            needUploadItemsAmt = needUploadItems.length;
+                            syncItem.needUploadItemsAmt = response.needUploadItems.length;
                             syncItem.showreport = true;
-                            syncItem.needUploadItemsAmt = needUploadItems.length;
                             syncItem.shopeeItemsAmt = response.shopeeItemAmt;
-                            for (var i in needUploadItems){
-                                upload(needUploadItems[i]);
+                            if (needUploadItems.length > 0){
+                                for (var i in needUploadItems) {
+                                    upload(needUploadItems[i]);
+                                }
+                            } else {
+                                syncItem.syncing = false;
                             }
                         },
                         error: function(err){
@@ -94,9 +98,16 @@ $(document).ready(function () {
             },
             success: function (response) {
                 syncItem.report.push(response);
-                console.log(syncItem.report);
-                needUploadItemsAmt--;
-                if(needUploadItemsAmt <= 0){
+                syncItem.done++;
+                if (response["@Status"] == "Success" || response["Action"] == "uploadImage") {
+                    syncItem.success++;
+                    if (response["Action"] == "uploadImage") {
+                        syncItem.failUploadImg++;
+                    }
+                } else {
+                    syncItem.fail++;
+                }
+                if (syncItem.done >= syncItem.needUploadItemsAmt){
                     syncItem.syncing = false;
                     $.ajax({
                         url: '/items/logs',
