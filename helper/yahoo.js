@@ -107,8 +107,8 @@ function shopeeDataToYahooData(shopeeData){
     var data = {
         "SaleType": "Normal",
         "ProductName": cutShort(shopeeData.name,130),
-        "SalePrice": shopeeData.price * shopeeData.priceRate,
-        "CostPrice": shopeeData.price * shopeeData.priceRate,
+        "SalePrice": Math.floor(shopeeData.price * shopeeData.priceRate),
+        "CostPrice": Math.floor(shopeeData.price * shopeeData.priceRate),
         "CustomizedMainProductId": shopeeData.item_sku,
         "MallCategoryId": getCategory(shopeeData.name),
         "ShortDescription": cutShort(shopeeData.name,50),
