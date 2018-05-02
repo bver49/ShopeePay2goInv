@@ -43,7 +43,6 @@ router.post("/fromshopee", checkLogin(1),function (req, res) {
             return ele.shopee_id;
         });
         getAllItems(key).then(function(categories){
-            console.log(categories);
             var allItems = [];
             var needUploadItems = [];
             var needDelItems;
@@ -55,7 +54,6 @@ router.post("/fromshopee", checkLogin(1),function (req, res) {
             }
             for (var k in allItems) {
                 var itemIndex = items.indexOf(allItems[k].item_id.toString());
-                console.log(itemIndex);
                 if (itemIndex == -1) {
                     needUploadItems.push(allItems[k]);
                 } else {
