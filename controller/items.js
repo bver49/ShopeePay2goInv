@@ -78,7 +78,7 @@ router.post("/fromshopee", checkLogin(1),function (req, res) {
 router.post("/upload/yahoo", checkLogin(1),function (req, res) {
     var orderData = JSON.parse(req.body.orderData);
     orderData["priceRate"] = req.body.priceRate;
-    addItemTest(orderData).then(function(result){
+    addItem(orderData).then(function(result){
         if (result["@Status"] == "Success" || result["Action"] == "uploadImage") {
             Item.create({
                 "shopee_id": result.shopeeItemId,
