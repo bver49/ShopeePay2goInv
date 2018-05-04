@@ -62,6 +62,7 @@
                 <tr>
                     <th>編號</th>
                     <th>蝦皮ID</th>
+                    <th>YAHOO ID</th>
                     <th>商品名稱</th>
                     <th>商品貨號</th>
                     <th>上次同步時間</th>
@@ -73,6 +74,7 @@
                     <tr>
                         <td>{{ index+1 }}</td>
                         <td>{{ item.shopee_id }}</td>
+                        <td>{{ item.yahoo_id }}</td>
                         <td>{{ item.product_name }}</td>
                         <td>{{ item.sku }}</td>
                         <td>{{ item.created_at | time }}</td>

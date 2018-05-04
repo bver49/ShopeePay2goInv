@@ -7,6 +7,7 @@ var yahoo = require('../helper/yahoo');
 var getAllItems = shopee.getAllItems;
 var addItem = yahoo.addItem;
 var addItemTest = yahoo.addItemTest;
+var productOnline = yahoo.productOnline;
 var config = require('../config');
 var key = {
     shopeeshopid: config.shopee.shopid,
@@ -91,6 +92,17 @@ router.post("/upload/yahoo", checkLogin(1),function (req, res) {
                 "product_name": result.productName
             });
         }
+        res.send(result);
+    }).catch(function(err){
+        res.send({
+            "err":err
+        });
+    });
+});
+
+router.post("/online/yahoo", checkLogin(1),function (req, res) {
+    var item = JSON.parse(req.body.item);
+    productOnline(item).then(function(result){
         res.send(result);
     }).catch(function(err){
         res.send({

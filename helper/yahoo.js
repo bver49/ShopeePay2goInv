@@ -206,12 +206,21 @@ function productOnline(data){
         }
         var url = "http://tw.ews.mall.yahooapis.com/stauth/v1/Product/Online";
         callAPI(url, product).then(function (res) {
-            resolve({
-                '@Status': 'Success',
-                'Action': 'productOnline',
-                'shopeeItemId': data.shopeeItemId,
-                'productId': data.productId
-            });
+            if (res.SuccessList && res.SuccessList.Product && res.SuccessList.Product.length > 0) {
+                resolve({
+                    '@Status': 'Success',
+                    'Action': 'productOnline',
+                    'shopeeItemId': data.shopeeItemId,
+                    'productId': data.productId
+                });
+            } else {
+                resolve({
+                    '@Status': 'Fail',
+                    'Action': 'productOnline',
+                    'shopeeItemId': data.shopeeItemId,
+                    'productId': data.productId
+                });
+            }
         }).catch(function (err) {
             resolve({
                 '@Status': 'Fail',

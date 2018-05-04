@@ -109,6 +109,9 @@ $(document).ready(function () {
                 }
                 if (syncItem.done >= syncItem.needUploadItemsAmt){
                     syncItem.syncing = false;
+                    for(var i in syncItem.report) {
+                        online(syncItem.report[i]);
+                    }
                     $.ajax({
                         url: '/items/logs',
                         type: 'get',
@@ -117,6 +120,22 @@ $(document).ready(function () {
                         }
                     });
                 }
+            },
+            error: function(err){
+                console.log(err);
+            }
+        });
+    }
+
+    function online(data){
+        $.ajax({
+            url: '/items/online/yahoo',
+            type: 'post',
+            dataType:'json',
+            data:{
+                item: JSON.stringify(data)
+            },
+            success: function (response) {
             },
             error: function(err){
                 console.log(err);
