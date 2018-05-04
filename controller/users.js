@@ -12,7 +12,7 @@ router.get("/", function(req, res) {
 					[Op.ne]: 2
 				}
 			},
-			attributes: ["id", "username", "role","inv","ship"]
+			attributes: ["id", "username", "role", "inv", "ship", "syncitems"]
 		}).then(function(result) {
 			res.render("users", {
 				users: result,
