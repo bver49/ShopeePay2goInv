@@ -39,6 +39,8 @@
                                 <div v-else class="btn btn-danger" v-on:click="notAllowJob(index,user.id,'inv')">移除開發票權限</div>
                                 <div v-if="user.ship == 0" class="btn btn-success" v-on:click="allowJob(index,user.id,'ship')">新增出貨權限</div>
                                 <div v-else class="btn btn-danger" v-on:click="notAllowJob(index,user.id,'ship')">移除出貨權限</div>
+                                <div v-if="user.syncitems == 0" class="btn btn-success" v-on:click="allowJob(index,user.id,'syncitems')">新增同步商品權限</div>
+                                <div v-else class="btn btn-danger" v-on:click="notAllowJob(index,user.id,'syncitems')">移除同步商品權限</div>
                             </template>
                         </td>
                     </tr>
