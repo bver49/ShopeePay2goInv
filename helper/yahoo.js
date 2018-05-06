@@ -186,7 +186,7 @@ function updateStock(productId, variastionIndex, stock, action){
         var data = {
             "ProductId": productId,
             "Spec.1.Id": variastionIndex,
-            "Spec.1.Stock": parseInt(stock),
+            "Spec.1.Stock": (parseInt(stock) > 0) ? parseInt(stock) : 1,
             "Spec.1.Action": action
         }
         var url = "https://tw.ews.mall.yahooapis.com/stauth/v1/Product/UpdateStock";

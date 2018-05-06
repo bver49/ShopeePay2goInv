@@ -16,6 +16,7 @@ $(document).ready(function () {
             showreport:false,
             shopeeItemsAmt: 0,
             needUploadItemsAmt:0,
+            needOnline:0,
             success:0,
             fail:0,
             failUploadImg:0,
@@ -57,6 +58,7 @@ $(document).ready(function () {
                     syncItem.report = [];
                     syncItem.shopeeItemsAmt = 0;
                     syncItem.needUploadItemsAmt = 0;
+                    syncItem.needOnline = 0;
                     syncItem.done = 0;
                     syncItem.success = 0;
                     syncItem.fail = 0;
@@ -101,6 +103,7 @@ $(document).ready(function () {
                 syncItem.done++;
                 if (response["@Status"] == "Success" || response["Action"] == "uploadImage") {
                     syncItem.success++;
+                    syncItem.needOnline++;
                     if (response["Action"] == "uploadImage") {
                         syncItem.failUploadImg++;
                     }
@@ -108,7 +111,6 @@ $(document).ready(function () {
                     syncItem.fail++;
                 }
                 if (syncItem.done >= syncItem.needUploadItemsAmt){
-                    syncItem.syncing = false;
                     for(var i in syncItem.report) {
                         online(syncItem.report[i]);
                     }
@@ -136,6 +138,10 @@ $(document).ready(function () {
                 item: JSON.stringify(data)
             },
             success: function (response) {
+                syncItem.needOnline--;
+                if(syncItem.needOnline==0) {
+                    syncItem.syncing = false;
+                }
             },
             error: function(err){
                 console.log(err);
