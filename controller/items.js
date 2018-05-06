@@ -9,11 +9,11 @@ var addItem = yahoo.addItem;
 var addItemTest = yahoo.addItemTest;
 var productOnline = yahoo.productOnline;
 var config = require('../config');
-var key = {
-    shopeeshopid: config.shopee.shopid,
-    shopeepartnerid: config.shopee.partnerid,
-    shopeesecret: config.shopee.apisecret
-}
+// var key = {
+//     shopeeshopid: config.shopee.shopid,
+//     shopeepartnerid: config.shopee.partnerid,
+//     shopeesecret: config.shopee.apisecret
+// }
 
 router.get("/sync", checkLogin(),function (req, res) {
     if (req.user.role == 2 || req.user.syncitems == 1) {
@@ -32,6 +32,11 @@ router.get("/logs", checkLogin(1),function (req, res) {
 });
 
 router.post("/fromshopee", checkLogin(1),function (req, res) {
+    var key = {
+        shopeesecret: req.body.shopeesecret,
+        shopeeshopid: req.body.shopeeshopid,
+        shopeepartnerid: req.body.shopeepartnerid,
+    }
     Item.findAll({
         "where": {
             "on_yahoo": {
@@ -74,7 +79,9 @@ router.post("/fromshopee", checkLogin(1),function (req, res) {
                 "shopeeItemAmt":allItems.length
             });
         }).catch(function(err){
-            res.send(err);
+            res.send({
+                'err':err
+            });
         });
     });
 });

@@ -9,6 +9,28 @@ $(document).ready(function () {
         "extendedTimeOut": "1000"
     }
 
+    if (localStorage) {
+        $("#shopeesecret").val(localStorage.getItem("shopeesecret"));
+        $("#shopeeshopid").val(localStorage.getItem("shopeeshopid"));
+        $("#shopeepartnerid").val(localStorage.getItem("shopeepartnerid"));
+        $("#paytwogoid").val(localStorage.getItem("paytwogoid"));
+        $("#paytwogohashkey").val(localStorage.getItem("paytwogohashkey"));
+        $("#paytwogohashiv").val(localStorage.getItem("paytwogohashiv"));
+        $("#invurl").val(localStorage.getItem("invurl"));
+        $("#invemail").val(localStorage.getItem("invemail"));
+    }
+
+    $("#save").on("click", function () {
+        localStorage.setItem("shopeesecret", $("#shopeesecret").val());
+        localStorage.setItem("shopeeshopid", $("#shopeeshopid").val());
+        localStorage.setItem("shopeepartnerid", $("#shopeepartnerid").val());
+        localStorage.setItem("paytwogoid", $("#paytwogoid").val());
+        localStorage.setItem("paytwogohashkey", $("#paytwogohashkey").val());
+        localStorage.setItem("paytwogohashiv", $("#paytwogohashiv").val());
+        localStorage.setItem("invurl", $("#invurl").val());
+        localStorage.setItem("invemail", $("#invemail").val());
+    });
+
     var syncItem = new Vue({
         el: "#syncitem",
         data: {
@@ -67,17 +89,27 @@ $(document).ready(function () {
                     $.ajax({
                         url: '/items/fromshopee',
                         type: 'POST',
+                        data: {
+                            shopeesecret: $("#shopeesecret").val(),
+                            shopeeshopid: $("#shopeeshopid").val(),
+                            shopeepartnerid: $("#shopeepartnerid").val()
+                        },
                         success: function (response) {
-                            var needUploadItems = response.needUploadItems;
-                            syncItem.needUploadItemsAmt = response.needUploadItems.length;
-                            syncItem.showreport = true;
-                            syncItem.shopeeItemsAmt = response.shopeeItemAmt;
-                            if (needUploadItems.length > 0){
-                                for (var i in needUploadItems) {
-                                    upload(needUploadItems[i]);
-                                }
-                            } else {
+                            if (response.err) {
+                                toastr.warning("請檢查蝦皮金鑰是否出錯");
                                 syncItem.syncing = false;
+                            } else {
+                                var needUploadItems = response.needUploadItems;
+                                syncItem.needUploadItemsAmt = response.needUploadItems.length;
+                                syncItem.showreport = true;
+                                syncItem.shopeeItemsAmt = response.shopeeItemAmt;
+                                if (needUploadItems.length > 0) {
+                                    for (var i in needUploadItems) {
+                                        upload(needUploadItems[i]);
+                                    }
+                                } else {
+                                    syncItem.syncing = false;
+                                }
                             }
                         },
                         error: function(err){
@@ -85,6 +117,9 @@ $(document).ready(function () {
                         }
                     });
                 }
+            },
+            setting: function () {
+                $("#settingForm").modal("show");
             }
         }
     });

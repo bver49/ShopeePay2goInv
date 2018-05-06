@@ -216,7 +216,11 @@ function getCategory(key) {
         }
         var url = 'https://partner.shopeemobile.com/api/v1/shop_categorys/get';
         callAPI(key, url, data).then(function (body) {
-            resolve(body);
+            if(body.err) {
+                reject(body);
+            } else {
+                resolve(body);
+            }
         });
     });
 }
@@ -297,6 +301,8 @@ function getAllItems(key) {
                     resolve(categorys);
                 });
             });
+        }).catch(function(err){
+            reject(err);
         });
     });
 }

@@ -12,6 +12,11 @@ var key = {
     shopeesecret: config.shopee.apisecret
 }
 
-productOnline(data).then(function(res){
+shopee.getCategory({
+            shopeeshopid: '',
+            shopeepartnerid: '',
+            shopeesecret: ''
+        }
+).then(function(res){
     console.log(res);
 });
