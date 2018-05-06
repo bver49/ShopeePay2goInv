@@ -46,27 +46,30 @@ router.post("/fromshopee", checkLogin(1),function (req, res) {
         "attributes": ["shopee_id"]
     }).then(function(items) {
         items = items.map(function(ele){
-            return ele.shopee_id;
+            return ele.shopee_id.toString();
         });
+        var itemsMap = {};
+        for (var i in items){
+            itemsMap[items[i]] = true;
+        }
         getAllItems(key).then(function(categories){
             var allItems = [];
+            var allItemsId = [];
             var needUploadItems = [];
-            var needUploadItemsId = [];
             var needDelItems;
 
             for (var i in categories) {
                 for (var j in categories[i].items) {
-                    allItems.push(categories[i].items[j]);
+                    if (allItemsId.indexOf(categories[i].items[j].item_id) == -1) {
+                        allItemsId.push(categories[i].items[j].item_id);
+                        allItems.push(categories[i].items[j]);
+                    }
                 }
             }
             for (var k in allItems) {
-                var itemIndex = items.indexOf(allItems[k].item_id.toString());
-                var itemIdIndex = needUploadItemsId.indexOf(allItems[k].item_id);
-                if (itemIndex == -1 && itemIdIndex == -1) {
-                    needUploadItemsId.push(allItems[k].item_id);
+                var itemId = allItems[k].item_id.toString();
+                if (!itemsMap[itemId]) {
                     needUploadItems.push(allItems[k]);
-                } else {
-                    items.splice(itemIndex, 1);
                 }
             }
             needDelItems = items;
