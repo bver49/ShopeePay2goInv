@@ -8,6 +8,8 @@ var getAllItems = shopee.getAllItems;
 var addItem = yahoo.addItem;
 var addItemTest = yahoo.addItemTest;
 var productOnline = yahoo.productOnline;
+var productOffline = yahoo.productOffline;
+var delItem = yahoo.delItem;
 var config = require('../config');
 // var key = {
 //     shopeeshopid: config.shopee.shopid,
@@ -118,6 +120,46 @@ router.post("/online/yahoo", checkLogin(1),function (req, res) {
         res.send({
             "err":err
         });
+    });
+});
+
+router.post("/offline/yahoo", checkLogin(1),function(req, res){
+    Item.findAll({
+        "attributes": ["yahoo_id"]
+    }).then(function (items) {
+        if (items.length > 0) {
+            items = items.map(function (ele) {
+                return ele["yahoo_id"];
+            });
+            var offLineAll = Promise.all(items.map(function (ele) {
+                return productOffline({
+                    productId: ele,
+                    shopeeItemId: '1234'
+                });
+            }));
+            offLineAll.then(function (res) {
+                console.log(res);
+                var delAll = Promise.all(items.map(function (ele) {
+                    return delItem({
+                        productId: ele,
+                        shopeeItemId: '1234'
+                    });
+                }));
+                delAll.then(function (res) {
+                    console.log(res);
+                    Item.destroy({
+                        where: {}
+                    });
+                    res.send({
+                        "amount": items.length
+                    });
+                })
+            });
+        } else {
+            res.send({
+                "amount":0
+            });
+        }
     });
 });
 
