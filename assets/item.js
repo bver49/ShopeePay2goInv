@@ -120,19 +120,21 @@ $(document).ready(function () {
                 }
             },
             clean:function(){
-                syncItem.cleaning = true;
-                $.ajax({
-                    url: '/items/offline/yahoo',
-                    type: 'POST',
-                    success: function (response) {
-                        syncItem.cleaning = false;
-                        toastr.success("刪除商品成功!");
-                    },
-                    error: function (err) {
-                        syncItem.cleaning = false;
-                        alert("刪除商品發生錯誤請重新整理");
-                    }
-                });
+                if (confirm("確定要刪除商品?")) {
+                    syncItem.cleaning = true;
+                    $.ajax({
+                        url: '/items/offline/yahoo',
+                        type: 'POST',
+                        success: function (response) {
+                            syncItem.cleaning = false;
+                            toastr.success("刪除商品成功!");
+                        },
+                        error: function (err) {
+                            syncItem.cleaning = false;
+                            alert("刪除商品發生錯誤請重新整理");
+                        }
+                    });
+                }
             },
             setting: function () {
                 $("#settingForm").modal("show");
