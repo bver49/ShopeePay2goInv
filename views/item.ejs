@@ -4,12 +4,16 @@
 <div id="syncitem" class="container">
     <div class="col-md-10 col-md-offset-1 text-center">
         <div v-on:click="setting" class="btn btn-primary">修改金鑰</div>
-        <div v-if="syncing == false" v-on:click="sync" class="btn btn-primary">同步商品</div><br><br>
+        <div v-if="syncing == false && cleaning == false" v-on:click="clean" class="btn btn-danger">刪除所有架上商品</div>
+        <div v-if="syncing == false && cleaning == false" v-on:click="sync" class="btn btn-primary">同步商品</div><br><br>
         <div>上架價格倍率：<input id="priceRate" class="text-center" type="number" value="1"> 倍</div>
         <br><br>
-        <div v-if="syncing == false">上次同步時間:
+        <div v-if="syncing == false && cleaning == false">上次同步時間:
             <span v-if="items.length >0">{{ items[0].created_at | time }}</span>
             <span v-else>從未同步過</span>
+        </div>
+        <div v-else-if="cleaning == true">
+            <span>刪除架上商品中</span>
         </div>
         <div v-else class="text-center">
             <template v-if="needUploadItemsAmt <= 0">
