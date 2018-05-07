@@ -161,7 +161,15 @@ router.post("/offline/yahoo", checkLogin(1),function(req, res){
                     res.send({
                         "amount": items.length
                     });
-                })
+                }).catch(function(err){
+                    res.send({
+                        "err":err
+                    });
+                });
+            }).catch(function(err){
+                res.send({
+                    "err":err
+                });
             });
         } else {
             res.send({

@@ -125,10 +125,14 @@ $(document).ready(function () {
                         },
                         success: function (response) {
                             syncItem.cleaning = false;
-                            if(response.amount > 0 ) {
-                                toastr.success("刪除商品成功，總共刪除" + response.amount + "項商品!");
+                            if (response.err) {
+                                toastr.warning("請檢查Yahoo金鑰是否出錯");
                             } else {
-                                toastr.success("沒有商品可被清除!");
+                                if(response.amount > 0 ) {
+                                    toastr.success("刪除商品成功，總共刪除" + response.amount + "項商品!");
+                                } else {
+                                    toastr.success("沒有商品可被清除!");
+                                }
                             }
                         },
                         error: function (err) {
@@ -156,32 +160,36 @@ $(document).ready(function () {
                 yahooapisecret: $("#yahooapisecret").val()
             },
             success: function (response) {
-                syncItem.report.push(response);
-                syncItem.done++;
-                //計算成功與失敗比數
-                //紀錄上傳成功且需要上架商品個數
-                if (response["@Status"] == "Success" || response["Action"] == "uploadImage") {
-                    syncItem.success++;
-                    syncItem.needOnline++;
-                    if (response["Action"] == "uploadImage") {
-                        syncItem.failUploadImg++;
-                    }
+                if (response.err) {
+                    toastr.warning("請檢查Yahoo金鑰是否出錯");
                 } else {
-                    syncItem.fail++;
-                }
-                //所有商品都上傳完畢
-                if (syncItem.done >= syncItem.needUploadItemsAmt){
-                    //執行上架
-                    for(var i in syncItem.report) {
-                        online(syncItem.report[i]);
-                    }
-                    $.ajax({
-                        url: '/items/logs',
-                        type: 'get',
-                        success: function (response) {
-                            syncItem.items = response;
+                    syncItem.report.push(response);
+                    syncItem.done++;
+                    //計算成功與失敗比數
+                    //紀錄上傳成功且需要上架商品個數
+                    if (response["@Status"] == "Success" || response["Action"] == "uploadImage") {
+                        syncItem.success++;
+                        syncItem.needOnline++;
+                        if (response["Action"] == "uploadImage") {
+                            syncItem.failUploadImg++;
                         }
-                    });
+                    } else {
+                        syncItem.fail++;
+                    }
+                    //所有商品都上傳完畢
+                    if (syncItem.done >= syncItem.needUploadItemsAmt){
+                        //執行上架
+                        for(var i in syncItem.report) {
+                            online(syncItem.report[i]);
+                        }
+                        $.ajax({
+                            url: '/items/logs',
+                            type: 'get',
+                            success: function (response) {
+                                syncItem.items = response;
+                            }
+                        });
+                    }
                 }
             },
             error: function(err){
