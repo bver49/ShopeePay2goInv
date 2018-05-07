@@ -47,19 +47,16 @@ router.post("/fromshopee", checkLogin(1),function (req, res) {
         },
         "attributes": ["shopee_id"]
     }).then(function(items) {
-        items = items.map(function(ele){
-            return ele.shopee_id.toString();
-        });
         var itemsMap = {};
         for (var i in items){
-            itemsMap[items[i]] = true;
+            itemsMap[items[i].shopee_id.toString()] = true;
         }
         getAllItems(key).then(function(categories){
             var allItems = [];
             var allItemsId = [];
             var needUploadItems = [];
             var needDelItems;
-
+            //避免撈出的商品中有重複
             for (var i in categories) {
                 for (var j in categories[i].items) {
                     if (allItemsId.indexOf(categories[i].items[j].item_id) == -1) {
@@ -68,6 +65,7 @@ router.post("/fromshopee", checkLogin(1),function (req, res) {
                     }
                 }
             }
+            //避免上傳已上傳過的商品
             for (var k in allItems) {
                 var itemId = allItems[k].item_id.toString();
                 if (!itemsMap[itemId]) {
@@ -134,19 +132,17 @@ router.post("/offline/yahoo", checkLogin(1),function(req, res){
             var offLineAll = Promise.all(items.map(function (ele) {
                 return productOffline({
                     productId: ele,
-                    shopeeItemId: '1234'
+                    shopeeItemId: 'shopeeItemId'
                 });
             }));
             offLineAll.then(function (res) {
-                console.log(res);
                 var delAll = Promise.all(items.map(function (ele) {
                     return delItem({
                         productId: ele,
-                        shopeeItemId: '1234'
+                        shopeeItemId: 'shopeeItemId'
                     });
                 }));
                 delAll.then(function (res) {
-                    console.log(res);
                     Item.destroy({
                         where: {}
                     });

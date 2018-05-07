@@ -34,12 +34,12 @@ $(document).ready(function () {
     var syncItem = new Vue({
         el: "#syncitem",
         data: {
-            syncing: false,
-            cleaning: false,
-            showreport:false,
-            shopeeItemsAmt: 0,
-            needUploadItemsAmt:0,
-            needOnline:0,
+            syncing: false,    //同步中
+            cleaning: false,   //清除中
+            showreport:false,   //是否顯示上傳報告
+            shopeeItemsAmt: 0,  //總共多少商品
+            needUploadItemsAmt:0,   //總共多少商品待上傳
+            needOnline:0,          //總共多少商品待上架
             success:0,
             fail:0,
             failUploadImg:0,
@@ -127,7 +127,11 @@ $(document).ready(function () {
                         type: 'POST',
                         success: function (response) {
                             syncItem.cleaning = false;
-                            toastr.success("刪除商品成功!");
+                            if(response.amount > 0 ) {
+                                toastr.success("刪除商品成功，總共刪除" + response.amount + "項商品!");
+                            } else {
+                                toastr.success("沒有商品可被清除!");
+                            }
                         },
                         error: function (err) {
                             syncItem.cleaning = false;
@@ -154,6 +158,8 @@ $(document).ready(function () {
             success: function (response) {
                 syncItem.report.push(response);
                 syncItem.done++;
+                //計算成功與失敗比數
+                //紀錄上傳成功且需要上架商品個數
                 if (response["@Status"] == "Success" || response["Action"] == "uploadImage") {
                     syncItem.success++;
                     syncItem.needOnline++;
@@ -163,7 +169,9 @@ $(document).ready(function () {
                 } else {
                     syncItem.fail++;
                 }
+                //所有商品都上傳完畢
                 if (syncItem.done >= syncItem.needUploadItemsAmt){
+                    //執行上架
                     for(var i in syncItem.report) {
                         online(syncItem.report[i]);
                     }
@@ -191,8 +199,9 @@ $(document).ready(function () {
                 item: JSON.stringify(data)
             },
             success: function (response) {
+                //確認所有該上架的商品皆上架
                 syncItem.needOnline--;
-                if(syncItem.needOnline==0) {
+                if(syncItem.needOnline == 0) {
                     syncItem.syncing = false;
                 }
             },
