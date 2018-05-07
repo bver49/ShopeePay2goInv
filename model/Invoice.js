@@ -1,20 +1,19 @@
 var db = require("./db");
 var Sequelize = require("sequelize");
 
-var orderSchema = {
+var invoiceSchema = {
 	id: {
 	    type: Sequelize.INTEGER,
 		autoIncrement: true,
 		primaryKey: true
 	},
     sn:{
-        type: Sequelize.STRING,
-        unique: true
+        type: Sequelize.STRING
     }
 }
 
-var Order = db.define('order', orderSchema,{
+var Invoice = db.define('invoice', invoiceSchema,{
     timestamps: false
 });
 
-module.exports = Order;
+module.exports = Invoice;

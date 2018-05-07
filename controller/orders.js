@@ -1,6 +1,7 @@
 var express = require('express');
 var fs = require('fs');
 var router = express.Router();
+var Invoice = require('../model/Invoice');
 var shopee = require('../helper/shopee');
 var pay2go = require('../helper/pay2go');
 var getOrderList = shopee.getOrderList;
@@ -106,7 +107,9 @@ router.post("/:ordersn/geninv", function(req, res) {
                         res.send("解密錯誤")
                     } else {
                         if (result == "發票開立成功" || result == "已開過發票") {
-                            fs.appendFileSync('./list.txt', req.params.ordersn + '\n');
+                            Invoice.create({
+                                "sn":req.params.ordersn
+                            });
                         }
                         res.send(result);
                     }
@@ -119,8 +122,15 @@ router.post("/:ordersn/geninv", function(req, res) {
 });
 
 router.get("/invlist", function(req, res) {
-    var list = fs.readFileSync('./list.txt', 'utf8');
-    res.send(list.split(/\n/));
+    Invoice.findAll({
+        "where": {},
+        "attributes": ["sn"]
+    }).then(function(items) {
+        var list = items.map(function(ele){
+            return ele.sn.toString();
+        });
+        res.send(list);
+    });
 });
 
 router.post("/genexcel", function(req, res) {

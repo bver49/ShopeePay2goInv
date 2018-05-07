@@ -12,7 +12,6 @@ RUN npm install
 RUN npm rebuild bcrypt --build-from-source
 RUN npm install -g pm2
 
-RUN touch list.txt
 RUN mkdir file
 
 # Open 3000 Port
