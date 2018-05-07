@@ -34,10 +34,10 @@ router.get("/logs", checkLogin(1),function (req, res) {
 });
 
 router.post("/fromshopee", checkLogin(1),function (req, res) {
-    var key = {
+    var shopeeKey = {
         shopeesecret: req.body.shopeesecret,
         shopeeshopid: req.body.shopeeshopid,
-        shopeepartnerid: req.body.shopeepartnerid,
+        shopeepartnerid: req.body.shopeepartnerid
     }
     Item.findAll({
         "where": {
@@ -51,7 +51,7 @@ router.post("/fromshopee", checkLogin(1),function (req, res) {
         for (var i in items){
             itemsMap[items[i].shopee_id.toString()] = true;
         }
-        getAllItems(key).then(function(categories){
+        getAllItems(shopeeKey).then(function(categories){
             var allItems = [];
             var allItemsId = [];
             var needUploadItems = [];
@@ -90,9 +90,13 @@ router.post("/fromshopee", checkLogin(1),function (req, res) {
 });
 
 router.post("/upload/yahoo", checkLogin(1),function (req, res) {
+    var yahooKey = {
+        yahooapikey: req.body.yahooapikey,
+        yahooapisecret: req.body.yahooapisecret
+    }
     var orderData = JSON.parse(req.body.orderData);
     orderData["priceRate"] = req.body.priceRate;
-    addItem(orderData).then(function(result){
+    addItem(yahooKey, orderData).then(function(result){
         if (result["@Status"] == "Success" || result["Action"] == "uploadImage") {
             Item.create({
                 "shopee_id": result.shopeeItemId,
@@ -111,8 +115,12 @@ router.post("/upload/yahoo", checkLogin(1),function (req, res) {
 });
 
 router.post("/online/yahoo", checkLogin(1),function (req, res) {
+    var yahooKey = {
+        yahooapikey: req.body.yahooapikey,
+        yahooapisecret: req.body.yahooapisecret
+    }
     var item = JSON.parse(req.body.item);
-    productOnline(item).then(function(result){
+    productOnline(yahooKey, item).then(function(result){
         res.send(result);
     }).catch(function(err){
         res.send({
@@ -122,6 +130,10 @@ router.post("/online/yahoo", checkLogin(1),function (req, res) {
 });
 
 router.post("/offline/yahoo", checkLogin(1),function(req, res){
+    var yahooKey = {
+        yahooapikey: req.body.yahooapikey,
+        yahooapisecret: req.body.yahooapisecret
+    }
     Item.findAll({
         "attributes": ["yahoo_id"]
     }).then(function (items) {
@@ -130,14 +142,14 @@ router.post("/offline/yahoo", checkLogin(1),function(req, res){
                 return ele["yahoo_id"];
             });
             var offLineAll = Promise.all(items.map(function (ele) {
-                return productOffline({
+                return productOffline(yahooKey, {
                     productId: ele,
                     shopeeItemId: 'shopeeItemId'
                 });
             }));
             offLineAll.then(function (res) {
                 var delAll = Promise.all(items.map(function (ele) {
-                    return delItem({
+                    return delItem(yahooKey, {
                         productId: ele,
                         shopeeItemId: 'shopeeItemId'
                     });

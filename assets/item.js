@@ -13,22 +13,16 @@ $(document).ready(function () {
         $("#shopeesecret").val(localStorage.getItem("shopeesecret"));
         $("#shopeeshopid").val(localStorage.getItem("shopeeshopid"));
         $("#shopeepartnerid").val(localStorage.getItem("shopeepartnerid"));
-        $("#paytwogoid").val(localStorage.getItem("paytwogoid"));
-        $("#paytwogohashkey").val(localStorage.getItem("paytwogohashkey"));
-        $("#paytwogohashiv").val(localStorage.getItem("paytwogohashiv"));
-        $("#invurl").val(localStorage.getItem("invurl"));
-        $("#invemail").val(localStorage.getItem("invemail"));
+        $("#yahooapikey").val(localStorage.getItem("yahooapikey"));
+        $("#yahooapisecret").val(localStorage.getItem("yahooapisecret"));
     }
 
     $("#save").on("click", function () {
         localStorage.setItem("shopeesecret", $("#shopeesecret").val());
         localStorage.setItem("shopeeshopid", $("#shopeeshopid").val());
         localStorage.setItem("shopeepartnerid", $("#shopeepartnerid").val());
-        localStorage.setItem("paytwogoid", $("#paytwogoid").val());
-        localStorage.setItem("paytwogohashkey", $("#paytwogohashkey").val());
-        localStorage.setItem("paytwogohashiv", $("#paytwogohashiv").val());
-        localStorage.setItem("invurl", $("#invurl").val());
-        localStorage.setItem("invemail", $("#invemail").val());
+        localStorage.setItem("yahooapikey", $("#yahooapikey").val());
+        localStorage.setItem("yahooapisecret", $("#yahooapisecret").val());
     });
 
     var syncItem = new Vue({
@@ -125,6 +119,10 @@ $(document).ready(function () {
                     $.ajax({
                         url: '/items/offline/yahoo',
                         type: 'POST',
+                        data: {
+                            yahooapikey: $("#yahooapikey").val(),
+                            yahooapisecret: $("#yahooapisecret").val()
+                        },
                         success: function (response) {
                             syncItem.cleaning = false;
                             if(response.amount > 0 ) {
@@ -153,7 +151,9 @@ $(document).ready(function () {
             dataType:'json',
             data:{
                 orderData: JSON.stringify(orderData),
-                priceRate: parseFloat($('#priceRate').val())
+                priceRate: parseFloat($('#priceRate').val()),
+                yahooapikey: $("#yahooapikey").val(),
+                yahooapisecret: $("#yahooapisecret").val()
             },
             success: function (response) {
                 syncItem.report.push(response);
@@ -196,7 +196,9 @@ $(document).ready(function () {
             type: 'post',
             dataType:'json',
             data:{
-                item: JSON.stringify(data)
+                item: JSON.stringify(data),
+                yahooapikey: $("#yahooapikey").val(),
+                yahooapisecret: $("#yahooapisecret").val()
             },
             success: function (response) {
                 //確認所有該上架的商品皆上架

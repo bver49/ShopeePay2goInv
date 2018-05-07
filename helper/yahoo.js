@@ -9,7 +9,7 @@ var imageField = "ImageFile";
 var yahooAPIkey = config.yahoo.apikey;
 var yahooAPISecret = config.yahoo.apisecret;
 
-function callAPI(url, data){
+function callAPI(key, url, data){
     return new Promise(function(resolve, reject){
         var hasImg = false;
         var formData = {};
@@ -37,8 +37,8 @@ function callAPI(url, data){
             }
         }
         var ts = Math.floor(new Date().getTime() / 1000);
-        var RequestContent = `ApiKey=${yahooAPIkey}&TimeStamp=${ts}&Format=json${QueryString}`;
-        var Signature = crypto.createHmac('sha1', yahooAPISecret).update(RequestContent).digest('hex');
+        var RequestContent = `ApiKey=${ key.yahooapikey }&TimeStamp=${ ts }&Format=json${ QueryString }`;
+        var Signature = crypto.createHmac('sha1', key.yahooapisecret).update(RequestContent).digest('hex');
         RequestContent = encodeURI(RequestContent)
                         .replace(/\#/g, "%23")
                         .replace(/\\/g, "%5C")
@@ -138,10 +138,10 @@ function shopeeDataToYahooData(shopeeData){
     return data;
 }
 
-function submitVerifyMain(data){
+function submitVerifyMain(key, data){
     return new Promise(function(resolve,reject){
         var url = "https://tw.ews.mall.yahooapis.com/stauth/v2/Product/SubmitVerifyMain";
-        callAPI(url, data).then(function (res) {
+        callAPI(key, url, data).then(function (res) {
             resolve(res);
         }).catch(function(err){
             err["Action"] = "submitVerifyMain";
@@ -150,10 +150,10 @@ function submitVerifyMain(data){
     });
 }
 
-function submitMain(data) {
+function submitMain(key, data) {
     return new Promise(function (resolve, reject) {
         var url = "https://tw.ews.mall.yahooapis.com/stauth/v2/Product/SubmitMain";
-        callAPI(url, data).then(function (res) {
+        callAPI(key, url, data).then(function (res) {
             resolve(res);
         }).catch(function (err) {
             err["Action"] = "submitMain";
@@ -162,7 +162,7 @@ function submitMain(data) {
     });
 }
 
-function uploadImage(productId, images) {
+function uploadImage(key, productId, images) {
     return new Promise(function (resolve, reject) {
         var data = {
             "ImageFile": images,
@@ -171,7 +171,7 @@ function uploadImage(productId, images) {
             "Purge": true
         }
         var url = "https://tw.ews.mall.yahooapis.com/stauth/v1/Product/UploadImage";
-        callAPI(url, data).then(function (res) {
+        callAPI(key, url, data).then(function (res) {
             resolve(res);
         }).catch(function (err) {
             err["Action"] = "uploadImage";
@@ -181,7 +181,7 @@ function uploadImage(productId, images) {
     });
 }
 
-function updateStock(productId, variastionIndex, stock, action){
+function updateStock(key, productId, variastionIndex, stock, action){
     return new Promise(function (resolve, reject) {
         var data = {
             "ProductId": productId,
@@ -190,7 +190,7 @@ function updateStock(productId, variastionIndex, stock, action){
             "Spec.1.Action": action
         }
         var url = "https://tw.ews.mall.yahooapis.com/stauth/v1/Product/UpdateStock";
-        callAPI(url, data).then(function (res) {
+        callAPI(key, url, data).then(function (res) {
             resolve(res);
         }).catch(function (err) {
             err["Action"] = "updateStock-"+action;
@@ -199,13 +199,13 @@ function updateStock(productId, variastionIndex, stock, action){
     });
 }
 
-function productOnline(data){
+function productOnline(key, data){
     return new Promise(function (resolve, reject) {
         var product = {
             "ProductId": data.productId
         }
         var url = "http://tw.ews.mall.yahooapis.com/stauth/v1/Product/Online";
-        callAPI(url, product).then(function (res) {
+        callAPI(key, url, product).then(function (res) {
             if (res.SuccessList && res.SuccessList.Product && res.SuccessList.Product.length > 0) {
                 resolve({
                     '@Status': 'Success',
@@ -232,13 +232,13 @@ function productOnline(data){
     });
 }
 
-function productOffline(data) {
+function productOffline(key, data) {
     return new Promise(function (resolve, reject) {
         var product = {
             "ProductId": data.productId
         }
         var url = "http://tw.ews.mall.yahooapis.com/stauth/v1/Product/Offline";
-        callAPI(url, product).then(function (res) {
+        callAPI(key, url, product).then(function (res) {
             resolve({
                 '@Status': 'Success',
                 'Action': 'productOffline',
@@ -256,13 +256,13 @@ function productOffline(data) {
     });
 }
 
-function delItem(data) {
+function delItem(key, data) {
     return new Promise(function (resolve, reject) {
         var product = {
             "ProductId": data.productId
         }
         var url = "http://tw.ews.mall.yahooapis.com/stauth/v1/Product/Delete";
-        callAPI(url, product).then(function (res) {
+        callAPI(key, url, product).then(function (res) {
             resolve({
                 '@Status': 'Success',
                 'Action': 'delItem',
@@ -313,19 +313,19 @@ function addItemTest(data) {
     });
 }
 
-function addItem(data) {
+function addItem(key, data) {
     var shopeeData = data;
     var itemId = shopeeData.item_id;
     var productId = "";
     return new Promise(function (resolve, reject) {
         var data = shopeeDataToYahooData(shopeeData);
-        submitMain(data).then(function (res) {
+        submitMain(key, data).then(function (res) {
             productId = res.ProductId;
-            return uploadImage(productId, shopeeData.images);
+            return uploadImage(key, productId, shopeeData.images);
         }).then(function (res) {
             if (shopeeData.has_variation == true) {
                 var updateItemStock = Promise.all(shopeeData.variations.map(function(ele, index){
-                    return updateStock(productId, index + 1, ele.stock, "add");
+                    return updateStock(key, productId, index + 1, ele.stock, "add");
                 }));
                 return updateItemStock;
             } else {
