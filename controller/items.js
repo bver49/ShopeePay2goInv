@@ -143,7 +143,13 @@ router.post("/offline/yahoo", checkLogin(1),function(req, res){
         yahooapikey: req.body.yahooapikey,
         yahooapisecret: req.body.yahooapisecret
     }
+    var yahooStore = req.body.yahooapikey.slice(0,5);
     Item.findAll({
+        "where": {
+            "yahoo_store":{
+                [Op.eq]: yahooStore
+            }
+        },
         "attributes": ["yahoo_id"]
     }).then(function (items) {
         if (items.length > 0) {
@@ -165,7 +171,11 @@ router.post("/offline/yahoo", checkLogin(1),function(req, res){
                 }));
                 delAll.then(function (res) {
                     Item.destroy({
-                        where: {}
+                        "where": {
+                            "yahoo_store":{
+                                [Op.eq]: yahooStore
+                            }
+                        }
                     });
                     res.send({
                         "amount": items.length
