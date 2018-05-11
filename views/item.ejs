@@ -71,7 +71,7 @@
                     <th>商品名稱</th>
                     <th>商品貨號</th>
                     <th>上次同步時間</th>
-                    <th>同步平台</th>
+                    <th>商店代號</th>
                 </tr>
             </thead>
             <tbody>
@@ -83,7 +83,7 @@
                         <td>{{ item.product_name }}</td>
                         <td>{{ item.sku }}</td>
                         <td>{{ item.created_at | time }}</td>
-                        <td>Yahoo</td>
+                        <td>{{ item.yahoo_store }}</td>
                     </tr>
                 </template>
             </tbody>

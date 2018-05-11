@@ -87,7 +87,9 @@ $(document).ready(function () {
                         data: {
                             shopeesecret: $("#shopeesecret").val(),
                             shopeeshopid: $("#shopeeshopid").val(),
-                            shopeepartnerid: $("#shopeepartnerid").val()
+                            shopeepartnerid: $("#shopeepartnerid").val(),
+                            yahooapikey: $("#yahooapikey").val(),
+                            yahooapisecret: $("#yahooapisecret").val()
                         },
                         success: function (response) {
                             if (response.err) {

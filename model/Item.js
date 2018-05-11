@@ -21,6 +21,9 @@ var itemSchema = {
 		type: Sequelize.INTEGER,
         defaultValue:0
     },
+    yahoo_store: {
+        type: Sequelize.STRING
+    },
     yahoo_id: {
 		type: Sequelize.STRING,
         defaultValue:0

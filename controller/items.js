@@ -39,10 +39,14 @@ router.post("/fromshopee", checkLogin(1),function (req, res) {
         shopeeshopid: req.body.shopeeshopid,
         shopeepartnerid: req.body.shopeepartnerid
     }
+    var yahooStore = req.body.yahooapikey.slice(0,5);
     Item.findAll({
         "where": {
             "on_yahoo": {
                 [Op.eq]: 1
+            },
+            "yahoo_store":{
+                [Op.eq]: yahooStore
             }
         },
         "attributes": ["shopee_id"]
@@ -94,6 +98,7 @@ router.post("/upload/yahoo", checkLogin(1),function (req, res) {
         yahooapikey: req.body.yahooapikey,
         yahooapisecret: req.body.yahooapisecret
     }
+    var yahooStore = req.body.yahooapikey.slice(0,5);
     var orderData = JSON.parse(req.body.orderData);
     orderData["priceRate"] = req.body.priceRate;
     addItem(yahooKey, orderData).then(function(result){
@@ -103,7 +108,8 @@ router.post("/upload/yahoo", checkLogin(1),function (req, res) {
                 "on_yahoo": 1,
                 "yahoo_id": (result.productId) ? result.productId : "fortest",
                 "sku": result.sku,
-                "product_name": result.productName
+                "product_name": result.productName,
+                "yahoo_store": yahooStore
             });
         }
         res.send(result);
