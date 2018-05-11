@@ -375,6 +375,7 @@ function addItem(key, data) {
 }
 
 module.exports = {
+    "callAPI": callAPI,
     "addItemTest": addItemTest,
     "addItem": addItem,
     "delItem": delItem,
