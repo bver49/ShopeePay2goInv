@@ -103,7 +103,7 @@ function cutShort(str, limit) {
     }
 }
 
-function shopeeDataToYahooData(shopeeData){
+function shopeeDataToYahooData(shopeeData, shipType, payType){
     var data = {
         "SaleType": "Normal",
         "ProductName": cutShort(shopeeData.name,130),
@@ -113,8 +113,8 @@ function shopeeDataToYahooData(shopeeData){
         "MallCategoryId": getCategory(shopeeData.name),
         "ShortDescription": cutShort(shopeeData.name,50),
         "LongDescription": cutShort(shopeeData.description,3000),
-        "PayTypeId": enums.paytype.atm,
-        "ShippingId": enums.shiptype.mail
+        "PayTypeId": payType,
+        "ShippingId": shipType
     }
     if (shopeeData.attributes.length > 0) {
         var index = 1;
@@ -136,6 +136,34 @@ function shopeeDataToYahooData(shopeeData){
     }
 
     return data;
+}
+
+function getPayTypeAndShipType(key) {
+    return new Promise(function (resolve, reject) {
+        var result = {
+            'payType':[],
+            'shipType':[]
+        }
+        var url = "https://tw.ews.mall.yahooapis.com/stauth/v1/StorePayment/Get";
+        callAPI(key, url, {}).then(function (res) {
+            result['payType'] = res.PayTypeList.PayType;
+            var url = "https://tw.ews.mall.yahooapis.com/stauth/v1/StoreShipping/Get";
+            callAPI(key, url, {}).then(function (res) {
+                result['shipType'] = res.ShippingTypeList.ShippingType;
+                resolve(result);
+            }).catch(function (err) {
+                reject({
+                    '@Status': 'Fail',
+                    'Action': 'getPayTypeAndShipType'
+                });
+            });
+        }).catch(function (err) {
+            reject({
+                '@Status': 'Fail',
+                'Action': 'getPayTypeAndShipType'
+            });
+        });
+    });
 }
 
 function submitVerifyMain(key, data){
@@ -280,11 +308,11 @@ function delItem(key, data) {
     });
 }
 
-function addItemTest(data) {
+function addItemTest(data, shipType, payType) {
     var shopeeData = data;
     var itemId = shopeeData.item_id;
     return new Promise(function (resolve, reject) {
-        var data = shopeeDataToYahooData(shopeeData);
+        var data = shopeeDataToYahooData(shopeeData, shipType, payType);
         submitVerifyMain(data).then(function (res) {
             console.log("Upload Item Test Done");
             console.log("Item: " + data["ProductName"] + "\n");
@@ -313,12 +341,12 @@ function addItemTest(data) {
     });
 }
 
-function addItem(key, data) {
+function addItem(key, data, shipType, payType) {
     var shopeeData = data;
     var itemId = shopeeData.item_id;
     var productId = "";
     return new Promise(function (resolve, reject) {
-        var data = shopeeDataToYahooData(shopeeData);
+        var data = shopeeDataToYahooData(shopeeData, shipType, payType);
         submitMain(key, data).then(function (res) {
             productId = res.ProductId;
             return uploadImage(key, productId, shopeeData.images);
@@ -381,5 +409,6 @@ module.exports = {
     "delItem": delItem,
     "productOnline": productOnline,
     "productOffline": productOffline,
-    "updateStock": updateStock
+    "updateStock": updateStock,
+    "getPayTypeAndShipType":getPayTypeAndShipType
 }

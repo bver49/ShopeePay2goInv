@@ -9,6 +9,7 @@ var addItem = yahoo.addItem;
 var addItemTest = yahoo.addItemTest;
 var productOnline = yahoo.productOnline;
 var productOffline = yahoo.productOffline;
+var getPayTypeAndShipType = yahoo.getPayTypeAndShipType;
 var delItem = yahoo.delItem;
 var config = require('../config');
 // var key = {
@@ -98,10 +99,12 @@ router.post("/upload/yahoo", checkLogin(1),function (req, res) {
         yahooapikey: req.body.yahooapikey,
         yahooapisecret: req.body.yahooapisecret
     }
+    var shipType = req.body["shipType[]"];
+    var payType = req.body["payType[]"];
     var yahooStore = req.body.yahooapikey.slice(0,5);
     var orderData = JSON.parse(req.body.orderData);
     orderData["priceRate"] = req.body.priceRate;
-    addItem(yahooKey, orderData).then(function(result){
+    addItem(yahooKey, orderData, shipType, payType).then(function(result){
         if (result["@Status"] == "Success" || result["Action"] == "uploadImage") {
             Item.create({
                 "shopee_id": result.shopeeItemId,
@@ -182,6 +185,21 @@ router.post("/offline/yahoo", checkLogin(1),function(req, res){
                 "amount":0
             });
         }
+    });
+});
+
+
+router.post("/yahoo/getPayTypeAndShipType", checkLogin(1),function (req, res) {
+    var yahooKey = {
+        yahooapikey: req.body.yahooapikey,
+        yahooapisecret: req.body.yahooapisecret
+    }
+    getPayTypeAndShipType(yahooKey).then(function(result){
+        res.send(result);
+    }).catch(function(err){
+        res.send({
+            'err':err
+        });
     });
 });
 

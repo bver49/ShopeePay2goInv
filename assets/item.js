@@ -28,12 +28,17 @@ $(document).ready(function () {
     var syncItem = new Vue({
         el: "#syncitem",
         data: {
+            selectPayTypeAndShipType:false,
             syncing: false,    //同步中
             cleaning: false,   //清除中
             showreport:false,   //是否顯示上傳報告
             shopeeItemsAmt: 0,  //總共多少商品
             needUploadItemsAmt:0,   //總共多少商品待上傳
             needOnline:0,          //總共多少商品待上架
+            payType:[],
+            shipType:[],
+            choosePayType:[],
+            chooseShipType:[],
             success:0,
             fail:0,
             failUploadImg:0,
@@ -68,8 +73,37 @@ $(document).ready(function () {
             });
         },
         methods:{
+            getPayTypeAndShipType:function(){
+                syncItem.payType = [];
+                syncItem.shipType = [];
+                syncItem.choosePayType = [];
+                syncItem.chooseShipType = [];
+
+                $.ajax({
+                    url: '/items/yahoo/getPayTypeAndShipType',
+                    type: 'POST',
+                    data: {
+                        yahooapikey: $("#yahooapikey").val(),
+                        yahooapisecret: $("#yahooapisecret").val()
+                    },
+                    success: function (response) {
+                        if (response.err) {
+                            toastr.warning("請檢查Yahoo金鑰是否出錯");
+                        } else {
+                            syncItem.selectPayTypeAndShipType = true;
+                            syncItem.payType = response.payType;
+                            syncItem.shipType = response.shipType;
+                            console.log(response);
+                        }
+                    }
+                });
+            },
             sync:function(){
                 if (confirm("確定要同步商品?")) {
+                    if (syncItem.choosePayType.length == 0 || syncItem.chooseShipType.length == 0) {
+                        toastr.warning("請至少各選擇一個");
+                        return;
+                    }
                     syncItem.syncing = true;
                     syncItem.showreport = false;
                     syncItem.report = [];
@@ -85,6 +119,8 @@ $(document).ready(function () {
                         url: '/items/fromshopee',
                         type: 'POST',
                         data: {
+                            shipType: syncItem.chooseShipType,
+                            payType: syncItem.choosePayType,
                             shopeesecret: $("#shopeesecret").val(),
                             shopeeshopid: $("#shopeeshopid").val(),
                             shopeepartnerid: $("#shopeepartnerid").val(),
@@ -156,6 +192,8 @@ $(document).ready(function () {
             type: 'post',
             dataType:'json',
             data:{
+                shipType: syncItem.chooseShipType,
+                payType: syncItem.choosePayType,
                 orderData: JSON.stringify(orderData),
                 priceRate: parseFloat($('#priceRate').val()),
                 yahooapikey: $("#yahooapikey").val(),
@@ -215,6 +253,7 @@ $(document).ready(function () {
                 syncItem.needOnline--;
                 if(syncItem.needOnline == 0) {
                     syncItem.syncing = false;
+                    syncItem.selectPayTypeAndShipType = false;
                 }
             },
             error: function(err){
