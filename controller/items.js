@@ -104,6 +104,7 @@ router.post("/upload/yahoo", checkLogin(1),function (req, res) {
     var yahooStore = req.body.yahooapikey.slice(0,5);
     var orderData = JSON.parse(req.body.orderData);
     orderData["priceRate"] = req.body.priceRate;
+    orderData["marketPriceRate"] = req.body.marketPriceRate;
     addItem(yahooKey, orderData, shipType, payType).then(function(result){
         if (result["@Status"] == "Success" || result["Action"] == "uploadImage") {
             Item.create({

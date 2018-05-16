@@ -195,6 +195,7 @@ $(document).ready(function () {
                 shipType: syncItem.chooseShipType,
                 payType: syncItem.choosePayType,
                 orderData: JSON.stringify(orderData),
+                marketPriceRate: parseFloat($('#marketPriceRate').val()),
                 priceRate: parseFloat($('#priceRate').val()),
                 yahooapikey: $("#yahooapikey").val(),
                 yahooapisecret: $("#yahooapisecret").val()
@@ -251,7 +252,7 @@ $(document).ready(function () {
             success: function (response) {
                 //確認所有該上架的商品皆上架
                 syncItem.needOnline--;
-                if(syncItem.needOnline == 0) {
+                if(syncItem.needOnline <= 0) {
                     syncItem.syncing = false;
                     syncItem.selectPayTypeAndShipType = false;
                 }

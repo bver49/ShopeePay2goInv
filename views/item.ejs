@@ -7,7 +7,11 @@
         <div v-if="syncing == false && cleaning == false" v-on:click="clean" class="btn btn-danger">刪除所有架上商品</div>
         <div v-if="selectPayTypeAndShipType == false && syncing == false && cleaning == false" v-on:click="getPayTypeAndShipType" class="btn btn-primary">同步商品設定</div>
         <div v-if="selectPayTypeAndShipType == true && syncing == false && cleaning == false" v-on:click="sync" class="btn btn-primary">同步商品</div><br><br>
-        <div>上架價格倍率：<input id="priceRate" class="text-center" type="number" value="1"> 倍</div>
+        <div>售價倍率：<input id="priceRate" class="text-center" type="number" value="1"> 倍</div>
+        <div>市價倍率：<input id="marketPriceRate" class="text-center" type="number" value="0.8"> 倍</div>
+        <br>
+        <p>Yahoo 商品售價 = 蝦皮商城售價 x 售價倍率</p><br>
+        <p>Yahoo 商品市價 = (蝦皮商城售價 x 售價倍率) / 市價倍率</p>
         <br><br>
         <div v-if="selectPayTypeAndShipType == true">
             付款設定：
