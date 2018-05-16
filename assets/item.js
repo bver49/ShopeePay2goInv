@@ -51,14 +51,14 @@ $(document).ready(function () {
                 var time = new Date(new Date(value).getTime() + (8 * 60 * 60 * 1000));
                 return time.getFullYear() + "/" + (time.getMonth() + 1) + "/" + time.getDate() + " " + ((time.getHours() < 10) ? ("0" + time.getHours()) : (time.getHours())) + ":" + ((time.getMinutes() < 10) ? ("0" + time.getMinutes()) : (time.getMinutes()));
             },
-            status:function(status, action){
+            status:function(status, detail){
                 if(status == "Success") {
                     return "同步成功";
                 } else {
-                    if (action == "uploadImage") {
+                    if (detail["Action"] == "uploadImage") {
                         return "圖片上傳失敗";
                     } else {
-                        return "同步失敗";
+                        return "同步失敗(" + (detail["ErrorMessage"] || "商品資訊內容過長") + ")";
                     }
                 }
             }
@@ -220,8 +220,13 @@ $(document).ready(function () {
                     //所有商品都上傳完畢
                     if (syncItem.done >= syncItem.needUploadItemsAmt){
                         //執行上架
-                        for(var i in syncItem.report) {
-                            online(syncItem.report[i]);
+                        if (syncItem.needOnline > 0) {
+                            for (var i in syncItem.report) {
+                                online(syncItem.report[i]);
+                            }
+                        } else {
+                            syncItem.syncing = false;
+                            syncItem.selectPayTypeAndShipType = false;
                         }
                         $.ajax({
                             url: '/items/logs',

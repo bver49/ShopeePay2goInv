@@ -107,14 +107,14 @@ function cutShort(str, limit) {
 function shopeeDataToYahooData(shopeeData, shipType, payType){
     var data = {
         "SaleType": "Normal",
-        "ProductName": cutShort(shopeeData.name,130),
+        "ProductName": cutShort(shopeeData.name, 120),
         "MarketPrice": Math.floor((shopeeData.price * shopeeData.priceRate) / shopeeData.marketPriceRate),
         "SalePrice": Math.floor(shopeeData.price * shopeeData.priceRate),
         "CostPrice": Math.floor(shopeeData.price * shopeeData.priceRate),
         "CustomizedMainProductId": shopeeData.item_sku,
         "MallCategoryId": getCategory(shopeeData.name),
-        "ShortDescription": cutShort(shopeeData.name,50),
-        "LongDescription": cutShort(shopeeData.description,3000),
+        "ShortDescription": cutShort(shopeeData.name, 45),
+        "LongDescription": cutShort(shopeeData.description, 1200),
         "PayTypeId": payType,
         "ShippingId": shipType
     }

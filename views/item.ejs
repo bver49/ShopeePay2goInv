@@ -74,7 +74,7 @@
                                 <td>{{ detail.shopeeItemId }}</td>
                                 <td>{{ detail.productName }}</td>
                                 <td>{{ detail.sku }}</td>
-                                <td>{{ detail["@Status"] | status(detail["Action"]) }}</td>
+                                <td>{{ detail["@Status"] | status(detail) }}</td>
                             </tr>
                         </template>
                     </tbody>
