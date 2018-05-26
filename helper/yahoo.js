@@ -111,7 +111,7 @@ function shopeeDataToYahooData(shopeeData, shipType, payType){
         "CustomizedMainProductId": shopeeData.item_sku,
         "MallCategoryId": getCategory(shopeeData.name),
         "ShortDescription": cutShort(shopeeData.name, 45),
-        "LongDescription": cutShort(shopeeData.description, 1000),
+        "LongDescription": cutShort(shopeeData.description, 1200).replace(/\n/g, "<br/>"),
         "PayTypeId": payType,
         "ShippingId": shipType
     }
