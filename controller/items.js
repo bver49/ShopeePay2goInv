@@ -163,7 +163,7 @@ router.post("/offline/yahoo", checkLogin(1),function(req, res){
                     shopeeItemId: 'shopeeItemId'
                 });
             }));
-            offLineAll.then(function (res) {
+            offLineAll.then(function (result) {
                 var delAll = Promise.all(items.map(function (ele) {
                     return delItem(yahooKey, {
                         productId: ele,

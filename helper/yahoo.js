@@ -47,9 +47,6 @@ function callAPI(key, url, data){
                         .replace(/\?/g, "%3F")
                         .replace(/\+/g, "%2B")
                         .replace(/\:/g, "%3A")
-                        .replace(/\@/g, "%40")
-                        .replace(/\$/g, "%24")
-                        .replace(/\;/g, "%3B")
                         .replace(/\,/g, "%2C");
         url = url + "?" + RequestContent + "&Signature=" + Signature;
         request({
@@ -114,7 +111,7 @@ function shopeeDataToYahooData(shopeeData, shipType, payType){
         "CustomizedMainProductId": shopeeData.item_sku,
         "MallCategoryId": getCategory(shopeeData.name),
         "ShortDescription": cutShort(shopeeData.name, 45),
-        "LongDescription": cutShort(shopeeData.description, 1200),
+        "LongDescription": cutShort(shopeeData.description, 1000),
         "PayTypeId": payType,
         "ShippingId": shipType
     }
