@@ -170,7 +170,7 @@ router.post("/offline/yahoo", checkLogin(1),function(req, res){
                         shopeeItemId: 'shopeeItemId'
                     });
                 }));
-                delAll.then(function (res) {
+                delAll.then(function (result) {
                     Item.destroy({
                         "where": {
                             "yahoo_store":{
