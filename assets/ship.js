@@ -327,7 +327,7 @@ $(document).ready(function () {
           shopeepartnerid: $("#shopeepartnerid").val()
         },
         success: function (response) {
-          if (response.tracking_info && response.tracking_info.length > 0 && response.tracking_info[0].description == '包裹配達取件門市') {
+          if (response.tracking_info && response.tracking_info.length > 0 && response.tracking_info[0].description.indexOf('包裹配達') != -1) {
             resolve(response);
           } else {
             resolve('');
