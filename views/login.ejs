@@ -20,7 +20,7 @@
     <div class="col-md-4 col-md-offset-4" style="margin-top:50px;">
       <img src="/assets/logo.jpg" style="width:100%;">
       <h1 class="h2 text-center">登入</h1><br><br>
-      <form>
+      <form id="loginForm">
         <div class="form-group">
           <label style="margin-bottom:10px;">Username</label>
           <input type="text" class="form-control" id="username" placeholder="username">
@@ -34,6 +34,14 @@
       </form>
     </div>
   </div>
+  <script>
+    $(document).on('keypress', function(e) {
+        var keycode = (event.keyCode ? event.keyCode : event.which);
+        if(keycode == '13'){
+            $("#login").click();
+        }
+    });
+  </script>
 </body>
 
 </html>
