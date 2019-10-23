@@ -118,7 +118,7 @@ $(document).ready(function () {
             for (var i = page * 50; i < (page + 1) * 50 && i < Page.length; i++) {
                 var update = new Date(Page[i].update_time * 1000);
                 var updatestr = update.getFullYear() + "/" + (update.getMonth() + 1) + "/" + update.getDate() + " " + ((update.getHours() < 10) ? ("0" + update.getHours()) : (update.getHours())) + ":" + ((update.getMinutes() < 10) ? ("0" + update.getMinutes()) : (update.getMinutes()));
-                var shipdate = (Page[i].detail) ? (new Date(Page[i].update_time * 1000 + (Page[i].detail.days_to_ship * 24 * 3600000))) : new Date(Page[i].update_time * 1000 + (7 * 24 * 3600000));
+                var shipdate = (Page[i].detail) ? (new Date(Page[i].update_time * 1000 + (Page[i].detail.days_to_ship * 86400 * 1000))) : new Date(Page[i].update_time * 1000 + (7 * 86400 * 1000));
                 var shipdatestr = shipdate.getFullYear() + "/" + (shipdate.getMonth() + 1) + "/" + shipdate.getDate();
                 var shipstatus = (Page[i].order_status == 'READY_TO_SHIP') ? '準備出貨' : '已到貨';
                 if (Math.floor((shipdate.getTime() - Date.now()) / 1000) <= threeDay) {
@@ -400,7 +400,7 @@ $(document).ready(function () {
                 $('#buyernote').show();
             }
             if ($("#tt").val() != "" && $("#tf").val() != "") {
-                if (((Math.floor(new Date($("#tt").val()).getTime() / 1000) + (24 * 60 * 60) - 1) - Math.floor(new Date($("#tf").val()).getTime() / 1000)) <= 15 * 24 * 3600) {
+                if (((Math.floor(new Date($("#tt").val()).getTime() / 1000) + (24 * 60 * 60) - 1) - Math.floor(new Date($("#tf").val()).getTime() / 1000)) <= 15 * 86400) {
                     start();
                     getNote(Math.floor(new Date($("#tf").val()).getTime() / 1000), Math.floor(new Date($("#tt").val()).getTime() / 1000), function () {
                         $.ajax({

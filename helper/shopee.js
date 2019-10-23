@@ -34,7 +34,7 @@ function callAPI(key, url, data) {
 function getOrderList(tf, tt, page, key, cb) {
     tt = dateToTs(tt);
     tf = dateToTs(tf);
-    tt += (24 * 3600);
+    tt += 86400;
     var data = {
         "shopid": parseInt(key.shopeeshopid),
         "partner_id": parseInt(key.shopeepartnerid),
@@ -63,7 +63,7 @@ function getOrderList(tf, tt, page, key, cb) {
 function getOrderListByStatus(tf, tt, page, status, key, cb) {
     tt = dateToTs(tt);
     tf = dateToTs(tf);
-    tt += (24 * 3600) - 1;
+    tt += (86400 - 1);
     var data = {
         "shopid": parseInt(key.shopeeshopid),
         "partner_id": parseInt(key.shopeepartnerid),
