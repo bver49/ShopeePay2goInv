@@ -1,4 +1,4 @@
-FROM mhart/alpine-node:6
+FROM mhart/alpine-node:8
 
 RUN apk update \
   && apk add --no-cache curl bash make gcc g++ git python
