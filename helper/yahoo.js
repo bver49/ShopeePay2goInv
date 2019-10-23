@@ -307,39 +307,6 @@ function delItem(key, data) {
     });
 }
 
-function addItemTest(data, shipType, payType) {
-    var shopeeData = data;
-    var itemId = shopeeData.item_id;
-    return new Promise(function (resolve, reject) {
-        var data = shopeeDataToYahooData(shopeeData, shipType, payType);
-        submitVerifyMain(data).then(function (res) {
-            console.log("Upload Item Test Done");
-            console.log("Item: " + data["ProductName"] + "\n");
-            resolve({
-                '@Status': 'Success',
-                'Action': 'addItemTest',
-                'shopeeItemId': itemId,
-                'productName': data["ProductName"],
-                'sku': data["CustomizedMainProductId"]
-            });
-        }).catch(function (err) {
-            console.log("Upload Item Test Fail");
-            console.log("Item: " + data["ProductName"] + "\n");
-            err["@Status"] = "Fail";
-            err["shopeeItemId"] = itemId;
-            err["submitData"] = shopeeData;
-            err["productName"] = data["ProductName"];
-            err["sku"] = data["CustomizedMainProductId"];
-            if (err.ErrorList) {
-                err.ErrorList = err.ErrorList.Error.map(function(ele){
-                    return ele.Parameter + " -> " + ele.Message;
-                });
-            }
-            resolve(err);
-        });
-    });
-}
-
 function addItem(key, data, shipType, payType) {
     var shopeeData = data;
     var itemId = shopeeData.item_id;
@@ -403,7 +370,6 @@ function addItem(key, data, shipType, payType) {
 
 module.exports = {
     "callAPI": callAPI,
-    "addItemTest": addItemTest,
     "addItem": addItem,
     "delItem": delItem,
     "productOnline": productOnline,

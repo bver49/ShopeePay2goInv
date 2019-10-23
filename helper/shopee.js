@@ -15,7 +15,7 @@ function encode(url, data, secret) {
 }
 
 function callAPI(key, url, data) {
-    return new Promise(function(resolve, reject){
+    return new Promise(function (resolve, reject) {
         request({
             method: 'POST',
             headers: {
@@ -45,7 +45,7 @@ function getOrderList(tf, tt, page, key, cb) {
         "pagination_offset": parseInt(page) * 100 //第幾頁
     }
     var url = 'https://partner.shopeemobile.com/api/v1/orders/basics';
-    callAPI(key, url, data).then(function(body){
+    callAPI(key, url, data).then(function (body) {
         try {
             body.orders = (body.orders == undefined) ? [] : body.orders;
             body.more = (body.more == undefined) ? false : body.more;
@@ -216,7 +216,7 @@ function getCategory(key) {
         }
         var url = 'https://partner.shopeemobile.com/api/v1/shop_categorys/get';
         callAPI(key, url, data).then(function (body) {
-            if(body.err) {
+            if (body.err) {
                 reject(body);
             } else {
                 resolve(body);
@@ -295,13 +295,13 @@ function getAllItems(key) {
                                 categorys[i].items[j] = itemsObject[categorys[i].items[j]];
                             }
                         }
-                    } catch (err){
+                    } catch (err) {
                         reject(err);
                     }
                     resolve(categorys);
                 });
             });
-        }).catch(function(err){
+        }).catch(function (err) {
             reject(err);
         });
     });
@@ -317,6 +317,6 @@ module.exports = {
     "getOrderLogistic": getOrderLogistic,
     "genExcel": genExcel,
     "getCategory": getCategory,
-    "getItemInCategory":getItemInCategory,
+    "getItemInCategory": getItemInCategory,
     "getAllItems": getAllItems
 }

@@ -6,7 +6,6 @@ var shopee = require('../helper/shopee');
 var yahoo = require('../helper/yahoo');
 var getAllItems = shopee.getAllItems;
 var addItem = yahoo.addItem;
-var addItemTest = yahoo.addItemTest;
 var productOnline = yahoo.productOnline;
 var productOffline = yahoo.productOffline;
 var getPayTypeAndShipType = yahoo.getPayTypeAndShipType;
@@ -18,7 +17,7 @@ var config = require('../config');
 //     shopeesecret: config.shopee.apisecret
 // }
 
-router.get("/sync", checkLogin(),function (req, res) {
+router.get("/sync", checkLogin(), function (req, res) {
     if (req.user.role == 2 || req.user.syncitems == 1) {
         res.render("item", {
             me: req.user
@@ -28,35 +27,35 @@ router.get("/sync", checkLogin(),function (req, res) {
     }
 });
 
-router.get("/logs", checkLogin(1),function (req, res) {
+router.get("/logs", checkLogin(1), function (req, res) {
     Item.findAll().then(function (items) {
         res.send(items);
     });
 });
 
-router.post("/fromshopee", checkLogin(1),function (req, res) {
+router.post("/fromshopee", checkLogin(1), function (req, res) {
     var shopeeKey = {
         shopeesecret: req.body.shopeesecret,
         shopeeshopid: req.body.shopeeshopid,
         shopeepartnerid: req.body.shopeepartnerid
     }
-    var yahooStore = req.body.yahooapikey.slice(0,5);
+    var yahooStore = req.body.yahooapikey.slice(0, 5);
     Item.findAll({
         "where": {
             "on_yahoo": {
                 [Op.eq]: 1
             },
-            "yahoo_store":{
+            "yahoo_store": {
                 [Op.eq]: yahooStore
             }
         },
         "attributes": ["shopee_id"]
-    }).then(function(items) {
+    }).then(function (items) {
         var itemsMap = {};
-        for (var i in items){
+        for (var i in items) {
             itemsMap[items[i].shopee_id.toString()] = true;
         }
-        getAllItems(shopeeKey).then(function(categories){
+        getAllItems(shopeeKey).then(function (categories) {
             var allItems = [];
             var allItemsId = [];
             var needUploadItems = [];
@@ -82,30 +81,30 @@ router.post("/fromshopee", checkLogin(1),function (req, res) {
             console.log("Total " + needUploadItems.length + " need to upload");
             console.log("Total " + needDelItems.length + " need to delete");
             res.send({
-                "needUploadItems":needUploadItems,
-                "needDelItems":needDelItems,
-                "shopeeItemAmt":allItems.length
+                "needUploadItems": needUploadItems,
+                "needDelItems": needDelItems,
+                "shopeeItemAmt": allItems.length
             });
-        }).catch(function(err){
+        }).catch(function (err) {
             res.send({
-                'err':err
+                'err': err
             });
         });
     });
 });
 
-router.post("/upload/yahoo", checkLogin(1),function (req, res) {
+router.post("/upload/yahoo", checkLogin(1), function (req, res) {
     var yahooKey = {
         yahooapikey: req.body.yahooapikey,
         yahooapisecret: req.body.yahooapisecret
     }
     var shipType = req.body["shipType[]"];
     var payType = req.body["payType[]"];
-    var yahooStore = req.body.yahooapikey.slice(0,5);
+    var yahooStore = req.body.yahooapikey.slice(0, 5);
     var orderData = JSON.parse(req.body.orderData);
     orderData["priceRate"] = req.body.priceRate;
     orderData["marketPriceRate"] = req.body.marketPriceRate;
-    addItem(yahooKey, orderData, shipType, payType).then(function(result){
+    addItem(yahooKey, orderData, shipType, payType).then(function (result) {
         if (result["@Status"] == "Success" || result["Action"] == "uploadImage") {
             Item.create({
                 "shopee_id": result.shopeeItemId,
@@ -117,37 +116,37 @@ router.post("/upload/yahoo", checkLogin(1),function (req, res) {
             });
         }
         res.send(result);
-    }).catch(function(err){
+    }).catch(function (err) {
         res.send({
-            "err":err
+            "err": err
         });
     });
 });
 
-router.post("/online/yahoo", checkLogin(1),function (req, res) {
+router.post("/online/yahoo", checkLogin(1), function (req, res) {
     var yahooKey = {
         yahooapikey: req.body.yahooapikey,
         yahooapisecret: req.body.yahooapisecret
     }
     var item = JSON.parse(req.body.item);
-    productOnline(yahooKey, item).then(function(result){
+    productOnline(yahooKey, item).then(function (result) {
         res.send(result);
-    }).catch(function(err){
+    }).catch(function (err) {
         res.send({
-            "err":err
+            "err": err
         });
     });
 });
 
-router.post("/offline/yahoo", checkLogin(1),function(req, res){
+router.post("/offline/yahoo", checkLogin(1), function (req, res) {
     var yahooKey = {
         yahooapikey: req.body.yahooapikey,
         yahooapisecret: req.body.yahooapisecret
     }
-    var yahooStore = req.body.yahooapikey.slice(0,5);
+    var yahooStore = req.body.yahooapikey.slice(0, 5);
     Item.findAll({
         "where": {
-            "yahoo_store":{
+            "yahoo_store": {
                 [Op.eq]: yahooStore
             }
         },
@@ -173,7 +172,7 @@ router.post("/offline/yahoo", checkLogin(1),function(req, res){
                 delAll.then(function (result) {
                     Item.destroy({
                         "where": {
-                            "yahoo_store":{
+                            "yahoo_store": {
                                 [Op.eq]: yahooStore
                             }
                         }
@@ -181,35 +180,35 @@ router.post("/offline/yahoo", checkLogin(1),function(req, res){
                     res.send({
                         "amount": items.length
                     });
-                }).catch(function(err){
+                }).catch(function (err) {
                     res.send({
-                        "err":err
+                        "err": err
                     });
                 });
-            }).catch(function(err){
+            }).catch(function (err) {
                 res.send({
-                    "err":err
+                    "err": err
                 });
             });
         } else {
             res.send({
-                "amount":0
+                "amount": 0
             });
         }
     });
 });
 
 
-router.post("/yahoo/getPayTypeAndShipType", checkLogin(1),function (req, res) {
+router.post("/yahoo/getPayTypeAndShipType", checkLogin(1), function (req, res) {
     var yahooKey = {
         yahooapikey: req.body.yahooapikey,
         yahooapisecret: req.body.yahooapisecret
     }
-    getPayTypeAndShipType(yahooKey).then(function(result){
+    getPayTypeAndShipType(yahooKey).then(function (result) {
         res.send(result);
-    }).catch(function(err){
+    }).catch(function (err) {
         res.send({
-            'err':err
+            'err': err
         });
     });
 });

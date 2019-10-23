@@ -153,7 +153,7 @@ $(document).ready(function () {
         el: "#orderDetail",
         data: {
             order: {},
-            show:false
+            show: false
         },
         filters: {
             time: function (value) {
