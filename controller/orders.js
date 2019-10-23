@@ -50,9 +50,9 @@ router.post("/:ordersn/detail", function(req, res) {
   }
   getOrderDetail(req.params.ordersn, key, function(order) {
     if (order) {
-        getOrderIncome(req.params.ordersn, key, function(income) {
+      getOrderIncome(req.params.ordersn, key, function(income) {
         var detail = income.order.income_details;
-        var total_fee = parseInt(detail.escrow_amount) + parseInt(detail.commission_fee) + parseInt(detail.credit_card_transaction_fee) - parseInt(detail.actual_shipping_cost) - parseInt(detail.shipping_fee_rebate);
+        var total_fee = parseInt(detail.escrow_amount) + parseInt(detail.commission_fee) + parseInt(detail.credit_card_transaction_fee) - parseInt(detail.actual_shipping_cost) - parseInt(detail.shipping_fee_rebate) - parseInt(detail.coin);
         order.total_amount = (total_fee > 0) ? total_fee : 0;
         res.send(order);
       });
@@ -98,7 +98,7 @@ router.post("/:ordersn/geninv", function(req, res) {
     getOrderDetail(req.params.ordersn, key, function(order) {
         getOrderIncome(req.params.ordersn, key, function(income) {
             var detail = income.order.income_details;
-            var total_fee = parseInt(detail.escrow_amount) + parseInt(detail.commission_fee) + parseInt(detail.credit_card_transaction_fee) - parseInt(detail.actual_shipping_cost) - parseInt(detail.shipping_fee_rebate);
+            var total_fee = parseInt(detail.escrow_amount) + parseInt(detail.commission_fee) + parseInt(detail.credit_card_transaction_fee) - parseInt(detail.actual_shipping_cost) - parseInt(detail.shipping_fee_rebate) - parseInt(detail.coin);
             order.total_amount = (total_fee > 0) ? total_fee : 0;
             order.invitemname = req.body.invitemname;
             if (order.total_amount > 0) {
