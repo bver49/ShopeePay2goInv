@@ -18,4 +18,4 @@ RUN mkdir file
 EXPOSE 3000
 
 # Run pm2 when container start
-CMD [ "pm2", "start","app.js","--no-daemon" ]
+CMD [ "pm2", "start", "app.js", "--no-daemon"]

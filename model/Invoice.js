@@ -30,7 +30,12 @@ var invoiceSchema = {
 		type: 'TIMESTAMP',
 		defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
 		allowNull: false
-    }
+    },
+    "status": {
+        type: Sequelize.TINYINT,
+        defaultValue: 0,
+        allowNull: false
+	}
 }
 
 var Invoice = db.define('invoice', invoiceSchema,{
