@@ -9,6 +9,27 @@ var invoiceSchema = {
 	},
     sn:{
         type: Sequelize.STRING
+    },
+    "MerchantID": {
+        type: Sequelize.STRING(50),
+        allowNull: true
+    },
+    "TotalAmt": {
+	    type: Sequelize.INTEGER,
+		allowNull: true
+	},
+    "InvoiceNumber": {
+        type: Sequelize.STRING(50),
+        allowNull: true
+    },
+    "RandomNum": {
+        type: Sequelize.STRING(5),
+        allowNull: true
+    },
+    created_at: {
+		type: 'TIMESTAMP',
+		defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+		allowNull: false
     }
 }
 

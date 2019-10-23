@@ -1,21 +1,14 @@
-var Promise = require("bluebird");
-var request = require('request');
-var config = require('./config');
-var shopee = require('./helper/shopee');
-var yahoo = require('./helper/yahoo');
-var callAPI = yahoo.callAPI;
-var Invoice = require('./model/Invoice');
-var ts = Math.floor(new Date().getTime() / 1000);
-var key = {
-    shopeeshopid: config.shopee.shopid,
-    shopeepartnerid: config.shopee.partnerid,
-    shopeesecret: config.shopee.apisecret
+var pay2go = require('./helper/pay2go');
+var data = {
+    "ordersn":"12343522",
+    "recipient_address": {
+        "name": "derek"
+    },
+    "message_to_seller": "test@gmail.com",
+    "total_amount": 1000,
+    "invitemname": "服飾",
+    "order_status":"COMPLETED"
 }
-var yahooKey = {
-    yahooapikey: config.yahoo.apikey,
-    yahooapisecret: config.yahoo.apisecret
-}
-var url = 'https://tw.ews.mall.yahooapis.com/stauth/v1/StorePayment/Get';
-callAPI(yahooKey,url,{}).then(function(res){
-    console.log(res.PayTypeList);
+
+pay2go.genInvoice(data, key, function(res) {
 });

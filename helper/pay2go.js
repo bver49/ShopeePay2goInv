@@ -1,8 +1,6 @@
 var request = require('request');
 var qs = require('querystring');
-var MCrypt = require('mcrypt').MCrypt;
-var taxRate = 0.05;
-var rijEcb = new MCrypt('rijndael-128', 'cbc');
+var rijndael = require('rijndael-js');
 var emailReg = new RegExp(/[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/i);
 
 function countOrigin(amount) {
@@ -40,8 +38,8 @@ function padding(str) {
 }
 
 function postdata(data, key, iv) {
-    rijEcb.open(key, iv);
-    return rijEcb.encrypt(padding(qs.stringify(data))).toString('hex').trim();
+    var cipher = new rijndael(key, 'cbc');
+    return Buffer.from(cipher.encrypt(padding(qs.stringify(data)), 128, iv)).toString('hex').trim();
 }
 
 //開發票
@@ -76,23 +74,29 @@ module.exports.genInvoice = function (shopeeData, key, cb) {
                     MerchantID_: key.paytwogoid,
                     PostData_: postdata(data, key.paytwogohashkey, key.paytwogohashiv)
                 }
-            }, function (e, r, b) {
-                b = JSON.parse(b);
-                if (b.Message.indexOf("重覆") !== -1 || b.Message.indexOf("重複") !== -1) {
+            }, function (err, response, body) {
+                body = JSON.parse(body);
+                if (body.Message.indexOf("重覆") !== -1 || body.Message.indexOf("重複") !== -1) {
                     console.log("已開過發票");
-                    cb("已開過發票");
-                } else if (b.Message.indexOf("成功") !== -1) {
+                    cb({
+                        "msg":"已開過發票",
+                        "detail": body
+                    });
+                } else if (body.Message.indexOf("成功") !== -1) {
                     console.log("發票開立成功");
-                    cb("發票開立成功");
+                    cb({
+                        "msg":"發票開立成功",
+                        "detail": body
+                    });
                 } else {
-                    console.log(b.Message);
-                    cb(b.Message);
+                    console.log(body.Message);
+                    cb({"msg":body.Message});
                 }
             });
         } catch (err) {
-            cb("解密錯誤")
+            cb({"msg":"解密錯誤"});
         }
     } else {
-        cb("訂單尚未完成");
+        cb({"msg":"訂單尚未完成"});
     }
 }

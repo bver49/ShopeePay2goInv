@@ -109,15 +109,22 @@ router.post("/:ordersn/geninv", function (req, res) {
             order.invitemname = req.body.invitemname;
             if (order.total_amount > 0) {
                 genInvoice(order, key, function (result) {
-                    if (result == "解密錯誤") {
+                    if (result.msg == "解密錯誤") {
                         res.send("解密錯誤")
                     } else {
-                        if (result == "發票開立成功" || result == "已開過發票") {
+                        if (result.msg == "發票開立成功" || result.msg == "已開過發票") {
+                            var invDetail = result.detail.Result;
+                            invDetail = JSON.parse(invDetail);
                             Invoice.create({
-                                "sn": req.params.ordersn
+                                "sn": req.params.ordersn,
+                                "MerchantID": invDetail.MerchantID,
+                                "TotalAmt": invDetail.TotalAmt,
+                                "InvoiceNumber": invDetail.InvoiceNumber,
+                                "RandomNum": invDetail.RandomNum,
+                                "created_at": invDetail.CreateTime
                             });
                         }
-                        res.send(result);
+                        res.send(result.msg);
                     }
                 });
             } else {
