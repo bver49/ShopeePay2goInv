@@ -24,23 +24,23 @@ router.post("/", function (req, res) {
         shopeepartnerid: req.body.shopeepartnerid
     }
     if (req.query.status && req.query.status == 1) {
-        getOrderListByStatus(req.body.tf, req.body.tt, req.body.page, "READY_TO_SHIP", key, function (list, more) {
+        getOrderListByStatus(req.body.tf, req.body.tt, req.body.page, "READY_TO_SHIP", key, function (orders, more) {
             res.json({
-                list: list,
+                orders: orders,
                 more: more
             });
         });
     } else {
-        getOrderList(req.body.tf, req.body.tt, req.body.page, key, function (list, more) {
+        getOrderList(req.body.tf, req.body.tt, req.body.page, key, function (orders, more) {
             res.json({
-                list: list,
+                orders: orders,
                 more: more
             });
         });
     }
 });
 
-//查詢訂單 會篩選訂單狀態
+//用更新時間查詢訂單 會篩選訂單狀態
 router.post("/byStatusAndUpdateTime", function (req, res) {
     var key = {
         shopeesecret: req.body.shopeesecret,
