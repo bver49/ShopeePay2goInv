@@ -6,7 +6,7 @@ var emojiRegex = require('emoji-regex');
 var emojiReg = emojiRegex();
 
 function dateToTs(date) {
-    return Math.floor((new Date(date).getTime() - (8 * 60 * 60 * 1000)) / 1000);
+    return Math.floor(new Date(date).getTime() / 1000);
 }
 
 function encode(url, data, secret) {

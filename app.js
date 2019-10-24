@@ -43,9 +43,19 @@ app.get("/", checkLogin(), function (req, res) {
     });
 });
 
-app.get("/inv", checkLogin(), function (req, res) {
+app.get("/generateInvoice", checkLogin(), function (req, res) {
     if (req.user.role == 2 || req.user.inv == 1) {
-        res.render("inv", {
+        res.render("generateInvoice", {
+            me: req.user
+        });
+    } else {
+        res.redirect("/");
+    }
+});
+
+app.get("/manageInvoice", checkLogin(), function (req, res) {
+    if (req.user.role == 2 || req.user.inv == 1) {
+        res.render("manageInvoice", {
             me: req.user
         });
     } else {

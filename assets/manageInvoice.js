@@ -11,10 +11,10 @@ $(document).ready(function () {
         "extendedTimeOut": "1000"
     }
 
-    var genInv = new Vue({
+    window.genInv = new Vue({
         el: "#geninv",
         data: {
-            invoiceList: [],
+            invoiceList: {},
             loading: 0,
             page: 1,
             orderlist: [],
@@ -61,7 +61,7 @@ $(document).ready(function () {
                                 tt: $("#tt").val(),
                                 tf: $("#tf").val(),
                                 page: 0,
-                                status: "COMPLETED",
+                                status: $("#orderStatus").val(),
                                 shopeesecret: $("#shopeesecret").val(),
                                 shopeeshopid: $("#shopeeshopid").val(),
                                 shopeepartnerid: $("#shopeepartnerid").val(),
@@ -72,11 +72,19 @@ $(document).ready(function () {
                             success: function (response) {
                                 Page = [];
                                 if (response.orders) {
-                                    for (var i in response.orders) {
-                                        Page.push(response.orders[i]);
-                                    }
                                     for (var i in response.invoices) {
-                                        genInv.invoiceList.push(response.invoices[i].sn);
+                                        genInv.invoiceList[response.invoices[i].sn] = response.invoices[i];
+                                    }
+                                    for (var i in response.orders) {
+                                        if (
+                                            (
+                                                response.orders[i].order_status == "CANCELLED" ||
+                                                response.orders[i].order_status == "TO_RETURN"
+                                            ) &&
+                                            genInv.invoiceList[response.orders[i].ordersn]
+                                        ) {
+                                            Page.push(response.orders[i]);
+                                        }
                                     }
                                     if (response.more === true) {
                                         getNextPage(1)
@@ -104,8 +112,11 @@ $(document).ready(function () {
                     }
                 }
             },
-            genInvoice: function (ordersn) {
-                genInvoice(ordersn);
+            discountInvoice: function (ordersn) {
+                discountInvoice(ordersn);
+            },
+            invalidInvoice: function (ordersn) {
+                invalidInvoice(ordersn);
             },
             showDetail: function (ordersn) {
                 getOrder(ordersn);
@@ -113,7 +124,7 @@ $(document).ready(function () {
             selectAll: function () {
                 if (!genInv.hasSelectAll) {
                     for (var i in genInv.orderlist) {
-                        if (genInv.invoiceList.indexOf(genInv.orderlist[i].ordersn) == -1) {
+                        if (! genInv.invoiceList[genInv.orderlist[i].ordersn]) {
                             genInv.ordersCheck.push(genInv.orderlist[i].ordersn);
                         }
                     }
@@ -125,7 +136,7 @@ $(document).ready(function () {
             },
             allDateGenInvoice: function () {
                 for (var i in Page) {
-                    if (Page[i].order_status == 'COMPLETED' && genInv.invoiceList.indexOf(Page[i].ordersn) == -1) {
+                    if (Page[i].order_status == 'COMPLETED' && ! genInv.invoiceList[Page[i].ordersn]) {
                         genInvoice(Page[i].ordersn);
                     }
                 }
@@ -187,7 +198,7 @@ $(document).ready(function () {
                 tt: $("#tt").val(),
                 tf: $("#tf").val(),
                 page: page,
-                status: "COMPLETED",
+                status: $("#orderStatus").val(),
                 shopeesecret: $("#shopeesecret").val(),
                 shopeeshopid: $("#shopeeshopid").val(),
                 shopeepartnerid: $("#shopeepartnerid").val(),
@@ -196,11 +207,19 @@ $(document).ready(function () {
                 paytwogohashiv: $("#paytwogohashiv").val()
             },
             success: function (response) {
-                for (var i in response.orders) {
-                    Page.push(response.orders[i]);
-                }
                 for (var i in response.invoices) {
-                    genInv.invoiceList.push(response.invoices[i].sn);
+                    genInv.invoiceList[response.invoices[i].sn] = response.invoices[i];
+                }
+                for (var i in response.orders) {
+                    if (
+                        (
+                            response.orders[i].order_status == "CANCELLED" ||
+                            response.orders[i].order_status == "TO_RETURN"
+                        )
+                        && genInv.invoiceList[response.orders[i].ordersn]
+                    ) {
+                        Page.push(response.orders[i]);
+                    }
                 }
                 if (response.more === true) {
                     getNextPage(page + 1);
@@ -220,10 +239,10 @@ $(document).ready(function () {
         });
     }
 
-    function genInvoice(ordersn) {
+    function invalidInvoice(ordersn) {
         if (ordersn) {
             $.ajax({
-                url: '/orders/' + ordersn + '/geninv',
+                url: '/orders/' + ordersn + '/invalidInvoice',
                 type: 'POST',
                 data: {
                     shopeesecret: $("#shopeesecret").val(),
@@ -232,29 +251,41 @@ $(document).ready(function () {
                     paytwogoid: $("#paytwogoid").val(),
                     paytwogohashkey: $("#paytwogohashkey").val(),
                     paytwogohashiv: $("#paytwogohashiv").val(),
-                    invurl: $("#invurl").val(),
-                    invemail: $("#invemail").val(),
-                    invitemname: $("#invitemname").val()
+                    invurl: $("#invurl").val()
                 },
                 success: function (response) {
-                    if (response == "發票開立成功" || response == "已開過發票") {
-                        if (genInv.ordersCheck.indexOf(ordersn) != -1) {
-                            genInv.ordersCheck.splice(genInv.ordersCheck.indexOf(ordersn), 1);
-                        }
-                        genInv.invoiceList.push(ordersn);
-                        toastr.success(`訂單編號 ${ordersn} ${response}`)
-                    } else if (response == "解密錯誤") {
-                        toastr.warning("請檢查智付寶金鑰");
-                    } else if (response == "取得商店申請資格失敗") {
-                        toastr.warning("請確認商店已開通電子發票功能");
-                    } else {
-                        toastr.warning(`訂單編號 ${ordersn} ${response}`)
-                    }
-                    console.log(ordersn + "-" + response);
+                    console.log(response);
+                    genInv.invoiceList[ordersn].status = 1;
+                    genInv.$forceUpdate();
                 }
             });
         } else {
-            toastr.warning(`訂單編號有誤`);
+            toastr.warning('訂單編號有誤');
+        }
+    }
+
+    function discountInvoice(ordersn) {
+        if (ordersn) {
+            $.ajax({
+                url: '/orders/' + ordersn + '/discountInvoice',
+                type: 'POST',
+                data: {
+                    shopeesecret: $("#shopeesecret").val(),
+                    shopeeshopid: $("#shopeeshopid").val(),
+                    shopeepartnerid: $("#shopeepartnerid").val(),
+                    paytwogoid: $("#paytwogoid").val(),
+                    paytwogohashkey: $("#paytwogohashkey").val(),
+                    paytwogohashiv: $("#paytwogohashiv").val(),
+                    invurl: $("#invurl").val()
+                },
+                success: function (response) {
+                    console.log(response);
+                    genInv.invoiceList[ordersn].status = 2;
+                    genInv.$forceUpdate();
+                }
+            });
+        } else {
+            toastr.warning('訂單編號有誤');
         }
     }
 

@@ -23,7 +23,7 @@
                         <td v-else>已驗證</td>
                         <td>
                             <span v-if="user.inv == 1">
-                                開立發票
+                                發票管理
                             </span>
                             <span v-if="user.ship == 1">
                                 出貨管理
@@ -37,8 +37,8 @@
                                 <div class="btn btn-success" v-on:click="verifyUser(index,user.id)">驗證</div>
                             </template>
                             <template v-else>
-                                <div v-if="user.inv == 0" class="btn btn-success" v-on:click="allowJob(index,user.id,'inv')">新增開立發票</div>
-                                <div v-else class="btn btn-danger" v-on:click="notAllowJob(index,user.id,'inv')">移除開立發票</div>
+                                <div v-if="user.inv == 0" class="btn btn-success" v-on:click="allowJob(index,user.id,'inv')">新增發票管理</div>
+                                <div v-else class="btn btn-danger" v-on:click="notAllowJob(index,user.id,'inv')">移除發票管理</div>
                                 <div v-if="user.ship == 0" class="btn btn-success" v-on:click="allowJob(index,user.id,'ship')">新增出貨管理</div>
                                 <div v-else class="btn btn-danger" v-on:click="notAllowJob(index,user.id,'ship')">移除出貨管理</div>
                                 <div v-if="user.syncitems == 0" class="btn btn-success" v-on:click="allowJob(index,user.id,'syncitems')">新增同步商品</div>

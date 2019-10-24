@@ -69,7 +69,7 @@ module.exports.genInvoice = function (shopeeData, key, cb) {
         try {
             request({
                 method: 'post',
-                url: 'https://inv.pay2go.com/api/invoice_issue',
+                url: 'https://cinv.pay2go.com/api/invoice_issue',
                 formData: {
                     MerchantID_: key.paytwogoid,
                     PostData_: postdata(data, key.paytwogohashkey, key.paytwogohashiv)
@@ -101,8 +101,8 @@ module.exports.genInvoice = function (shopeeData, key, cb) {
     }
 }
 
-//開發票
-module.exports.discountInvoice = function (invoiceNumber, ordersn, totalAmount, dicountAmount, key, cb) {
+//折讓發票
+module.exports.discountInvoice = function (invoiceNumber, ordersn, dicountAmount, key, cb) {
     var data = {
         RespondType: "JSON",
         Version: "1.3",
@@ -112,30 +112,39 @@ module.exports.discountInvoice = function (invoiceNumber, ordersn, totalAmount, 
         ItemName: "服飾",
         ItemCount: "1",
         ItemUnit: "件",
-        ItemPrice: totalAmount,
-        ItemAmt: totalAmount,
-        ItemTaxAmt: totalAmount,
-        TotalAmt: totalAmount,
+        ItemPrice: dicountAmount,
+        ItemAmt: dicountAmount,
+        ItemTaxAmt: 0,
+        TotalAmt: dicountAmount,
         Status: "1"
     }
     try {
         request({
             method: 'post',
-            url: 'https://inv.ezpay.com.tw/api/allowance_issue',
+            url: 'https://cinv.ezpay.com.tw/api/allowance_issue',
             formData: {
                 MerchantID_: key.paytwogoid,
                 PostData_: postdata(data, key.paytwogohashkey, key.paytwogohashiv)
             }
         }, function (err, response, body) {
             body = JSON.parse(body);
-            console.log(body);
+            if (body.Message.indexOf("成功") !== -1) {
+                console.log("發票折讓成功");
+                cb({
+                    "msg":"成功",
+                    "detail": body
+                });
+            } else {
+                console.log(body.Message);
+                cb({"msg":body.Message});
+            }
         });
     } catch (err) {
         cb({"msg":"解密錯誤"});
     }
 }
 
-//開發票
+//作廢發票
 module.exports.invalidInvoice = function (invoiceNumber, key, cb) {
     var data = {
         RespondType: "JSON",
@@ -147,14 +156,23 @@ module.exports.invalidInvoice = function (invoiceNumber, key, cb) {
     try {
         request({
             method: 'post',
-            url: 'https://inv.ezpay.com.tw/api/invoice_invalid',
+            url: 'https://cinv.ezpay.com.tw/api/invoice_invalid',
             formData: {
                 MerchantID_: key.paytwogoid,
                 PostData_: postdata(data, key.paytwogohashkey, key.paytwogohashiv)
             }
         }, function (err, response, body) {
             body = JSON.parse(body);
-            console.log(body);
+            if (body.Message.indexOf("成功") !== -1) {
+                console.log("作廢發票成功");
+                cb({
+                    "msg":"成功",
+                    "detail": body
+                });
+            } else {
+                console.log(body.Message);
+                cb({"msg":body.Message});
+            }
         });
     } catch (err) {
         cb({"msg":"解密錯誤"});
