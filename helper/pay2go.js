@@ -139,7 +139,7 @@ module.exports.discountInvoice = function (invoiceNumber, ordersn, dicountAmount
             if (body.Message.indexOf("成功") !== -1) {
                 console.log("發票折讓成功");
                 cb({
-                    "msg":"成功",
+                    "msg":"發票折讓成功",
                     "detail": body
                 });
             } else {
@@ -178,7 +178,7 @@ module.exports.invalidInvoice = function (invoiceNumber, key, cb) {
             if (body.Message.indexOf("成功") !== -1) {
                 console.log("作廢發票成功");
                 cb({
-                    "msg":"成功",
+                    "msg":"作廢發票成功",
                     "detail": body
                 });
             } else {

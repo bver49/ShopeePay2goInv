@@ -80,8 +80,7 @@ $(document).ready(function () {
                                             (
                                                 response.orders[i].order_status == "CANCELLED" ||
                                                 response.orders[i].order_status == "TO_RETURN"
-                                            ) &&
-                                            genInv.invoiceList[response.orders[i].ordersn]
+                                            ) && genInv.invoiceList[response.orders[i].ordersn]
                                         ) {
                                             Page.push(response.orders[i]);
                                         }
@@ -122,9 +121,12 @@ $(document).ready(function () {
                 getOrder(ordersn);
             },
             selectAll: function () {
-                if (!genInv.hasSelectAll) {
+                if (! genInv.hasSelectAll) {
                     for (var i in genInv.orderlist) {
-                        if (! genInv.invoiceList[genInv.orderlist[i].ordersn]) {
+                        if (
+                            genInv.invoiceList[genInv.orderlist[i].ordersn] &&
+                            genInv.invoiceList[genInv.orderlist[i].ordersn].status == 0
+                        ) {
                             genInv.ordersCheck.push(genInv.orderlist[i].ordersn);
                         }
                     }
@@ -134,17 +136,49 @@ $(document).ready(function () {
                     genInv.hasSelectAll = false;
                 }
             },
-            allDateGenInvoice: function () {
+            allDateDiscountInvoice: function () {
                 for (var i in Page) {
-                    if (Page[i].order_status == 'COMPLETED' && ! genInv.invoiceList[Page[i].ordersn]) {
-                        genInvoice(Page[i].ordersn);
+                    if (
+                        (
+                            Page[i].order_status == "CANCELLED" ||
+                            Page[i].order_status == "TO_RETURN"
+                        ) &&
+                        (
+                            genInv.invoiceList[Page[i].ordersn] &&
+                            genInv.invoiceList[Page[i].ordersn].status == 0
+                        )
+                    ) {
+                        discountInvoice(Page[i].ordersn);
                     }
                 }
             },
-            allSelectGenInvoice: function () {
+            allDateInvalidInvoice: function () {
+                for (var i in Page) {
+                    if (
+                        (
+                            Page[i].order_status == "CANCELLED" ||
+                            Page[i].order_status == "TO_RETURN"
+                        ) &&
+                        (
+                            genInv.invoiceList[Page[i].ordersn] &&
+                            genInv.invoiceList[Page[i].ordersn].status == 0
+                        )
+                    ) {
+                        invalidInvoice(Page[i].ordersn);
+                    }
+                }
+            },
+            allSelectDiscountInvoice: function () {
                 var tempArr = genInv.ordersCheck;
                 for (var i in tempArr) {
-                    genInvoice(tempArr[i]);
+                    discountInvoice(tempArr[i]);
+                }
+                genInv.hasSelectAll = false;
+            },
+            allSelectInvalidInvoice: function () {
+                var tempArr = genInv.ordersCheck;
+                for (var i in tempArr) {
+                    invalidInvoice(tempArr[i]);
                 }
                 genInv.hasSelectAll = false;
             },
@@ -219,8 +253,7 @@ $(document).ready(function () {
                         (
                             response.orders[i].order_status == "CANCELLED" ||
                             response.orders[i].order_status == "TO_RETURN"
-                        )
-                        && genInv.invoiceList[response.orders[i].ordersn]
+                        ) && genInv.invoiceList[response.orders[i].ordersn]
                     ) {
                         Page.push(response.orders[i]);
                     }
@@ -258,9 +291,21 @@ $(document).ready(function () {
                     isProduction: $("#isProduction").val()
                 },
                 success: function (response) {
-                    console.log(response);
-                    genInv.invoiceList[ordersn].status = 1;
-                    genInv.$forceUpdate();
+                    if (response == "作廢發票成功") {
+                        if (genInv.ordersCheck.indexOf(ordersn) != -1) {
+                            genInv.ordersCheck.splice(genInv.ordersCheck.indexOf(ordersn), 1);
+                        }
+                        genInv.invoiceList[ordersn].status = 1;
+                        genInv.$forceUpdate();
+                        toastr.success(`訂單編號 ${ordersn} ${response}`)
+                    } else if (response == "解密錯誤") {
+                        toastr.warning("請檢查智付寶金鑰");
+                    } else if (response == "取得商店申請資格失敗") {
+                        toastr.warning("請確認商店已開通電子發票功能");
+                    } else {
+                        toastr.warning(`訂單編號 ${ordersn} ${response}`)
+                    }
+                    console.log(ordersn + "-" + response);
                 }
             });
         } else {
@@ -283,9 +328,21 @@ $(document).ready(function () {
                     isProduction: $("#isProduction").val()
                 },
                 success: function (response) {
-                    console.log(response);
-                    genInv.invoiceList[ordersn].status = 2;
-                    genInv.$forceUpdate();
+                    if (response == "發票折讓成功") {
+                        if (genInv.ordersCheck.indexOf(ordersn) != -1) {
+                            genInv.ordersCheck.splice(genInv.ordersCheck.indexOf(ordersn), 1);
+                        }
+                        genInv.invoiceList[ordersn].status = 2;
+                        genInv.$forceUpdate();
+                        toastr.success(`訂單編號 ${ordersn} ${response}`)
+                    } else if (response == "解密錯誤") {
+                        toastr.warning("請檢查智付寶金鑰");
+                    } else if (response == "取得商店申請資格失敗") {
+                        toastr.warning("請確認商店已開通電子發票功能");
+                    } else {
+                        toastr.warning(`訂單編號 ${ordersn} ${response}`)
+                    }
+                    console.log(ordersn + "-" + response);
                 }
             });
         } else {

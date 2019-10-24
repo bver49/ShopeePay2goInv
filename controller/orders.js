@@ -52,6 +52,7 @@ router.post("/byStatusAndUpdateTime", function (req, res) {
         // for (var i in orders) {
         //     orders[i].order_status = (Math.floor(Math.random() * 6) % 2) ? "CANCELLED" : "TO_RETURN";
         // }
+        //篩出符合狀態的訂單
         orders = orders.filter(function (ele) {
             return ele.order_status == status;
         });
@@ -197,9 +198,7 @@ router.post("/:ordersn/invalidInvoice", function (req, res) {
         }
     }).then(function (invoices) {
         if (invoices.length == 0) {
-            res.send({
-                msg: "查無此訂單發票，或是發票已作廢/折讓"
-            });
+            res.send("查無此訂單發票，或是發票已作廢/折讓");
         } else {
             var invoiceNumber = invoices[0].InvoiceNumber;
             invalidInvoice(invoiceNumber, key, function (result) {
@@ -210,7 +209,7 @@ router.post("/:ordersn/invalidInvoice", function (req, res) {
                         sn: ordersn
                     }
                 });
-                res.send(result);
+                res.send(result.msg);
             });
         }
     });
@@ -236,9 +235,7 @@ router.post("/:ordersn/discountInvoice", function (req, res) {
         }
     }).then(function (invoices) {
         if (invoices.length == 0) {
-            res.send({
-                msg: "查無此訂單發票，或是發票已作廢/折讓"
-            });
+            res.send("查無此訂單發票，或是發票已作廢/折讓");
         } else {
             var invoiceNumber = invoices[0].InvoiceNumber;
             var discountAmount = invoices[0].TotalAmt;
@@ -250,7 +247,7 @@ router.post("/:ordersn/discountInvoice", function (req, res) {
                         sn: ordersn
                     }
                 });
-                res.send(result);
+                res.send(result.msg);
             });
         }
     });

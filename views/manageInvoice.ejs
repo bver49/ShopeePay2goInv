@@ -47,10 +47,10 @@
         </div>
         <div class="col-md-12" style="padding-top:10px;">
             <div class="col-md-6 col-md-offset-3" style="text-align:center;">
-                <div v-if="loading == 0 && checkAmt > 0" v-on:click="allSelectGenInvoice" class="btn btn-primary" style="margin-bottom:10px;">已選訂單全部折讓</div>
-                <div v-if="loading == 0 && checkAmt > 0" v-on:click="allSelectGenInvoice" class="btn btn-primary" style="margin-bottom:10px;">已選訂單全部作廢</div><br>
-                <div v-if="loading == 0 && orderlist.length > 0" v-on:click="allDateGenInvoice" class="btn btn-primary" style="margin-bottom:10px;">已選日期區間全部折讓</div>
-                <div v-if="loading == 0 && orderlist.length > 0" v-on:click="allDateGenInvoice" class="btn btn-primary" style="margin-bottom:10px;">已選日期區間全部作廢</div>
+                <div v-if="loading == 0 && checkAmt > 0" v-on:click="allSelectDiscountInvoice" class="btn btn-primary" style="margin-bottom:10px;">已選訂單全部折讓</div>
+                <div v-if="loading == 0 && checkAmt > 0" v-on:click="allSelectInvalidInvoice" class="btn btn-primary" style="margin-bottom:10px;">已選訂單全部作廢</div><br>
+                <div v-if="loading == 0 && orderlist.length > 0" v-on:click="allDateDiscountInvoice" class="btn btn-primary" style="margin-bottom:10px;">已選日期區間全部折讓</div>
+                <div v-if="loading == 0 && orderlist.length > 0" v-on:click="allDateInvalidInvoice" class="btn btn-primary" style="margin-bottom:10px;">已選日期區間全部作廢</div>
             </div>
             <div class="col-md-1 col-md-offset-5" style="text-align:center;">
                 <div class="form-group">
