@@ -11,7 +11,7 @@ $(document).ready(function () {
         "extendedTimeOut": "1000"
     }
 
-    window.genInv = new Vue({
+    genInv = new Vue({
         el: "#geninv",
         data: {
             invoiceList: {},
@@ -175,8 +175,12 @@ $(document).ready(function () {
         $("#paytwogoid").val(localStorage.getItem("paytwogoid"));
         $("#paytwogohashkey").val(localStorage.getItem("paytwogohashkey"));
         $("#paytwogohashiv").val(localStorage.getItem("paytwogohashiv"));
-        $("#invurl").val(localStorage.getItem("invurl"));
         $("#invemail").val(localStorage.getItem("invemail"));
+        if (localStorage.getItem("isProduction")) {
+            $("#isProduction").val(localStorage.getItem("isProduction"));
+        } else {
+            $("#isProduction").val('true');
+        }
     }
 
     $("#save").on("click", function () {
@@ -186,7 +190,7 @@ $(document).ready(function () {
         localStorage.setItem("paytwogoid", $("#paytwogoid").val());
         localStorage.setItem("paytwogohashkey", $("#paytwogohashkey").val());
         localStorage.setItem("paytwogohashiv", $("#paytwogohashiv").val());
-        localStorage.setItem("invurl", $("#invurl").val());
+        localStorage.setItem("isProduction", $("#isProduction").val());
         localStorage.setItem("invemail", $("#invemail").val());
     });
 
@@ -251,7 +255,7 @@ $(document).ready(function () {
                     paytwogoid: $("#paytwogoid").val(),
                     paytwogohashkey: $("#paytwogohashkey").val(),
                     paytwogohashiv: $("#paytwogohashiv").val(),
-                    invurl: $("#invurl").val()
+                    isProduction: $("#isProduction").val()
                 },
                 success: function (response) {
                     console.log(response);
@@ -276,7 +280,7 @@ $(document).ready(function () {
                     paytwogoid: $("#paytwogoid").val(),
                     paytwogohashkey: $("#paytwogohashkey").val(),
                     paytwogohashiv: $("#paytwogohashiv").val(),
-                    invurl: $("#invurl").val()
+                    isProduction: $("#isProduction").val()
                 },
                 success: function (response) {
                     console.log(response);

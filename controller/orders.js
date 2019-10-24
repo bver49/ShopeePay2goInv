@@ -49,9 +49,9 @@ router.post("/byStatusAndUpdateTime", function (req, res) {
     }
     var status = req.body.status;
     getOrderList(req.body.tf, req.body.tt, req.body.page, key, function (orders, more) {
-        for (var i in orders) {
-            orders[i].order_status = (Math.floor(Math.random() * 6) % 2) ? "CANCELLED" : "TO_RETURN";
-        }
+        // for (var i in orders) {
+        //     orders[i].order_status = (Math.floor(Math.random() * 6) % 2) ? "CANCELLED" : "TO_RETURN";
+        // }
         orders = orders.filter(function (ele) {
             return ele.order_status == status;
         });
@@ -142,7 +142,7 @@ router.post("/:ordersn/geninv", function (req, res) {
         paytwogoid: req.body.paytwogoid,
         paytwogohashkey: req.body.paytwogohashkey,
         paytwogohashiv: req.body.paytwogohashiv,
-        invurl: req.body.invurl,
+        isProduction: req.body.isProduction,
         invemail: (req.body.invemail == "") ? "c.p.max.tw@gmail.com" : req.body.invemail
     }
     getOrderDetail(req.params.ordersn, key, function (order) {
@@ -187,7 +187,7 @@ router.post("/:ordersn/invalidInvoice", function (req, res) {
         paytwogoid: req.body.paytwogoid,
         paytwogohashkey: req.body.paytwogohashkey,
         paytwogohashiv: req.body.paytwogohashiv,
-        invurl: req.body.invurl
+        isProduction: req.body.isProduction
     }
     var ordersn = req.params.ordersn;
     Invoice.findAll({
@@ -225,7 +225,7 @@ router.post("/:ordersn/discountInvoice", function (req, res) {
         paytwogoid: req.body.paytwogoid,
         paytwogohashkey: req.body.paytwogohashkey,
         paytwogohashiv: req.body.paytwogohashiv,
-        invurl: req.body.invurl
+        isProduction: req.body.isProduction
     }
     var ordersn = req.params.ordersn;
     var discountAmount = req.body.discountAmount;

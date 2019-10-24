@@ -67,9 +67,13 @@ module.exports.genInvoice = function (shopeeData, key, cb) {
     }
     if (shopeeData.order_status == "COMPLETED") {
         try {
+            var url = 'https://cinv.pay2go.com/api/invoice_issue';
+            if (key.isProduction == 'true') {
+                url = 'https://inv.pay2go.com/api/invoice_issue';
+            }
             request({
                 method: 'post',
-                url: 'https://cinv.pay2go.com/api/invoice_issue',
+                url: url,
                 formData: {
                     MerchantID_: key.paytwogoid,
                     PostData_: postdata(data, key.paytwogohashkey, key.paytwogohashiv)
@@ -119,9 +123,13 @@ module.exports.discountInvoice = function (invoiceNumber, ordersn, dicountAmount
         Status: "1"
     }
     try {
+        var url = 'https://cinv.ezpay.com.tw/api/allowance_issue';
+        if (key.isProduction == 'true') {
+            url = 'https://inv.ezpay.com.tw/api/allowance_issue';
+        }
         request({
             method: 'post',
-            url: 'https://cinv.ezpay.com.tw/api/allowance_issue',
+            url: url,
             formData: {
                 MerchantID_: key.paytwogoid,
                 PostData_: postdata(data, key.paytwogohashkey, key.paytwogohashiv)
@@ -154,9 +162,13 @@ module.exports.invalidInvoice = function (invoiceNumber, key, cb) {
         InvalidReason: "作廢"
     }
     try {
+        var url = 'https://cinv.ezpay.com.tw/api/invoice_invalid';
+        if (key.isProduction == 'true') {
+            url = 'https://inv.ezpay.com.tw/api/invoice_invalid';
+        }
         request({
             method: 'post',
-            url: 'https://cinv.ezpay.com.tw/api/invoice_invalid',
+            url: url,
             formData: {
                 MerchantID_: key.paytwogoid,
                 PostData_: postdata(data, key.paytwogohashkey, key.paytwogohashiv)

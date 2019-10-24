@@ -164,8 +164,12 @@ $(document).ready(function () {
         $("#paytwogoid").val(localStorage.getItem("paytwogoid"));
         $("#paytwogohashkey").val(localStorage.getItem("paytwogohashkey"));
         $("#paytwogohashiv").val(localStorage.getItem("paytwogohashiv"));
-        $("#invurl").val(localStorage.getItem("invurl"));
         $("#invemail").val(localStorage.getItem("invemail"));
+        if (localStorage.getItem("isProduction")) {
+            $("#isProduction").val(localStorage.getItem("isProduction"));
+        } else {
+            $("#isProduction").val('true');
+        }
     }
 
     $("#save").on("click", function () {
@@ -175,7 +179,7 @@ $(document).ready(function () {
         localStorage.setItem("paytwogoid", $("#paytwogoid").val());
         localStorage.setItem("paytwogohashkey", $("#paytwogohashkey").val());
         localStorage.setItem("paytwogohashiv", $("#paytwogohashiv").val());
-        localStorage.setItem("invurl", $("#invurl").val());
+        localStorage.setItem("isProduction", $("#isProduction").val());
         localStorage.setItem("invemail", $("#invemail").val());
     });
 
@@ -232,9 +236,9 @@ $(document).ready(function () {
                     paytwogoid: $("#paytwogoid").val(),
                     paytwogohashkey: $("#paytwogohashkey").val(),
                     paytwogohashiv: $("#paytwogohashiv").val(),
-                    invurl: $("#invurl").val(),
                     invemail: $("#invemail").val(),
-                    invitemname: $("#invitemname").val()
+                    invitemname: $("#invitemname").val(),
+                    isProduction: $("#isProduction").val()
                 },
                 success: function (response) {
                     if (response == "發票開立成功" || response == "已開過發票") {
