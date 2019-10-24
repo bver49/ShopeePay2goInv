@@ -14,7 +14,7 @@ $(document).ready(function () {
     var genInv = new Vue({
         el: "#geninv",
         data: {
-            invlist: [],
+            invoiceList: [],
             loading: 0,
             page: 1,
             orderlist: [],
@@ -46,15 +46,6 @@ $(document).ready(function () {
                 genInv.checkAmt = value.length;
             }
         },
-        mounted: function () {
-            $.ajax({
-                url: '/orders/invlist',
-                type: 'get',
-                success: function (response) {
-                    genInv.invlist = response;
-                }
-            });
-        },
         methods: {
             search: function () {
                 if ($("#tt").val() != "" && $("#tf").val() != "") {
@@ -79,11 +70,12 @@ $(document).ready(function () {
                             },
                             success: function (response) {
                                 Page = [];
-                                if (response.list) {
-                                    for (var i in response.list) {
-                                        if (response.list[i].order_status == 'COMPLETED') {
-                                            Page.push(response.list[i]);
-                                        }
+                                if (response.orders) {
+                                    for (var i in response.orders) {
+                                        Page.push(response.orders[i]);
+                                    }
+                                    for (var i in response.invoices) {
+                                        genInv.invoiceList.push(response.invoices[i].sn);
                                     }
                                     if (response.more === true) {
                                         getNextPage(1)
@@ -120,7 +112,7 @@ $(document).ready(function () {
             selectAll: function () {
                 if (!genInv.hasSelectAll) {
                     for (var i in genInv.orderlist) {
-                        if (genInv.invlist.indexOf(genInv.orderlist[i].ordersn) == -1) {
+                        if (genInv.invoiceList.indexOf(genInv.orderlist[i].ordersn) == -1) {
                             genInv.ordersCheck.push(genInv.orderlist[i].ordersn);
                         }
                     }
@@ -132,7 +124,7 @@ $(document).ready(function () {
             },
             allDateGenInvoice: function () {
                 for (var i in Page) {
-                    if (Page[i].order_status == 'COMPLETED' && genInv.invlist.indexOf(Page[i].ordersn) == -1) {
+                    if (Page[i].order_status == 'COMPLETED' && genInv.invoiceList.indexOf(Page[i].ordersn) == -1) {
                         genInvoice(Page[i].ordersn);
                     }
                 }
@@ -202,10 +194,11 @@ $(document).ready(function () {
                 paytwogohashiv: $("#paytwogohashiv").val()
             },
             success: function (response) {
-                for (var i in response.list) {
-                    if (response.list[i].order_status == 'COMPLETED') {
-                        Page.push(response.list[i]);
-                    }
+                for (var i in response.orders) {
+                    Page.push(response.orders[i]);
+                }
+                for (var i in response.invoices) {
+                    genInv.invoiceList.push(response.invoices[i].sn);
                 }
                 if (response.more === true) {
                     getNextPage(page + 1);
@@ -246,7 +239,7 @@ $(document).ready(function () {
                         if (genInv.ordersCheck.indexOf(ordersn) != -1) {
                             genInv.ordersCheck.splice(genInv.ordersCheck.indexOf(ordersn), 1);
                         }
-                        genInv.invlist.push(ordersn);
+                        genInv.invoiceList.push(ordersn);
                         toastr.success(`訂單編號 ${ordersn} ${response}`)
                     } else if (response == "解密錯誤") {
                         toastr.warning("請檢查智付寶金鑰");

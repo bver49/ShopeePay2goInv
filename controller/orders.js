@@ -1,5 +1,6 @@
 var express = require('express');
 var fs = require('fs');
+var Op = require('sequelize').Op;
 var router = express.Router();
 var Invoice = require('../model/Invoice');
 var shopee = require('../helper/shopee');
@@ -13,30 +14,49 @@ var getOrderLogistic = shopee.getOrderLogistic;
 var genExcel = shopee.genExcel;
 var genInvoice = pay2go.genInvoice;
 
+//查詢訂單
 router.post("/", function (req, res) {
     var key = {
         shopeesecret: req.body.shopeesecret,
         shopeeshopid: req.body.shopeeshopid,
         shopeepartnerid: req.body.shopeepartnerid
     }
+    //出貨管理
     if (req.query.status && req.query.status == 1) {
-        req.query.status = "READY_TO_SHIP";
-        getOrderListByStatus(req.body.tf, req.body.tt, req.body.page, req.query.status, key, function (list, more) {
+        getOrderListByStatus(req.body.tf, req.body.tt, req.body.page, "READY_TO_SHIP", key, function (orders, more) {
             res.json({
-                list: list,
+                orders: orders,
                 more: more
             });
         });
     } else {
-        getOrderList(req.body.tf, req.body.tt, req.body.page, key, function (list, more) {
-            res.json({
-                list: list,
-                more: more
+        //開發票
+        getOrderList(req.body.tf, req.body.tt, req.body.page, key, function (orders, more) {
+            //只查訂單狀態為 COMPLETED 的發票
+            var ordersn = [];
+            for (var i in orders) {
+                if (orders[i].order_status == 'COMPLETED') {
+                    ordersn.push(orders[i].ordersn);
+                }
+            }
+            Invoice.findAll({
+                where: {
+                    sn: {
+                        [Op.in]: ordersn
+                    }
+                }
+            }).then(function(invoices) {
+                res.json({
+                    orders: orders,
+                    invoices: invoices,
+                    more: more
+                });
             });
         });
     }
 });
 
+//多筆訂單詳細資料
 router.post("/detail", function (req, res) {
     var key = {
         shopeesecret: req.body.shopeesecret,
@@ -48,6 +68,7 @@ router.post("/detail", function (req, res) {
     });
 });
 
+//單筆訂單詳細資料
 router.post("/:ordersn/detail", function (req, res) {
     var key = {
         shopeesecret: req.body.shopeesecret,
@@ -68,6 +89,7 @@ router.post("/:ordersn/detail", function (req, res) {
     });
 });
 
+//訂單收益
 router.post("/:ordersn/income", function (req, res) {
     var key = {
         shopeesecret: req.body.shopeesecret,
@@ -79,6 +101,7 @@ router.post("/:ordersn/income", function (req, res) {
     });
 });
 
+//訂單運輸狀態
 router.post("/:ordersn/logistic", function (req, res) {
     var key = {
         shopeesecret: req.body.shopeesecret,
@@ -90,6 +113,7 @@ router.post("/:ordersn/logistic", function (req, res) {
     });
 });
 
+//開立發票
 router.post("/:ordersn/geninv", function (req, res) {
     var key = {
         shopeesecret: req.body.shopeesecret,
@@ -98,7 +122,7 @@ router.post("/:ordersn/geninv", function (req, res) {
         paytwogoid: req.body.paytwogoid,
         paytwogohashkey: req.body.paytwogohashkey,
         paytwogohashiv: req.body.paytwogohashiv,
-        invurl: (req.body.invurl == "") ? 'https://inv.pay2go.com/api/invoice_issue' : req.body.invurl,
+        invurl: req.body.invurl,
         invemail: (req.body.invemail == "") ? "c.p.max.tw@gmail.com" : req.body.invemail
     }
     getOrderDetail(req.params.ordersn, key, function (order) {
@@ -134,24 +158,14 @@ router.post("/:ordersn/geninv", function (req, res) {
     });
 });
 
-router.get("/invlist", function (req, res) {
-    Invoice.findAll({
-        "where": {},
-        "attributes": ["sn"]
-    }).then(function (items) {
-        var list = items.map(function (ele) {
-            return ele.sn.toString();
-        });
-        res.send(list);
-    });
-});
-
+//產生excel
 router.post("/genexcel", function (req, res) {
     genExcel(req.body, function () {
         res.send('ok');
     });
 });
 
+//下載excel
 router.get('/downloadexcel', function (req, res) {
     res.download('./file/待出貨商品統計.xlsx');
 });

@@ -75,12 +75,12 @@
                         <template v-if="orderlist.length != 0">
                             <template  v-for="order in orderlist">
                                 <tr v-if="order.order_status == 'COMPLETED'">
-                                    <td class="text-center"><input v-if="invlist.indexOf(order.ordersn) == -1" type="checkbox" v-bind:value="order.ordersn" v-model="ordersCheck"></td>
+                                    <td class="text-center"><input v-if="invoiceList.indexOf(order.ordersn) == -1" type="checkbox" v-bind:value="order.ordersn" v-model="ordersCheck"></td>
                                     <td class="text-center">{{ order.ordersn }}</td>
                                     <td class="text-center">{{ order.update_time | time }}</td>
                                     <td class="text-center">完成</td>
                                     <td>
-                                        <div v-if="invlist.indexOf(order.ordersn) == -1" class="btn btn-primary" v-on:click="genInvoice(order.ordersn)">開立發票</div>
+                                        <div v-if="invoiceList.indexOf(order.ordersn) == -1" class="btn btn-primary" v-on:click="genInvoice(order.ordersn)">開立發票</div>
                                         <div class="btn btn-primary" v-on:click="showDetail(order.ordersn)">詳細資料</div>
                                     </td>
                                 </tr>

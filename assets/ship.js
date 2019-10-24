@@ -87,10 +87,10 @@ $(document).ready(function () {
                 shopeepartnerid: $("#shopeepartnerid").val()
             },
             success: function (response) {
-                for (var i in response.list) {
-                    if (!Page[response.list[i].ordersn]) {
-                        Page[response.list[i].ordersn] = response.list[i];
-                        orderSn.push(response.list[i].ordersn);
+                for (var i in response.orders) {
+                    if (! Page[response.orders[i].ordersn]) {
+                        Page[response.orders[i].ordersn] = response.orders[i];
+                        orderSn.push(response.orders[i].ordersn);
                     }
                 }
                 if (response.more === true) {
@@ -110,9 +110,7 @@ $(document).ready(function () {
     function refreshTable(page) {
         $("#orderlist").empty();
         if (Page.length < 1) {
-            var row = `<tr>
-									<td colspan="8" class="text-center">查無資料</td>
-								</tr>`
+            var row = '<tr><td colspan="8" class="text-center">查無資料</td></tr>';
             $("#orderlist").append(row);
         } else {
             for (var i = page * 50; i < (page + 1) * 50 && i < Page.length; i++) {
@@ -415,11 +413,11 @@ $(document).ready(function () {
                                 shopeepartnerid: $("#shopeepartnerid").val()
                             },
                             success: function (response) {
-                                if (response.list) {
-                                    for (var i in response.list) {
-                                        if (!Page[response.list[i].ordersn]) {
-                                            Page[response.list[i].ordersn] = response.list[i];
-                                            orderSn.push(response.list[i].ordersn);
+                                if (response.orders) {
+                                    for (var i in response.orders) {
+                                        if (! Page[response.orders[i].ordersn]) {
+                                            Page[response.orders[i].ordersn] = response.orders[i];
+                                            orderSn.push(response.orders[i].ordersn);
                                         }
                                     }
                                     if (response.more === true) {
