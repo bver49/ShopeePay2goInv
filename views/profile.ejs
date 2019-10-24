@@ -20,14 +20,40 @@
         </form>
         <div id="profile">
             <div style="margin-top:30px;">
-                Username :
-                <%= (me.username) %>
-                <br>
-                <br> 擁有權限&nbsp;&nbsp;:&nbsp;&nbsp;
-                <%= (me.inv==1)?"開立發票":"" %>&nbsp;&nbsp;
-                <%= (me.ship==1)?"出貨管理":"" %>&nbsp;&nbsp;
-                <%= (me.syncitems==1)?"同步商品":"" %>&nbsp;&nbsp;
-                <%= (me.role==2)?"用戶管理":"" %>
+                <p>Username : <%= (me.username) %></p><br>
+                <p>權限</p><br>
+                <p>
+                    <span>開立發票 :</span>
+                    <% if (me.inv==1) { %>
+                        <span class="glyphicon glyphicon-ok"></span>
+                    <% } else { %>
+                        <span class="glyphicon glyphicon-remove"></span>
+                    <% } %>
+                </p><br>
+                <p>
+                    <span>出貨管理 :</span>
+                    <% if (me.ship==1) { %>
+                        <span class="glyphicon glyphicon-ok"></span>
+                    <% } else { %>
+                        <span class="glyphicon glyphicon-remove"></span>
+                    <% } %>
+                </p><br>
+                <p>
+                    <span>同步商品 :</span>
+                    <% if (me.syncitems==1) { %>
+                        <span class="glyphicon glyphicon-ok"></span>
+                    <% } else { %>
+                        <span class="glyphicon glyphicon-remove"></span>
+                    <% } %>
+                </p><br>
+                <p>
+                    <span>用戶管理 :</span>
+                    <% if (me.role==2) { %>
+                        <span class="glyphicon glyphicon-ok"></span>
+                    <% } else { %>
+                        <span class="glyphicon glyphicon-remove"></span>
+                    <% } %>
+                </p><br>
             </div>
             <div id="editprofile" class="btn btn-primary" style="width:30%;margin-top:50px;margin-left:35%">修改資料</div>
         </div>
