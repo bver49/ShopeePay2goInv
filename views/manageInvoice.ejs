@@ -70,13 +70,14 @@
                         <th>訂單編號</th>
                         <th>更新時間</th>
                         <th>訂單狀態</th>
+                        <th>發票狀態</th>
                         <th>操作</th>
                     </tr>
                 </thead>
                 <tbody>
                     <template v-if="loading == 1">
                         <tr>
-                            <td class="text-center" colspan="5">資料讀取中</td>
+                            <td class="text-center" colspan="6">資料讀取中</td>
                         </tr>
                     </template>
                     <template v-else>
@@ -91,6 +92,11 @@
                                         <span v-else-if="order.order_status == 'TO_RETURN'">退回</span>
                                         <span v-else>完成</span>
                                     </td>
+                                    <td class="text-center">
+                                        <span v-if="invoiceList[order.ordersn].status == 0">開立成功</span>
+                                        <span v-else-if="invoiceList[order.ordersn].status == 1">已作廢</span>
+                                        <span v-else>已折讓</span>
+                                    </td>
                                     <td>
                                         <div class="btn btn-primary" v-on:click="showDetail(order.ordersn)">詳細資料</div>
                                         <div class="btn btn-primary" v-if="invoiceList[order.ordersn].status == 0" v-on:click="invalidInvoice(order.ordersn)">作廢</div>
@@ -102,7 +108,7 @@
                         </template>
                         <template v-else>
                             <tr>
-                                <td colspan="5" class="text-center">查無資料</td>
+                                <td colspan="6" class="text-center">查無資料</td>
                             </tr>
                         </template>
                     </template>

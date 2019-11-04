@@ -64,6 +64,9 @@ router.post("/byStatusAndUpdateTime", function (req, res) {
             where: {
                 sn: {
                     [Op.in]: ordersn
+                },
+                status: {
+                    [Op.ne]: -1
                 }
             }
         }).then(function (invoices) {
