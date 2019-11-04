@@ -51,7 +51,7 @@ module.exports.genInvoice = function (shopeeData, key, cb) {
         MerchantOrderNo: shopeeData.ordersn,
         Status: "1",
         Category: "B2C",
-        BuyerName: shopeeData.recipient_address.name,
+        BuyerName: shopeeData.recipient_address.name + '(' + shopeeData.buyer_username + ')',
         BuyerEmail: shopeeData.message_to_seller.match(emailReg) ? shopeeData.message_to_seller.match(emailReg)[0] : key.invemail,
         PrintFlag: "Y",
         TaxType: "1",
