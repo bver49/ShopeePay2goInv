@@ -49,13 +49,12 @@ router.post("/byStatusAndUpdateTime", function (req, res) {
     }
     var status = req.body.status;
     getOrderList(req.body.tf, req.body.tt, req.body.page, key, function (orders, more) {
-        // for (var i in orders) {
-        //     orders[i].order_status = (Math.floor(Math.random() * 6) % 2) ? "CANCELLED" : "TO_RETURN";
-        // }
-        //篩出符合狀態的訂單
-        orders = orders.filter(function (ele) {
-            return ele.order_status == status;
-        });
+        //如果有設定訂單狀態要篩出符合狀態的訂單
+        if (status != "ALL") {
+            orders = orders.filter(function (ele) {
+                return ele.order_status == status;
+            });
+        }
         var ordersn = [];
         for (var i in orders) {
             ordersn.push(orders[i].ordersn);
@@ -238,17 +237,21 @@ router.post("/:ordersn/discountInvoice", function (req, res) {
             res.send("查無此訂單發票，或是發票已作廢/折讓");
         } else {
             var invoiceNumber = invoices[0].InvoiceNumber;
-            var discountAmount = invoices[0].TotalAmt;
-            discountInvoice(invoiceNumber, ordersn, discountAmount, key, function (result) {
-                Invoice.update({
-                    status: 2
-                }, {
-                    where: {
-                        sn: ordersn
-                    }
+            var invoiceTotalAmount = invoices[0].TotalAmt;
+            if (discountAmount > invoiceTotalAmount) {
+                res.send("錯誤，折讓金額大於發票金額");
+            } else {
+                discountInvoice(invoiceNumber, ordersn, discountAmount, key, function (result) {
+                    Invoice.update({
+                        status: 2
+                    }, {
+                        where: {
+                            sn: ordersn
+                        }
+                    });
+                    res.send(result.msg);
                 });
-                res.send(result.msg);
-            });
+            }
         }
     });
 });

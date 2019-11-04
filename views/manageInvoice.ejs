@@ -30,8 +30,10 @@
             <div class="form-group">
                 <label>訂單狀態:</label>
                 <select class="form-control" id="orderStatus">
+                    <option value="ALL">不限</option>
                     <option value="CANCELLED">取消</option>
                     <option value="TO_RETURN">退回</option>
+                    <option value="COMPLETED">完成</option>
                 </select>
             </div>
         </form>
@@ -80,18 +82,20 @@
                     <template v-else>
                         <template v-if="orderlist.length != 0">
                             <template  v-for="order in orderlist">
-                                <tr v-if="order.order_status == 'CANCELLED' || order.order_status == 'TO_RETURN'">
+                                <tr v-if="['CANCELLED', 'TO_RETURN', 'COMPLETED'].indexOf(order.order_status) != -1">
                                     <td class="text-center"><input v-if="invoiceList[order.ordersn].status == 0" type="checkbox" v-bind:value="order.ordersn" v-model="ordersCheck"></td>
                                     <td class="text-center">{{ order.ordersn }}</td>
                                     <td class="text-center">{{ order.update_time | time }}</td>
                                     <td class="text-center">
                                         <span v-if="order.order_status == 'CANCELLED'">取消</span>
-                                        <span v-else>退回</span>
+                                        <span v-else-if="order.order_status == 'TO_RETURN'">退回</span>
+                                        <span v-else>完成</span>
                                     </td>
                                     <td>
-                                        <div class="btn btn-primary" v-if="invoiceList[order.ordersn].status == 0" v-on:click="discountInvoice(order.ordersn)">折讓</div>
-                                        <div class="btn btn-primary" v-if="invoiceList[order.ordersn].status == 0" v-on:click="invalidInvoice(order.ordersn)">作廢</div>
                                         <div class="btn btn-primary" v-on:click="showDetail(order.ordersn)">詳細資料</div>
+                                        <div class="btn btn-primary" v-if="invoiceList[order.ordersn].status == 0" v-on:click="invalidInvoice(order.ordersn)">作廢</div>
+                                        <div class="btn btn-primary" v-if="invoiceList[order.ordersn].status == 0" v-on:click="discountInvoice(order.ordersn)">折讓</div>
+                                        <span v-if="invoiceList[order.ordersn].status == 0">折讓金額：<input v-bind:id="order.ordersn+'Amount'" style="width:60px;" type="text" v-bind:value="invoiceList[order.ordersn].TotalAmt"></span>
                                     </td>
                                 </tr>
                             </template>

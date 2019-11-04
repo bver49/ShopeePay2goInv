@@ -77,10 +77,8 @@ $(document).ready(function () {
                                     }
                                     for (var i in response.orders) {
                                         if (
-                                            (
-                                                response.orders[i].order_status == "CANCELLED" ||
-                                                response.orders[i].order_status == "TO_RETURN"
-                                            ) && genInv.invoiceList[response.orders[i].ordersn]
+                                            isAllowOrderStatus(response.orders[i].order_status) &&
+                                            genInv.invoiceList[response.orders[i].ordersn]
                                         ) {
                                             Page.push(response.orders[i]);
                                         }
@@ -139,10 +137,7 @@ $(document).ready(function () {
             allDateDiscountInvoice: function () {
                 for (var i in Page) {
                     if (
-                        (
-                            Page[i].order_status == "CANCELLED" ||
-                            Page[i].order_status == "TO_RETURN"
-                        ) &&
+                        isAllowOrderStatus(Page[i].order_status) &&
                         (
                             genInv.invoiceList[Page[i].ordersn] &&
                             genInv.invoiceList[Page[i].ordersn].status == 0
@@ -155,10 +150,7 @@ $(document).ready(function () {
             allDateInvalidInvoice: function () {
                 for (var i in Page) {
                     if (
-                        (
-                            Page[i].order_status == "CANCELLED" ||
-                            Page[i].order_status == "TO_RETURN"
-                        ) &&
+                        isAllowOrderStatus(Page[i].order_status) &&
                         (
                             genInv.invoiceList[Page[i].ordersn] &&
                             genInv.invoiceList[Page[i].ordersn].status == 0
@@ -250,10 +242,8 @@ $(document).ready(function () {
                 }
                 for (var i in response.orders) {
                     if (
-                        (
-                            response.orders[i].order_status == "CANCELLED" ||
-                            response.orders[i].order_status == "TO_RETURN"
-                        ) && genInv.invoiceList[response.orders[i].ordersn]
+                        isAllowOrderStatus(response.orders[i].order_status) &&
+                        genInv.invoiceList[response.orders[i].ordersn]
                     ) {
                         Page.push(response.orders[i]);
                     }
@@ -325,7 +315,8 @@ $(document).ready(function () {
                     paytwogoid: $("#paytwogoid").val(),
                     paytwogohashkey: $("#paytwogohashkey").val(),
                     paytwogohashiv: $("#paytwogohashiv").val(),
-                    isProduction: $("#isProduction").val()
+                    isProduction: $("#isProduction").val(),
+                    discountAmount: $("#" + ordersn + "Amount").val()
                 },
                 success: function (response) {
                     if (response == "發票折讓成功") {
@@ -375,6 +366,10 @@ $(document).ready(function () {
         Page.sort(function (a, b) {
             return a.update_time - b.update_time
         });
+    }
+
+    function isAllowOrderStatus(status) {
+        return ["CANCELLED", "TO_RETURN", "COMPLETED"].indexOf(status) != -1
     }
 
     $('#datetimepickertf').datetimepicker({
