@@ -12,6 +12,7 @@ var getOrderListByStatus = shopee.getOrderListByStatus;
 var getOrderIncome = shopee.getOrderIncome;
 var getOrderLogistic = shopee.getOrderLogistic;
 var genExcel = shopee.genExcel;
+var getReturnList = shopee.getReturnList;
 var genInvoice = pay2go.genInvoice;
 var invalidInvoice = pay2go.invalidInvoice;
 var discountInvoice = pay2go.discountInvoice;
@@ -302,6 +303,24 @@ router.post("/genexcel", function (req, res) {
 //下載excel
 router.get('/downloadexcel', function (req, res) {
     res.download('./file/待出貨商品統計.xlsx');
+});
+
+//查詢退款清單
+router.post("/getReturnList", function (req, res) {
+    var key = {
+        shopeesecret: req.body.shopeesecret,
+        shopeeshopid: req.body.shopeeshopid,
+        shopeepartnerid: req.body.shopeepartnerid
+    }
+    getReturnList(req.body.tf, req.body.tt, req.body.page, key, function (returns, more) {
+        returns = returns.filter(function (ele) {
+            return ele.status == "REFUND_PAID";
+        });
+        res.json({
+            returns: returns,
+            more: more
+        });
+    });
 });
 
 module.exports = router;

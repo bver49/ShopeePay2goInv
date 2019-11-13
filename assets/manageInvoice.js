@@ -55,6 +55,24 @@ $(document).ready(function () {
                         genInv.orderlist = [];
                         genInv.loading = 1;
                         $.ajax({
+                            url: '/orders/getReturnList',
+                            type: 'POST',
+                            data: {
+                                tt: $("#tt").val(),
+                                tf: $("#tf").val(),
+                                page: 0,
+                                shopeesecret: $("#shopeesecret").val(),
+                                shopeeshopid: $("#shopeeshopid").val(),
+                                shopeepartnerid: $("#shopeepartnerid").val(),
+                                paytwogoid: $("#paytwogoid").val(),
+                                paytwogohashkey: $("#paytwogohashkey").val(),
+                                paytwogohashiv: $("#paytwogohashiv").val()
+                            },
+                            success: function (response) {
+                                console.log(response);
+                            }
+                        });
+                        $.ajax({
                             url: '/orders/byStatusAndCreatedTime',
                             type: 'POST',
                             data: {

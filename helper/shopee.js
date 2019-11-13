@@ -307,6 +307,32 @@ function getAllItems(key) {
     });
 }
 
+function getReturnList (tf, tt, page, key, cb) {
+    tt = dateToTs(tt);
+    tf = dateToTs(tf);
+    tt += (86400 - 1);
+    var data = {
+        "shopid": parseInt(key.shopeeshopid),
+        "partner_id": parseInt(key.shopeepartnerid),
+        "timestamp": Math.floor(new Date().getTime() / 1000),
+        "create_time_to": tt,
+        "create_time_from": tf,
+        "pagination_entries_per_page": 100, //一頁呈現的訂單數目
+        "pagination_offset": parseInt(page) * 100 //第幾頁
+    }
+    var url = 'https://partner.shopeemobile.com/api/v1/returns/get';
+    callAPI(key, url, data).then(function (body) {
+        try {
+            cb(body.returns, body.more);
+        } catch (err) {
+            console.log(body);
+            console.log(err);
+            console.log(data);
+            cb([], false);
+        }
+    });
+}
+
 module.exports = {
     "callAPI": callAPI,
     "getOrderList": getOrderList,
@@ -318,5 +344,6 @@ module.exports = {
     "genExcel": genExcel,
     "getCategory": getCategory,
     "getItemInCategory": getItemInCategory,
-    "getAllItems": getAllItems
+    "getAllItems": getAllItems,
+    "getReturnList": getReturnList
 }
