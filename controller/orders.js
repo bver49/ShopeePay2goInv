@@ -40,8 +40,41 @@ router.post("/", function (req, res) {
     }
 });
 
+//查詢訂單
+router.post("/byStatusAndCreatedTime", function (req, res) {
+    var key = {
+        shopeesecret: req.body.shopeesecret,
+        shopeeshopid: req.body.shopeeshopid,
+        shopeepartnerid: req.body.shopeepartnerid
+    }
+    var status = req.body.status;
+    getOrderListByStatus(req.body.tf, req.body.tt, req.body.page, status, key, function (orders, more) {
+        var ordersn = [];
+        for (var i in orders) {
+            ordersn.push(orders[i].ordersn);
+        }
+        //撈訂單發票
+        Invoice.findAll({
+            where: {
+                sn: {
+                    [Op.in]: ordersn
+                },
+                status: {
+                    [Op.ne]: -1
+                }
+            }
+        }).then(function (invoices) {
+            res.json({
+                orders: orders,
+                invoices: invoices,
+                more: more
+            });
+        });
+    });
+});
+
 //用更新時間查詢訂單 會篩選訂單狀態
-router.post("/byStatusAndUpdateTime", function (req, res) {
+router.post("/byStatusAndUpdatedTime", function (req, res) {
     var key = {
         shopeesecret: req.body.shopeesecret,
         shopeeshopid: req.body.shopeeshopid,

@@ -55,7 +55,7 @@ $(document).ready(function () {
                         genInv.orderlist = [];
                         genInv.loading = 1;
                         $.ajax({
-                            url: '/orders/byStatusAndUpdateTime',
+                            url: '/orders/byStatusAndCreatedTime',
                             type: 'POST',
                             data: {
                                 tt: $("#tt").val(),
@@ -222,7 +222,7 @@ $(document).ready(function () {
 
     function getNextPage(page, cb) {
         $.ajax({
-            url: '/orders/byStatusAndUpdateTime',
+            url: '/orders/byStatusAndCreatedTime',
             type: 'POST',
             data: {
                 tt: $("#tt").val(),
