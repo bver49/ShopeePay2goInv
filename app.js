@@ -53,16 +53,6 @@ app.get("/generateInvoice", checkLogin(), function (req, res) {
     }
 });
 
-app.get("/manageInvoice", checkLogin(), function (req, res) {
-    if (req.user.role == 2 || req.user.inv == 1) {
-        res.render("manageInvoice", {
-            me: req.user
-        });
-    } else {
-        res.redirect("/");
-    }
-});
-
 app.get("/ship", checkLogin(), function (req, res) {
     if (req.user.role == 2 || req.user.ship == 1) {
         res.render("ship", {
