@@ -1,0 +1,35 @@
+<% layout('./layout') %>
+<% include ./menu %>
+<div class="container">
+    <div class="col-md-4 col-md-offset-4" style="margin-top:50px;">
+        <p class="h2">批次開立發票資料轉換</p><br><br>
+        <form id="uploadForm" action="/invoice/orderDataToEzpayData" method="post" enctype="multipart/form-data">
+            <label for="type">訂單資料來源：</label><br><br>
+            <select class="form-control" name='type'>
+                <option value="1">Yahoo</option>
+                <option value="2">露天</option>
+            </select><br><br>
+            <label for="type">檔案 (.csv/.xlsx)：</label><br><br>
+            <input type="file" name="orderData" id="orderData">
+        </form>
+        <br><br>
+        <div id="submit" class="btn btn-primary">上傳</div>
+        <div id="hint" class="h4" style="display:none;text-align:center;">轉換中...</div>
+    </div>
+</div>
+<script>
+    $(document).ready(function() {
+        $('#submit').on('click', function() {
+            if ($("#orderData").val() != "") {
+                var file = $("#orderData")[0].files[0];
+                if (["text/csv", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"].indexOf(file.type) == -1) {
+                    alert('不支援此檔案格式');
+                    return
+                }
+                $('#uploadForm').submit();
+                $('#submit').remove();
+                $('#hint').show();
+            }
+        });
+    });
+</script>

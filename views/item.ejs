@@ -1,6 +1,6 @@
 <% layout('./layout') %>
-<script src="/assets/item.js"></script>
 <% include ./menu %>
+<script src="/assets/item.js"></script>
 <div id="syncitem" class="container">
     <div class="col-md-10 col-md-offset-1 text-center">
         <div v-if="syncing == false && cleaning == false" v-on:click="setting" class="btn btn-primary">修改金鑰</div>

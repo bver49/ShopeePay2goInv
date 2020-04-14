@@ -36,6 +36,7 @@ app.use("/orders", checkLogin(1), require("./controller/orders"));
 app.use("/items", require('./controller/items'));
 app.use("/users", require('./controller/users'));
 app.use("/notes", checkLogin(1), require('./controller/notes'));
+app.use("/invoice", checkLogin(), require("./controller/invoice"));
 
 app.get("/", checkLogin(), function (req, res) {
     res.render("profile", {
