@@ -13,7 +13,9 @@ router.get("/orderDataToEzpayData", function (req, res) {
 
 router.post("/orderDataToEzpayData", upload.single('orderData'), function (req, res) {
     var type = req.body.type;
-    var file = orderDataToEzpayData.genEzpayData(req.file.path, type);
+    var userNo = req.body.userNo;
+    var shopNo = req.body.shopNo;
+    var file = orderDataToEzpayData.genEzpayData(req.file.path, shopNo, userNo, type);
     res.download(file, function(){
         //清除檔案
         fs.unlinkSync(req.file.path);

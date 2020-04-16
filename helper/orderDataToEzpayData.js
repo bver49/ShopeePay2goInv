@@ -2,11 +2,9 @@ var fs = require('fs');
 var dayjs = require('dayjs');
 var xlsx = require('xlsx');
 var today = dayjs().format('YYYYMMDD');
-var userNo = 'C0816550934';
-var shopNo = '31924800';
-var fileName = 'files/' + shopNo + '_' + today + '.csv';
 
-module.exports.genEzpayData = function (file, type) {
+module.exports.genEzpayData = function (file, shopNo, userNo, type) {
+    var fileName = 'files/' + shopNo + '_' + today + '.csv';
     var workBook = xlsx.readFile(file);
     //轉成json資料
     for (var index in workBook['Sheets']) {

@@ -4,6 +4,10 @@
     <div class="col-md-4 col-md-offset-4" style="margin-top:50px;">
         <p class="h2">批次開立發票資料轉換</p><br><br>
         <form id="uploadForm" action="/invoice/orderDataToEzpayData" method="post" enctype="multipart/form-data">
+            <label for="type">Ezpay會員代號：</label><br><br>
+            <input type="text" id="userNo" name="userNo"><br><br>
+            <label for="type">Ezpay商店代號：</label><br><br>
+            <input type="text" id="shopNo" name="shopNo"><br><br>
             <label for="type">訂單資料來源：</label><br><br>
             <select class="form-control" name='type'>
                 <option value="1">Yahoo</option>
@@ -23,6 +27,14 @@
     $(document).ready(function() {
         $('#submit').on('click', function() {
             if ($("#orderData").val() != "") {
+                if ($('#userNo').val() == "") {
+                    alert('請輸入Ezpay會員代號');
+                    return
+                }
+                if ($('#shopNo').val() == "") {
+                    alert('請輸入Ezpay商店代號');
+                    return
+                }
                 var file = $("#orderData")[0].files[0];
                 if (["application/csv", "application/vnd.ms-excel", "text/csv", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"].indexOf(file.type) == -1) {
                     alert('不支援此檔案格式');
