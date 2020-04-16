@@ -29,8 +29,12 @@
                     return
                 }
                 $('#uploadForm').submit();
-                $('#submit').remove();
+                $('#submit').hide();
                 $('#hint').show();
+                setTimeout(function(){
+                    $('#submit').show();
+                    $('#hint').hide();
+                }, 5000);
             }
         });
     });
