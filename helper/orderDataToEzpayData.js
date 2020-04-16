@@ -31,8 +31,8 @@ module.exports.genEzpayData = function (file, shopNo, userNo, type) {
         }
         var tax = Math.round(userPay * 0.05);
         var invoicePrice = userPay - tax;
-        rowS += orderNo + "\t" + ",B2C,," + userid + ",c.p.max.tw@gmail.com,,2,c.p.max.tw@gmail.com,,Y,1,5," + invoicePrice + "," + tax + "," + userPay + ",\n";
-        rowI += orderNo + "\t" + "," + itemName + ",1,組," + userPay + "," + userPay + ",\n";
+        rowS += '="' + orderNo + '"' + ',B2C,,' + userid + ',c.p.max.tw@gmail.com,,2,c.p.max.tw@gmail.com,,Y,1,5,' + invoicePrice + ',' + tax + ',' + userPay + ',\n';
+        rowI += '="' + orderNo + '"' + ',' + itemName + ',1,組,' + userPay + ',' + userPay + ',\n';
         rows.push(rowS);
         rows.push(rowI);
     }
