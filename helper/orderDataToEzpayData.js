@@ -39,7 +39,7 @@ module.exports.genEzpayData = function (file, type) {
         rows.push(rowI);
     }
     for (var i in rows) {
-        fs.appendFileSync(fileName, rows[i], 'big-5');
+        fs.appendFileSync(fileName, rows[i], 'utf8');
     }
     return fileName;
 }
