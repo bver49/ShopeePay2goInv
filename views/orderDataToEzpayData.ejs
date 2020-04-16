@@ -24,7 +24,7 @@
         $('#submit').on('click', function() {
             if ($("#orderData").val() != "") {
                 var file = $("#orderData")[0].files[0];
-                if (["text/csv", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"].indexOf(file.type) == -1) {
+                if (["application/csv", "application/vnd.ms-excel", "text/csv", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"].indexOf(file.type) == -1) {
                     alert('不支援此檔案格式');
                     return
                 }
