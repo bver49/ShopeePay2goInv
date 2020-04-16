@@ -38,8 +38,9 @@ module.exports.genEzpayData = function (file, type) {
         rows.push(rowS);
         rows.push(rowI);
     }
+    fs.appendFileSync(fileName, "\ufeff");
     for (var i in rows) {
-        fs.appendFileSync(fileName, rows[i], 'utf8');
+        fs.appendFileSync(fileName, rows[i]);
     }
     return fileName;
 }
