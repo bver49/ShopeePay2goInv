@@ -4,6 +4,7 @@ var xlsx = require('xlsx');
 var today = dayjs().format('YYYYMMDD');
 
 module.exports.genEzpayData = function (file, shopNo, userNo, type) {
+    var orderNoList = [];
     var fileName = 'files/' + shopNo + '_' + today + '.txt';
     var workBook = xlsx.readFile(file);
     //轉成json資料
@@ -31,10 +32,13 @@ module.exports.genEzpayData = function (file, shopNo, userNo, type) {
         }
         var tax = Math.round(userPay * 0.05);
         var invoicePrice = userPay - tax;
-        rowS += orderNo + ',B2C,,' + userid + ',c.p.max.tw@gmail.com,,,,,Y,1,5,' + invoicePrice + ',' + tax + ',' + userPay + ',\n';
-        rowI += orderNo + ',' + itemName + ',1,組,' + userPay + ',' + userPay + ',\n';
-        rows.push(rowS);
-        rows.push(rowI);
+        if (orderNoList.indexOf(orderNo) == -1) {
+            rowS += orderNo + ',B2C,,' + userid + ',c.p.max.tw@gmail.com,,,,,Y,1,5,' + invoicePrice + ',' + tax + ',' + userPay + ',\n';
+            rowI += orderNo + ',' + itemName + ',1,組,' + userPay + ',' + userPay + ',\n';
+            rows.push(rowS);
+            rows.push(rowI);
+            orderNoList.push(orderNo);
+        }
     }
     fs.appendFileSync(fileName, "\ufeff");
     for (var i in rows) {
