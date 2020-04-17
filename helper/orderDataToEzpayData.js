@@ -1,4 +1,5 @@
 var fs = require('fs');
+var iconv = require('iconv-lite');
 var dayjs = require('dayjs');
 var xlsx = require('xlsx');
 var today = dayjs(new Date().toLocaleString("zh-tw", {timeZone: "Asia/Taipei"})).format('YYYYMMDD');
@@ -15,20 +16,28 @@ module.exports.genEzpayData = function (file, shopNo, userNo, type, email) {
     }
     var rows = ['H,INVO,' + userNo + ',' + shopNo + ',' + today + '\n'];
     for (var i in data) {
+        var eachData = data[i];
+        if (type == '2') {
+            eachData = {};
+            for (var j in data[i]) {
+                decodeKey = iconv.decode(j, 'big5');
+                eachData[decodeKey] = data[i][j];
+            }
+        }
         var rowS = 'S,';
         var rowI = 'I,';
         if (type == '1') {
             // yahoo
-            var orderNo = data[i]['訂單編號'];
-            var userPay = data[i]['買家實付金額'];
-            var userid = data[i]['買家拍賣代號'];
-            var itemName = data[i]['商品名稱'].replace(/ /g, '').slice(30);
+            var orderNo = eachData['訂單編號'];
+            var userPay = eachData['買家實付金額'];
+            var userid = eachData['買家拍賣代號'];
+            var itemName = eachData['商品名稱'].replace(/ /g, '').slice(30);
         } else if (type == '2') {
             // ruten
-            var orderNo = data[i]['訂單編號'];
-            var userPay = data[i]['結帳總金額'];
-            var userid = data[i]['買家帳號'];
-            var itemName = data[i]['商品名稱'].replace(/ /g, '').slice(30);
+            var orderNo = eachData['訂單編號'];
+            var userPay = eachData['結帳總金額'];
+            var userid = eachData['買家帳號'];
+            var itemName = iconv.decode(eachData['商品名稱'], 'big5').toString().replace(/ /g, '').slice(30);
         }
         var tax = Math.round(userPay * 0.05);
         var invoicePrice = userPay - tax;

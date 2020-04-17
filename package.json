@@ -20,6 +20,7 @@
     "emoji-regex": "^6.5.1",
     "excel4node": "^1.2.1",
     "express": "^4.16.2",
+    "iconv-lite": "^0.5.1",
     "multer": "^1.4.2",
     "mysql2": "^1.4.2",
     "nodemon": "^1.12.1",
