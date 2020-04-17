@@ -8,6 +8,8 @@
             <input type="text" id="userNo" name="userNo"><br><br>
             <label for="type">Ezpay商店代號：</label><br><br>
             <input type="text" id="shopNo" name="shopNo"><br><br>
+            <label for="type">Email：</label><br><br>
+            <input type="text" id="email" name="email"><br><br>
             <label for="type">訂單資料來源：</label><br><br>
             <select class="form-control" name='type'>
                 <option value="1">Yahoo</option>
@@ -33,6 +35,10 @@
                 }
                 if ($('#shopNo').val() == "") {
                     alert('請輸入Ezpay商店代號');
+                    return
+                }
+                if ($('#email').val() == "") {
+                    alert('請輸入email');
                     return
                 }
                 var file = $("#orderData")[0].files[0];
