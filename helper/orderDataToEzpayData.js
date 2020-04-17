@@ -1,7 +1,7 @@
 var fs = require('fs');
 var dayjs = require('dayjs');
 var xlsx = require('xlsx');
-var today = dayjs().format('YYYYMMDD');
+var today = dayjs(new Date().toLocaleString("zh-tw", {timeZone: "Asia/Taipei"})).format('YYYYMMDD');
 
 module.exports.genEzpayData = function (file, shopNo, userNo, type) {
     var orderNoList = [];
