@@ -2,9 +2,9 @@ var fs = require('fs');
 var iconv = require('iconv-lite');
 var dayjs = require('dayjs');
 var xlsx = require('xlsx');
-var today = dayjs(new Date().toLocaleString("zh-tw", {timeZone: "Asia/Taipei"})).format('YYYYMMDD');
 
 module.exports.genEzpayData = function (file, shopNo, userNo, type, email) {
+    var today = dayjs(new Date().toLocaleString("zh-tw", {timeZone: "Asia/Taipei"})).format('YYYYMMDD');
     var orderNoList = [];
     var fileName = 'files/' + shopNo + '_' + today + '.txt';
     var workBook = xlsx.readFile(file);
