@@ -4,6 +4,7 @@ var Op = require('sequelize').Op;
 var Item = require('../model/Item');
 var shopee = require('../helper/shopee');
 var yahoo = require('../helper/yahoo');
+var common = require('../helper/common');
 var getAllItems = shopee.getAllItems;
 var addItem = yahoo.addItem;
 var productOnline = yahoo.productOnline;
@@ -17,7 +18,7 @@ var config = require('../config');
 //     shopeesecret: config.shopee.apisecret
 // }
 
-router.get("/sync", checkLogin(), function (req, res) {
+router.get("/sync", common.checkLogin(), function (req, res) {
     if (req.user.role == 2 || req.user.syncitems == 1) {
         res.render("item", {
             me: req.user
@@ -27,13 +28,13 @@ router.get("/sync", checkLogin(), function (req, res) {
     }
 });
 
-router.get("/logs", checkLogin(1), function (req, res) {
+router.get("/logs", common.checkLogin(1), function (req, res) {
     Item.findAll().then(function (items) {
         res.send(items);
     });
 });
 
-router.post("/fromshopee", checkLogin(1), function (req, res) {
+router.post("/fromshopee", common.checkLogin(1), function (req, res) {
     var shopeeKey = {
         shopeesecret: req.body.shopeesecret,
         shopeeshopid: req.body.shopeeshopid,
@@ -93,7 +94,7 @@ router.post("/fromshopee", checkLogin(1), function (req, res) {
     });
 });
 
-router.post("/upload/yahoo", checkLogin(1), function (req, res) {
+router.post("/upload/yahoo", common.checkLogin(1), function (req, res) {
     var yahooKey = {
         yahooapikey: req.body.yahooapikey,
         yahooapisecret: req.body.yahooapisecret
@@ -123,7 +124,7 @@ router.post("/upload/yahoo", checkLogin(1), function (req, res) {
     });
 });
 
-router.post("/online/yahoo", checkLogin(1), function (req, res) {
+router.post("/online/yahoo", common.checkLogin(1), function (req, res) {
     var yahooKey = {
         yahooapikey: req.body.yahooapikey,
         yahooapisecret: req.body.yahooapisecret
@@ -138,7 +139,7 @@ router.post("/online/yahoo", checkLogin(1), function (req, res) {
     });
 });
 
-router.post("/offline/yahoo", checkLogin(1), function (req, res) {
+router.post("/offline/yahoo", common.checkLogin(1), function (req, res) {
     var yahooKey = {
         yahooapikey: req.body.yahooapikey,
         yahooapisecret: req.body.yahooapisecret
@@ -199,7 +200,7 @@ router.post("/offline/yahoo", checkLogin(1), function (req, res) {
 });
 
 
-router.post("/yahoo/getPayTypeAndShipType", checkLogin(1), function (req, res) {
+router.post("/yahoo/getPayTypeAndShipType", common.checkLogin(1), function (req, res) {
     var yahooKey = {
         yahooapikey: req.body.yahooapikey,
         yahooapisecret: req.body.yahooapisecret
@@ -212,19 +213,5 @@ router.post("/yahoo/getPayTypeAndShipType", checkLogin(1), function (req, res) {
         });
     });
 });
-
-function checkLogin(isAPI) {
-    return function (req, res, next) {
-        if (req.user) {
-            next();
-        } else {
-            if (isAPI) {
-                res.send("您沒有權限");
-            } else {
-                res.redirect("/users/login");
-            }
-        }
-    }
-}
 
 module.exports = router;

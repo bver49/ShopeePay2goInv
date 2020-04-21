@@ -4,6 +4,24 @@ var path = require("path");
 var bodyParser = require("body-parser");
 var cookieParser = require("cookie-parser");
 var User = require("./model/User");
+var common = require("./helper/common.js");
+var basicAuth = require('basic-auth');
+var auth = function(req, resp, next) {
+	function unauthorized(resp) {
+		resp.set('WWW-Authenticate', 'Basic realm=Input User&Password');
+		return resp.sendStatus(401);
+	}
+	var user = basicAuth(req);
+	if (! user || ! user.name || ! user.pass) {
+		return unauthorized(resp);
+	}
+	// 简单粗暴，用户名直接为User，密码直接为Password
+	if (user.name === 'cpmax' && user.pass === 'leoleo17') {
+		return next();
+	} else {
+		return unauthorized(resp);
+	}
+};
 
 app.engine('ejs', require('ejs-locals'));
 app.use(bodyParser.json());
@@ -32,19 +50,19 @@ app.use(function (req, res, next) {
     }
 });
 
-app.use("/orders", checkLogin(1), require("./controller/orders"));
+app.use("/orders", common.checkLogin(1), require("./controller/orders"));
 app.use("/items", require('./controller/items'));
-app.use("/users", require('./controller/users'));
-app.use("/notes", checkLogin(1), require('./controller/notes'));
-app.use("/invoice", checkLogin(), require("./controller/invoice"));
+app.use("/users", auth, require('./controller/users'));
+app.use("/notes", common.checkLogin(1), require('./controller/notes'));
+app.use("/invoice", require("./controller/invoice"));
 
-app.get("/", checkLogin(), function (req, res) {
+app.get("/", common.checkLogin(), function (req, res) {
     res.render("profile", {
         me: req.user
     });
 });
 
-app.get("/generateInvoice", checkLogin(), function (req, res) {
+app.get("/generateInvoice", common.checkLogin(), function (req, res) {
     if (req.user.role == 2 || req.user.inv == 1) {
         res.render("generateInvoice", {
             me: req.user
@@ -54,7 +72,7 @@ app.get("/generateInvoice", checkLogin(), function (req, res) {
     }
 });
 
-app.get("/ship", checkLogin(), function (req, res) {
+app.get("/ship", common.checkLogin(), function (req, res) {
     if (req.user.role == 2 || req.user.ship == 1) {
         res.render("ship", {
             me: req.user
@@ -75,17 +93,3 @@ app.get('*', function (req, res, next) {
 app.listen(3000, function () {
     console.log("Listen on port 3000!");
 });
-
-function checkLogin(isAPI) {
-    return function (req, res, next) {
-        if (req.user) {
-            next();
-        } else {
-            if (isAPI) {
-                res.send("您沒有權限");
-            } else {
-                res.redirect("/users/login");
-            }
-        }
-    }
-}

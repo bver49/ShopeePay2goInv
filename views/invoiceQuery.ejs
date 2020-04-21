@@ -1,0 +1,64 @@
+<% layout('./layout') %>
+<div class="container">
+    <div class="col-md-10 col-md-offset-1 text-center">
+        <p class=h2>發票查詢</p><br>
+        <label for="">訂單編號 : </label>
+        <input id="orderNo" name="orderNo" type="text"><br><br>
+        <div id="detail" v-cloak>
+            <div id="search" class="btn btn-default" v-if="isLoading == false" v-on:click="search">查詢</div><br><br>
+            <div v-if="show == true">
+                <div v-if="invoice != null">
+                    <p>訂單編號：{{ invoice.sn }}</p><br>
+                    <p>發票金額：{{ invoice.TotalAmt }}</p><br>
+                    <p>發票號碼：{{ invoice.InvoiceNumber }}</p><br>
+                    <p>隨機碼：{{ invoice.RandomNum }}</p><br>
+                    <p>開立日期：{{ invoice.created_at | time }}</p>
+                </div>
+                <div v-else>
+                    <p>查無此訂單編號發票</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+    [v-cloak] {
+        display: none;
+    }
+</style>
+<script>
+    $(document).ready(function() {
+        var invoiceDetail = new Vue({
+            el: "#detail",
+            data: {
+                invoice: null,
+                show: false,
+                isLoading: false
+            },
+            filters: {
+                time: function (value) {
+                    var time = new Date(value);
+                    return time.getFullYear() + "/" + (time.getMonth() + 1) + "/" + time.getDate();
+                }
+            },
+            methods: {
+                search: function() {
+                    invoiceDetail.show = false;
+                    invoiceDetail.isLoading = true;
+                    $.ajax({
+                        url: '/invoice/query',
+                        type: 'POST',
+                        data: {
+                            orderNo: $('#orderNo').val()
+                        },
+                        success: function (response) {
+                            invoiceDetail.invoice = response;
+                            invoiceDetail.show = true;
+                            invoiceDetail.isLoading = false;
+                        }
+                    });
+                }
+            }
+        });
+    });
+</script>
