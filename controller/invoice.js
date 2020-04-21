@@ -9,7 +9,7 @@ var orderDataToEzpayData = require('../helper/orderDataToEzpayData');
 var router = express.Router();
 
 router.get("/query", function (req, res) {
-    res.render("invoiceQuery");
+    res.render("invoice/query");
 });
 
 router.post("/query", function (req, res) {
@@ -35,9 +35,18 @@ router.post("/query", function (req, res) {
     });
 });
 
+router.get("/import", function (req, res) {
+    res.render("invoice/import", {
+        'me': req.me
+    });
+});
+
+router.post("/import", function (req, res) {
+});
+
 
 router.get("/orderDataToEzpayData", common.checkLogin(), function (req, res) {
-    res.render("orderDataToEzpayData", {
+    res.render("invoice/orderDataToEzpayData", {
         me: req.user
     });
 });

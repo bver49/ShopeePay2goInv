@@ -1,4 +1,4 @@
-<% layout('./layout') %>
+<% layout('../layout') %>
 <div class="container">
     <div class="col-md-10 col-md-offset-1 text-center">
         <p class=h2>發票查詢</p><br>
@@ -43,20 +43,22 @@
             },
             methods: {
                 search: function() {
-                    invoiceDetail.show = false;
-                    invoiceDetail.isLoading = true;
-                    $.ajax({
-                        url: '/invoice/query',
-                        type: 'POST',
-                        data: {
-                            orderNo: $('#orderNo').val()
-                        },
-                        success: function (response) {
-                            invoiceDetail.invoice = response;
-                            invoiceDetail.show = true;
-                            invoiceDetail.isLoading = false;
-                        }
-                    });
+                    if ($('#orderNo').val() != '') {
+                        invoiceDetail.show = false;
+                        invoiceDetail.isLoading = true;
+                        $.ajax({
+                            url: '/invoice/query',
+                            type: 'POST',
+                            data: {
+                                orderNo: $('#orderNo').val()
+                            },
+                            success: function (response) {
+                                invoiceDetail.invoice = response;
+                                invoiceDetail.show = true;
+                                invoiceDetail.isLoading = false;
+                            }
+                        });
+                    }
                 }
             }
         });

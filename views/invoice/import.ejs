@@ -1,0 +1,24 @@
+<% layout('../layout') %>
+<% include ../menu %>
+<div class="container">
+    <div class="col-md-4 col-md-offset-4" style="margin-top:50px;">
+        <p class="h2">匯入批次開立發票回傳檔</p><br><br>
+        <form id="uploadForm" action="/invoice/import" method="post" enctype="multipart/form-data">
+            <label for="type">回傳檔：</label><br><br>
+            <input type="file" name="responseData" id="responseData">
+        </form>
+        <br><br>
+        <div id="submit" class="btn btn-primary">上傳</div>
+        <div id="hint" class="h4" style="display:none;text-align:center;">匯入中...</div>
+    </div>
+</div>
+<script>
+    $(document).ready(function() {
+        $('#submit').on('click', function() {
+            if ($("#responseData").val() != "") {
+                $('#uploadForm').submit();
+                $('#hint').show();
+            }
+        });
+    });
+</script>
