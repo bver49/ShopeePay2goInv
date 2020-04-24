@@ -19,8 +19,9 @@ var noteSchema = {
 	}
 }
 
-var Note = db.define('note', noteSchema,{
-  timestamps: false
+var Note = db.define('notes', noteSchema,{
+  timestamps: false,
+  freezeTableName: true
 });
 
 module.exports = Note;

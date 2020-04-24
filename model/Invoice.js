@@ -38,8 +38,9 @@ var invoiceSchema = {
 	}
 }
 
-var Invoice = db.define('invoice', invoiceSchema,{
-    timestamps: false
+var Invoice = db.define('invoices', invoiceSchema,{
+    timestamps: false,
+    freezeTableName: true
 });
 
 module.exports = Invoice;

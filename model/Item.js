@@ -40,8 +40,9 @@ var itemSchema = {
 	}
 }
 
-var Item = db.define('item', itemSchema, {
-    timestamps: false
+var Item = db.define('items', itemSchema, {
+    timestamps: false,
+    freezeTableName: true
 });
 
 module.exports = Item;

@@ -49,8 +49,9 @@ var userSchema = {
 	}
 }
 
-var User = db.define('user', userSchema,{
-  timestamps: false
+var User = db.define('users', userSchema,{
+  timestamps: false,
+  freezeTableName: true
 });
 
 module.exports = User;
