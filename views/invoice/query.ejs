@@ -11,7 +11,6 @@
                     <p>訂單編號：{{ invoice.sn }}</p><br>
                     <p>發票金額：{{ invoice.TotalAmt }}</p><br>
                     <p>發票號碼：{{ invoice.InvoiceNumber }}</p><br>
-                    <p>隨機碼：{{ invoice.RandomNum }}</p><br>
                     <p>開立日期：{{ invoice.created_at | time }}</p>
                 </div>
                 <div v-else>
