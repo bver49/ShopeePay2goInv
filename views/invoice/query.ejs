@@ -40,9 +40,9 @@
                     var time = new Date(value);
                     var month = time.getMonth() + 1;
                     if (month%2 == 0) {
-                        return time.getFullYear() + "年" + (time.getMonth()).toString().padStart(2, "0") + "-" + (time.getMonth() + 1).toString().padStart(2, "0") + "月";
+                        return (time.getFullYear() - 1911) + "年" + (time.getMonth()).toString().padStart(2, "0") + "-" + (time.getMonth() + 1).toString().padStart(2, "0") + "月";
                     } else {
-                        return time.getFullYear() + "年" + (time.getMonth() + 1).toString().padStart(2, "0") + "-" + (time.getMonth() + 2).toString().padStart(2, "0") + "月";
+                        return (time.getFullYear() - 1911) + "年" + (time.getMonth() + 1).toString().padStart(2, "0") + "-" + (time.getMonth() + 2).toString().padStart(2, "0") + "月";
                     }
                 },
                 time: function (value) {
