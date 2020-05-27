@@ -9,10 +9,9 @@
             <div v-if="show == true">
                 <div v-if="invoice != null">
                     <p>訂單編號：{{ invoice.sn }}</p><br>
-                    <p>{{ invoice.created_at | timeRange }}</p><br>
+                    <p v-if="invoice.show_period == 1">{{ invoice.created_at | period }}</p><br>
                     <p>發票金額：{{ invoice.TotalAmt }}</p><br>
                     <p>發票號碼：{{ invoice.InvoiceNumber }}</p><br>
-                    <p>開立日期：{{ invoice.created_at | time }}</p>
                 </div>
                 <div v-else>
                     <p>查無此訂單編號的發票</p>
@@ -36,7 +35,7 @@
                 isLoading: false
             },
             filters: {
-                timeRange: function (value) {
+                period: function (value) {
                     var time = new Date(value);
                     var month = time.getMonth() + 1;
                     if (month%2 == 0) {
@@ -44,10 +43,6 @@
                     } else {
                         return (time.getFullYear() - 1911) + "年" + (time.getMonth() + 1).toString().padStart(2, "0") + "-" + (time.getMonth() + 2).toString().padStart(2, "0") + "月";
                     }
-                },
-                time: function (value) {
-                    var time = new Date(value);
-                    return time.getFullYear() + "/" + (time.getMonth() + 1) + "/" + time.getDate();
                 }
             },
             methods: {
