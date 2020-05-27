@@ -54,8 +54,8 @@ router.post("/import", common.checkLogin(), upload.single('importData'), functio
     var orderNo = [];
     for (var i in datas) {
         var eachData = datas[i];
-        if (eachData['開立狀態'] == 'SUCCESS') {
-            orderNo.push(eachData['訂單編號']);
+        if (eachData['開立狀態'] == 'SUCCESS' && eachData['訂單編號'] != '') {
+            orderNo.push(String(eachData['訂單編號']));
         }
     }
     Invoice.findAll({
