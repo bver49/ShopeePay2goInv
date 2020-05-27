@@ -35,7 +35,12 @@ var invoiceSchema = {
         type: Sequelize.TINYINT,
         defaultValue: 0,
         allowNull: false
-	}
+    },
+    "show_period": {
+        type: Sequelize.TINYINT,
+        defaultValue: 1,
+        allowNull: false
+    }
 }
 
 var Invoice = db.define('invoices', invoiceSchema,{
