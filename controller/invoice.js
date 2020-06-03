@@ -51,6 +51,7 @@ router.post("/import", common.checkLogin(), upload.single('importData'), functio
         //只取第一個sheet
         break;
     }
+    //這次要新增的訂單編號
     var orderNo = [];
     for (var i in datas) {
         var eachData = datas[i];
@@ -58,6 +59,7 @@ router.post("/import", common.checkLogin(), upload.single('importData'), functio
             orderNo.push(String(eachData['訂單編號']));
         }
     }
+    //從資料庫撈是否有一樣編號的紀錄
     Invoice.findAll({
         'where': {
             sn: {
@@ -65,6 +67,7 @@ router.post("/import", common.checkLogin(), upload.single('importData'), functio
             }
         }
     }).then(function (invoices){
+        //資料庫有的從array移掉
         for (var i in invoices) {
             var eachInvoiceNo = invoices[i].sn;
             orderNo.splice(orderNo.indexOf(eachInvoiceNo), 1);
@@ -72,6 +75,7 @@ router.post("/import", common.checkLogin(), upload.single('importData'), functio
         var insertData = [];
         for (var i in datas) {
             var eachData = datas[i];
+            eachData['訂單編號'] = eachData['訂單編號'].toString();
             if (eachData['開立狀態'] == 'SUCCESS' && orderNo.indexOf(eachData['訂單編號']) != -1) {
                 insertData.push({
                     'sn':  eachData['訂單編號'],
