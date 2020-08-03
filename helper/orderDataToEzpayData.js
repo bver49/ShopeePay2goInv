@@ -17,13 +17,13 @@ module.exports.genEzpayData = function (file, shopNo, userNo, type, email) {
     var rows = ['H,INVO,' + userNo + ',' + shopNo + ',' + today + '\n'];
     for (var i in data) {
         var eachData = data[i];
-        if (type == '2') {
-            eachData = {};
-            for (var j in data[i]) {
-                decodeKey = iconv.decode(j, 'big5');
-                eachData[decodeKey] = data[i][j];
-            }
-        }
+        // if (type == '2') {
+        //     eachData = {};
+        //     for (var j in data[i]) {
+        //         decodeKey = iconv.decode(j, 'big5');
+        //         eachData[decodeKey] = data[i][j];
+        //     }
+        // }
         var rowS = 'S,';
         var rowI = 'I,';
         if (type == '1') {
@@ -37,7 +37,7 @@ module.exports.genEzpayData = function (file, shopNo, userNo, type, email) {
             var orderNo = eachData['訂單編號'];
             var userPay = eachData['結帳總金額'];
             var userid = eachData['買家帳號'];
-            var itemName = iconv.decode(eachData['商品名稱'], 'big5').toString().replace(/ /g, '').slice(30);
+            var itemName = eachData['商品名稱'].replace(/ /g, '').slice(30);//iconv.decode(eachData['商品名稱'], 'big5').toString().replace(/ /g, '').slice(30);
         }
         var tax = Math.round(userPay * 0.05);
         var invoicePrice = userPay - tax;

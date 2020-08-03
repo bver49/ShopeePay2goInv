@@ -67,9 +67,9 @@ module.exports.genInvoice = function (shopeeData, key, cb) {
     }
     if (shopeeData.order_status == "COMPLETED") {
         try {
-            var url = 'https://cinv.pay2go.com/api/invoice_issue';
+            var url = 'https://cinv.ezpay.com.tw/api/invoice_issue';
             if (key.isProduction == 'true') {
-                url = 'https://inv.pay2go.com/api/invoice_issue';
+                url = 'https://inv.ezpay.com.tw/api/invoice_issue';
             }
             request({
                 method: 'post',
