@@ -124,6 +124,7 @@
                 <p>發票稅額 : {{ Math.round(order.total_amount - (order.total_amount / 1.05)) }}</p><br>
                 <p>發票總金額(商品價格+運費) : {{ order.total_amount }}</p><br>
                 <p>運費：{{ order.estimated_shipping_fee }}</p>
+                <p>實際支付運費：{{ order.actual_shipping_cost }}</p>
                 <hr>
                 <template v-for="item in order.items">
                     <p>商品名稱：{{ item.item_name.split(" ")[0] }}</p>

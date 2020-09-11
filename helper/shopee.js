@@ -148,6 +148,11 @@ function getOrderIncome(ordersn, key, cb) {
     });
 }
 
+function countOrderIncomeTotalAmount(incomeDetail) {
+    var total = parseInt(incomeDetail.escrow_amount) + parseInt(incomeDetail.service_fee) + parseInt(incomeDetail.commission_fee) + parseInt(incomeDetail.credit_card_transaction_fee) - parseInt(incomeDetail.actual_shipping_cost) - parseInt(incomeDetail.shipping_fee_rebate) - parseInt(incomeDetail.coin);
+    return (total > 0) ? total : 0;
+}
+
 function getOrderLogistic(ordersn, key, cb) {
     var data = {
         "shopid": parseInt(key.shopeeshopid),
@@ -335,6 +340,7 @@ function getReturnList (tf, tt, page, key, cb) {
 
 module.exports = {
     "callAPI": callAPI,
+    "countOrderIncomeTotalAmount":countOrderIncomeTotalAmount,
     "getOrderList": getOrderList,
     "getOrderListByStatus": getOrderListByStatus,
     "getOrdersDetail": getOrdersDetail,

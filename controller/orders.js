@@ -12,6 +12,7 @@ var getOrderListByStatus = shopee.getOrderListByStatus;
 var getOrderIncome = shopee.getOrderIncome;
 var getOrderLogistic = shopee.getOrderLogistic;
 var genExcel = shopee.genExcel;
+var countOrderIncomeTotalAmount = shopee.countOrderIncomeTotalAmount;
 var getReturnList = shopee.getReturnList;
 var genInvoice = pay2go.genInvoice;
 var invalidInvoice = pay2go.invalidInvoice;
@@ -135,9 +136,7 @@ router.post("/:ordersn/detail", function (req, res) {
     getOrderDetail(req.params.ordersn, key, function (order) {
         if (order) {
             getOrderIncome(req.params.ordersn, key, function (income) {
-                var detail = income.order.income_details;
-                var total_fee = parseInt(detail.escrow_amount) + parseInt(detail.commission_fee) + parseInt(detail.credit_card_transaction_fee) - parseInt(detail.actual_shipping_cost) - parseInt(detail.shipping_fee_rebate) - parseInt(detail.coin);
-                order.total_amount = (total_fee > 0) ? total_fee : 0;
+                order.total_amount = countOrderIncomeTotalAmount(income.order.income_details);
                 res.send(order);
             });
         } else {
@@ -184,9 +183,7 @@ router.post("/:ordersn/geninv", function (req, res) {
     }
     getOrderDetail(req.params.ordersn, key, function (order) {
         getOrderIncome(req.params.ordersn, key, function (income) {
-            var detail = income.order.income_details;
-            var total_fee = parseInt(detail.escrow_amount) + parseInt(detail.commission_fee) + parseInt(detail.credit_card_transaction_fee) - parseInt(detail.actual_shipping_cost) - parseInt(detail.shipping_fee_rebate) - parseInt(detail.coin);
-            order.total_amount = (total_fee > 0) ? total_fee : 0;
+            order.total_amount = countOrderIncomeTotalAmount(income.order.income_details);
             order.invitemname = req.body.invitemname;
             if (order.total_amount > 0) {
                 genInvoice(order, key, function (result) {
