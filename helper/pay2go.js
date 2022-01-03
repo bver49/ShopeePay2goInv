@@ -11,25 +11,6 @@ function countTax(amount) {
     return Math.round(amount - (amount / 1.05));
 }
 
-function arrobjToStr(arr, title, invitemname) {
-    var str = "";
-    for (var i in arr) {
-        if (typeof title === "string") {
-            if (title == "item_name") {
-                arr[i][title] = (invitemname == '') ? (arr[i][title].split(" ")[0]) : (invitemname);
-            }
-            if (title == "item_sku") {
-                arr[i][title] = "件"
-            }
-            str += arr[i][title];
-        } else {
-            str += (arr[i].variation_quantity_purchased * arr[i].variation_discounted_price);
-        }
-        if (i != arr.length - 1) str += "|"
-    }
-    return str;
-}
-
 function padding(str) {
     var len = str.length
     var pad = 32 - (len % 32)

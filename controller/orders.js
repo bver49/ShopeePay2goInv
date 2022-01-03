@@ -5,6 +5,7 @@ var router = express.Router();
 var Invoice = require('../model/Invoice');
 var shopee = require('../helper/shopee');
 var pay2go = require('../helper/pay2go');
+var smilePay = require('../helper/smilePay');
 var getOrderList = shopee.getOrderList;
 var getOrdersDetail = shopee.getOrdersDetail;
 var getOrderDetail = shopee.getOrderDetail;
@@ -14,9 +15,6 @@ var getOrderLogistic = shopee.getOrderLogistic;
 var genExcel = shopee.genExcel;
 var countOrderIncomeTotalAmount = shopee.countOrderIncomeTotalAmount;
 var getReturnList = shopee.getReturnList;
-var genInvoice = pay2go.genInvoice;
-var invalidInvoice = pay2go.invalidInvoice;
-var discountInvoice = pay2go.discountInvoice;
 
 //查詢訂單
 router.post("/", function (req, res) {
@@ -171,6 +169,7 @@ router.post("/:ordersn/logistic", function (req, res) {
 
 //開立發票
 router.post("/:ordersn/geninv", function (req, res) {
+    var isSmilePay = false;
     var key = {
         shopeesecret: req.body.shopeesecret,
         shopeeshopid: req.body.shopeeshopid,
@@ -186,25 +185,47 @@ router.post("/:ordersn/geninv", function (req, res) {
             order.total_amount = countOrderIncomeTotalAmount(income.order.income_details);
             order.invitemname = req.body.invitemname;
             if (order.total_amount > 0) {
-                genInvoice(order, key, function (result) {
-                    if (result.msg == "解密錯誤") {
-                        res.send("解密錯誤")
-                    } else {
-                        if (result.msg == "發票開立成功" || result.msg == "已開過發票") {
-                            var invDetail = result.detail.Result;
-                            invDetail = JSON.parse(invDetail);
-                            Invoice.create({
-                                "sn": req.params.ordersn,
-                                "MerchantID": invDetail.MerchantID,
-                                "TotalAmt": invDetail.TotalAmt,
-                                "InvoiceNumber": invDetail.InvoiceNumber,
-                                "RandomNum": invDetail.RandomNum,
-                                "created_at": invDetail.CreateTime
-                            });
+                if (isSmilePay) {
+                    smilePay.genInvoice(order, key, function (result) {
+                        if (result.msg == "解密錯誤") {
+                            res.send("解密錯誤")
+                        } else {
+                            if (result.msg == "發票開立成功" || result.msg == "已開過發票") {
+                                var invDetail = result.detail.Result;
+                                invDetail = JSON.parse(invDetail);
+                                Invoice.create({
+                                    "sn": req.params.ordersn,
+                                    "MerchantID": invDetail.Grvc,
+                                    "TotalAmt": order.total_amount,
+                                    "InvoiceNumber": invDetail.InvoiceNumber,
+                                    "RandomNum": invDetail.RandomNumber,
+                                    "created_at": invDetail.InvoiceDate + ' ' + invDetail.InvoiceTime
+                                });
+                            }
+                            res.send(result.msg);
                         }
-                        res.send(result.msg);
-                    }
-                });
+                    });
+                }  else {
+                    pay2go.genInvoice(order, key, function (result) {
+                        if (result.msg == "解密錯誤") {
+                            res.send("解密錯誤")
+                        } else {
+                            if (result.msg == "發票開立成功" || result.msg == "已開過發票") {
+                                var invDetail = result.detail.Result;
+                                invDetail = JSON.parse(invDetail);
+                                Invoice.create({
+                                    "sn": req.params.ordersn,
+                                    "MerchantID": invDetail.MerchantID,
+                                    "TotalAmt": invDetail.TotalAmt,
+                                    "InvoiceNumber": invDetail.InvoiceNumber,
+                                    "RandomNum": invDetail.RandomNum,
+                                    "created_at": invDetail.CreateTime
+                                });
+                            }
+                            res.send(result.msg);
+                        }
+                    });
+                }
             } else {
                 res.send("0元訂單");
             }
@@ -214,6 +235,7 @@ router.post("/:ordersn/geninv", function (req, res) {
 
 //作廢
 router.post("/:ordersn/invalidInvoice", function (req, res) {
+    var isSmilePay = false;
     var key = {
         shopeesecret: req.body.shopeesecret,
         shopeeshopid: req.body.shopeeshopid,
@@ -234,22 +256,36 @@ router.post("/:ordersn/invalidInvoice", function (req, res) {
             res.send("查無此訂單發票，或是發票已作廢/折讓");
         } else {
             var invoiceNumber = invoices[0].InvoiceNumber;
-            invalidInvoice(invoiceNumber, key, function (result) {
-                Invoice.update({
-                    status: 1
-                }, {
-                    where: {
-                        sn: ordersn
-                    }
+            if (isSmilePay) {
+                smilePay.invalidInvoice(invoiceNumber, key, function (result) {
+                    Invoice.update({
+                        status: 1
+                    }, {
+                        where: {
+                            sn: ordersn
+                        }
+                    });
+                    res.send(result.msg);
                 });
-                res.send(result.msg);
-            });
+            } else {
+                pay2go.invalidInvoice(invoiceNumber, key, function (result) {
+                    Invoice.update({
+                        status: 1
+                    }, {
+                        where: {
+                            sn: ordersn
+                        }
+                    });
+                    res.send(result.msg);
+                });
+            }
         }
     });
 });
 
 //折讓
 router.post("/:ordersn/discountInvoice", function (req, res) {
+    var isSmilePay = false;
     var key = {
         shopeesecret: req.body.shopeesecret,
         shopeeshopid: req.body.shopeeshopid,
@@ -275,16 +311,29 @@ router.post("/:ordersn/discountInvoice", function (req, res) {
             if (discountAmount > invoiceTotalAmount) {
                 res.send("錯誤，折讓金額大於發票金額");
             } else {
-                discountInvoice(invoiceNumber, ordersn, discountAmount, key, function (result) {
-                    Invoice.update({
-                        status: 2
-                    }, {
-                        where: {
-                            sn: ordersn
-                        }
+                if (isSmilePay) {
+                    smilePay.discountInvoice(invoiceNumber, ordersn, discountAmount, key, function (result) {
+                        Invoice.update({
+                            status: 2
+                        }, {
+                            where: {
+                                sn: ordersn
+                            }
+                        });
+                        res.send(result.msg);
                     });
-                    res.send(result.msg);
-                });
+                } else {
+                    pay2go.discountInvoice(invoiceNumber, ordersn, discountAmount, key, function (result) {
+                        Invoice.update({
+                            status: 2
+                        }, {
+                            where: {
+                                sn: ordersn
+                            }
+                        });
+                        res.send(result.msg);
+                    });
+                }
             }
         }
     });

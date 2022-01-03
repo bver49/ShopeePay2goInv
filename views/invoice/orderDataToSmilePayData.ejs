@@ -1,0 +1,47 @@
+<% layout('../layout') %>
+<% include ../menu %>
+<div class="container">
+    <div class="col-md-4 col-md-offset-4" style="margin-top:50px;">
+        <p class="h2">批次開立發票資料轉換</p><br><br>
+        <form id="uploadForm" action="/invoice/orderDataToSmilePayData" method="post" enctype="multipart/form-data">
+            <label for="type">Email：</label><br><br>
+            <input type="text" id="email" name="email"><br><br>
+            <label for="type">訂單資料來源：</label><br><br>
+            <select class="form-control" name='type'>
+                <option value="1">Yahoo</option>
+                <option value="2">露天</option>
+            </select><br><br>
+            <label for="type">訂單資料：</label><br><br>
+            <p>1. 檔案類型需為 .csv 或 .xlsx</p><br>
+            <p>2. 請確認字體格式為utf-8</p><br>
+            <input type="file" name="orderData" id="orderData">
+        </form>
+        <br><br>
+        <div id="submit" class="btn btn-primary">上傳</div>
+        <div id="hint" class="h4" style="display:none;text-align:center;">轉換中...</div>
+    </div>
+</div>
+<script>
+    $(document).ready(function() {
+        $('#submit').on('click', function() {
+            if ($("#orderData").val() != "") {
+                if ($('#email').val() == "") {
+                    alert('請輸入email');
+                    return
+                }
+                var file = $("#orderData")[0].files[0];
+                if (["application/csv", "application/vnd.ms-excel", "text/csv", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"].indexOf(file.type) == -1) {
+                    alert('不支援此檔案格式');
+                    return
+                }
+                $('#uploadForm').submit();
+                $('#submit').hide();
+                $('#hint').show();
+                setTimeout(function(){
+                    $('#submit').show();
+                    $('#hint').hide();
+                }, 5000);
+            }
+        });
+    });
+</script>
