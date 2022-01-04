@@ -38,7 +38,9 @@ module.exports.genSmilePayData = function (file, type, email) {
         }
     }
     for (var i in rows) {
-        rows[i] = iconv.encode(rows[i], 'big5');
+        if (type == '2') {
+            rows[i] = iconv.encode(rows[i], 'big5');
+        }
         fs.appendFileSync(fileName, rows[i]);
     }
     return fileName;
