@@ -122,9 +122,6 @@ router.post("/importSmilePay", common.checkLogin(), upload.single('importData'),
         };
         for (var j in tempDatas[i]) {
             decodeKey = iconv.decode(j, 'big5');
-            if (decodeKey == '發票狀態') {
-                tempDatas[i][j] = iconv.decode(tempDatas[i][j], 'big5');
-            }
             row[decodeKey] = tempDatas[i][j];
         }
         datas.push(row);
@@ -133,8 +130,8 @@ router.post("/importSmilePay", common.checkLogin(), upload.single('importData'),
     var orderNo = [];
     for (var i in datas) {
         var eachData = datas[i];
-        if (eachData['發票狀態'] == '開立' && eachData['自訂號碼'] != '') {
-            orderNo.push(String(eachData['自訂號碼']));
+        if (eachData['錯誤碼'] == 0 && eachData['失敗原因'] == 'Succeeded') {
+            orderNo.push(eachData['自訂號碼']);
         }
     }
     //從資料庫撈是否有一樣編號的紀錄
@@ -153,13 +150,12 @@ router.post("/importSmilePay", common.checkLogin(), upload.single('importData'),
         var insertData = [];
         for (var i in datas) {
             var eachData = datas[i];
-            eachData['自訂號碼'] = eachData['自訂號碼'].toString();
-            if (eachData['發票狀態'] == '開立' && orderNo.indexOf(eachData['自訂號碼']) != -1) {
+            if (eachData['錯誤碼'] == 0 && eachData['失敗原因'] == 'Succeeded' && orderNo.indexOf(eachData['自訂號碼']) != -1) {
                 insertData.push({
                     'sn':  eachData['自訂號碼'],
                     'MerchantID': 'import',
-                    'TotalAmt': eachData['銷售額(含稅)'],
-                    'InvoiceNumber': eachData['發票號碼'],
+                    'TotalAmt': eachData['總金額'],
+                    'InvoiceNumber': eachData['發票號碼_1'],
                     'RandomNum': '無',
                     'status' : 0
                 });
@@ -167,7 +163,7 @@ router.post("/importSmilePay", common.checkLogin(), upload.single('importData'),
         }
         fs.unlinkSync(req.file.path);
         Invoice.bulkCreate(insertData).then(function () {
-            res.render("invoice/import", {
+            res.render("invoice/importSmilePay", {
                 'me': req.me,
                 'message': '匯入成功!'
             });
