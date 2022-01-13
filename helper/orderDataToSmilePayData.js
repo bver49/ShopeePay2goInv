@@ -3,6 +3,17 @@ var iconv = require('iconv-lite');
 var dayjs = require('dayjs');
 var xlsx = require('xlsx');
 
+
+function pad(pad, str, padLeft) {
+    if (typeof str === 'undefined')
+        return pad;
+    if (padLeft) {
+        return (pad + str).slice(-pad.length);
+    } else {
+        return (str + pad).substring(0, pad.length);
+    }
+}
+
 module.exports.genSmilePayData = function (file, type, email) {
     var orderNoList = [];
     var today = dayjs(new Date().toLocaleString("zh-tw", {timeZone: "Asia/Taipei"}));
@@ -26,7 +37,7 @@ module.exports.genSmilePayData = function (file, type, email) {
             var userid = eachData['買家拍賣代號'];
             var itemName = eachData['商品名稱'].replace(/ /g, '').slice(30);
             if ('發票統編' in eachData) {
-                taxIdNumber = String(eachData['發票統編']).padStart(8, '0');
+                taxIdNumber = String('00000000' + eachData['發票統編']).slice(-8);
             }
             if ('發票抬頭' in eachData) {
                 taxTitle = eachData['發票抬頭'];
