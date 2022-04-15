@@ -50,7 +50,7 @@ module.exports.genSmilePayData = function (file, type, email) {
             var itemName = eachData['商品名稱'].replace(/ /g, '').slice(30);
         }
         userid = userid.toString();
-        var tempRow = ',,' + today.format('YYYY/MM/DD') + ',' + today.format('HH:mm:ss') + ',7,1,1,1,Y,,0,,,,' + orderNo + ',' + itemName + ',1,' + userPay + ',組,' + userPay + ',' + userPay + ',0,0,' + userPay + ',,' + taxIdNumber + ',' + taxTitle + ',' + userid + ',,,' + email + ",,,,,,,,,,,,\n";
+        var tempRow = ',,' + today.format('YYYY/MM/DD') + ',' + today.format('HH:mm:ss') + ',7,1,1,1,Y,,0,,,' + orderNo + ',,' + itemName + ',1,' + userPay + ',組,' + userPay + ',' + userPay + ',0,0,' + userPay + ',,' + taxIdNumber + ',' + taxTitle + ',' + userid + ',,,' + email + ",,,,,,,,,,,,\n";
         if (orderNoList.indexOf(orderNo) == -1) {
             orderNoList.push(orderNo);
             rows.push(tempRow);

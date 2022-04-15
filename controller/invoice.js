@@ -118,7 +118,7 @@ router.post("/importSmilePay", common.checkLogin(), upload.single('importData'),
     for (var i in tempDatas) {
         var eachData = tempDatas[i];
         var row = {
-            '自訂號碼':''
+            '自訂發票編號':''
         };
         for (var j in tempDatas[i]) {
             decodeKey = iconv.decode(j, 'big5');
@@ -131,7 +131,7 @@ router.post("/importSmilePay", common.checkLogin(), upload.single('importData'),
     for (var i in datas) {
         var eachData = datas[i];
         if (eachData['錯誤碼'] == 0 && eachData['失敗原因'] == 'Succeeded') {
-            orderNo.push(eachData['自訂號碼']);
+            orderNo.push(String(eachData['自訂發票編號']));
         }
     }
     //從資料庫撈是否有一樣編號的紀錄
@@ -145,14 +145,16 @@ router.post("/importSmilePay", common.checkLogin(), upload.single('importData'),
         //資料庫有的從array移掉
         for (var i in invoices) {
             var eachInvoiceNo = invoices[i].sn;
-            orderNo.splice(orderNo.indexOf(eachInvoiceNo), 1);
+            if (orderNo.indexOf(eachInvoiceNo) != -1) {
+                orderNo.splice(orderNo.indexOf(eachInvoiceNo), 1);
+            }
         }
         var insertData = [];
         for (var i in datas) {
             var eachData = datas[i];
-            if (eachData['錯誤碼'] == 0 && eachData['失敗原因'] == 'Succeeded' && orderNo.indexOf(eachData['自訂號碼']) != -1) {
+            if (eachData['錯誤碼'] == 0 && eachData['失敗原因'] == 'Succeeded' && orderNo.indexOf(eachData['自訂發票編號'].toString()) != -1) {
                 insertData.push({
-                    'sn':  eachData['自訂號碼'],
+                    'sn':  eachData['自訂發票編號'],
                     'MerchantID': 'import',
                     'TotalAmt': eachData['總金額'],
                     'InvoiceNumber': eachData['發票號碼_1'],
